@@ -1,17 +1,15 @@
 import { supabase } from '../lib/supabaseClient';
 
 // 현재 사이트 origin 기반 리다이렉트 URL 생성
-// OAuth용: hash fragment를 포함하면 Supabase의 #access_token과 충돌하므로
-// OAuth에서는 baseUrl만 사용하고, 이메일 리다이렉트에서만 hash 포함
+// OAuth용: origin만 사용 (trailing slash 없이 Supabase allowlist와 정확히 일치)
+// hash fragment는 Supabase #access_token과 충돌하므로 OAuth에서 사용하지 않음
 function getBaseUrl() {
-  const origin = window.location.origin;
-  const pathname = window.location.pathname;
-  return `${origin}${pathname}`;
+  return window.location.origin;
 }
 
 function getRedirectUrl(hash = '') {
   const base = getBaseUrl();
-  return hash ? `${base}#${hash}` : base;
+  return hash ? `${base}/#${hash}` : base;
 }
 
 // Google OAuth 로그인
