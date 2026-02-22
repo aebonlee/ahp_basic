@@ -1,0 +1,38 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.brand {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.projectName {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.desc {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-light);
+}
+
+.errorDesc {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-danger);
+}

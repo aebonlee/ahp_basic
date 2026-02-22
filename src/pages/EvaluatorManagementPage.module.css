@@ -1,0 +1,9 @@
+.topBar {
+  margin-bottom: var(--spacing-md);
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}

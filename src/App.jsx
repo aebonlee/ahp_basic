@@ -2,7 +2,9 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { EvaluationProvider } from './contexts/EvaluationContext';
+import { ToastProvider } from './contexts/ToastContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ToastContainer from './components/common/Toast';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -30,6 +32,8 @@ export default function App() {
       <AuthProvider>
         <ProjectProvider>
           <EvaluationProvider>
+            <ToastProvider>
+            <ToastContainer />
             <Routes>
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
@@ -59,6 +63,7 @@ export default function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            </ToastProvider>
           </EvaluationProvider>
         </ProjectProvider>
       </AuthProvider>

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../contexts/ProjectContext';
+import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../hooks/useConfirm';
 import ProjectForm from './ProjectForm';
 import ProjectCard from './ProjectCard';
 import Button from '../common/Button';
+import ConfirmDialog from '../common/ConfirmDialog';
 import LoadingSpinner from '../common/LoadingSpinner';
 import HelpButton from '../common/HelpButton';
 import styles from './ProjectPanel.module.css';
@@ -11,6 +14,8 @@ import styles from './ProjectPanel.module.css';
 export default function ProjectPanel({ projects, loading, selectedProjectId, onSelect }) {
   const navigate = useNavigate();
   const { deleteProject } = useProjects();
+  const toast = useToast();
+  const { confirm, confirmDialogProps } = useConfirm();
   const [showForm, setShowForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [filter, setFilter] = useState('all');
@@ -25,12 +30,12 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    if (!(await confirm({ title: '프로젝트 삭제', message: '정말 삭제하시겠습니까?', variant: 'danger' }))) return;
     try {
       await deleteProject(id);
       if (selectedProjectId === id) onSelect(null);
     } catch (err) {
-      alert('삭제 실패: ' + err.message);
+      toast.error('삭제 실패: ' + err.message);
     }
   };
 
@@ -42,7 +47,7 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
     <div className={styles.panel}>
       <div className={styles.header}>
         <h2 className={styles.title}>프로젝트</h2>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+        <span className={styles.headerActions}>
           <Button size="sm" onClick={() => { setEditProject(null); setShowForm(true); }}>
             + 시작하기
           </Button>
@@ -94,6 +99,8 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
           ))
         )}
       </div>
+
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 }

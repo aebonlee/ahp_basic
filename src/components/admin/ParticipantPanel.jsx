@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { useEvaluators } from '../../hooks/useEvaluators';
+import { useToast } from '../../contexts/ToastContext';
+import { useConfirm } from '../../hooks/useConfirm';
 import ParticipantForm from './ParticipantForm';
 import StateTransitionButton from './StateTransitionButton';
 import Button from '../common/Button';
+import ConfirmDialog from '../common/ConfirmDialog';
 import LoadingSpinner from '../common/LoadingSpinner';
 import HelpButton from '../common/HelpButton';
 import styles from './ParticipantPanel.module.css';
 
 export default function ParticipantPanel({ project }) {
   const { evaluators, loading, addEvaluator, updateEvaluator, deleteEvaluator } = useEvaluators(project.id);
+  const toast = useToast();
+  const { confirm, confirmDialogProps } = useConfirm();
   const [showForm, setShowForm] = useState(false);
   const [editEval, setEditEval] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -30,13 +35,13 @@ export default function ParticipantPanel({ project }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    if (!(await confirm({ title: '평가자 삭제', message: '정말 삭제하시겠습니까?', variant: 'danger' }))) return;
     try {
       await deleteEvaluator(id);
       selectedIds.delete(id);
       setSelectedIds(new Set(selectedIds));
     } catch (err) {
-      alert('삭제 실패: ' + err.message);
+      toast.error('삭제 실패: ' + err.message);
     }
   };
 
@@ -114,6 +119,7 @@ export default function ParticipantPanel({ project }) {
           </table>
         )}
       </div>
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 }

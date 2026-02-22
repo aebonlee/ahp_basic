@@ -8,6 +8,8 @@ import PageLayout from '../components/layout/PageLayout';
 import DirectInputPanel from '../components/evaluation/DirectInputPanel';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
+import common from '../styles/common.module.css';
+import styles from './DirectInputPage.module.css';
 
 export default function DirectInputPage() {
   const { id } = useParams();
@@ -49,12 +51,12 @@ export default function DirectInputPage() {
 
   return (
     <PageLayout>
-      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>직접입력 평가</h1>
+      <h1 className={common.pageTitle}>직접입력 평가</h1>
       {pages.map(page => {
         const priorities = pagePriorities[page.parentId];
         return (
-          <div key={page.parentId} style={{ marginBottom: 24 }}>
-            <h3 style={{ fontSize: '1rem', marginBottom: 8 }}>{page.parentName}</h3>
+          <div key={page.parentId} className={styles.section}>
+            <h3 className={styles.sectionTitle}>{page.parentName}</h3>
             <DirectInputPanel
               projectId={id}
               evaluatorId={user?.id}
@@ -63,17 +65,17 @@ export default function DirectInputPage() {
               onValidationChange={handleValidationChange}
             />
             {priorities && priorities.priorities.some(p => p > 0) && (
-              <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--color-bg)', borderRadius: 6 }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 4 }}>우선순위 미리보기</p>
+              <div className={styles.previewBar}>
+                <p className={styles.previewLabel}>우선순위 미리보기</p>
                 {page.items.map((item, idx) => {
                   const pct = (priorities.priorities[idx] * 100).toFixed(1);
                   return (
-                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                      <span style={{ fontSize: '0.82rem', minWidth: 80 }}>{item.name}</span>
-                      <div style={{ flex: 1, height: 8, background: 'var(--color-border)', borderRadius: 4, overflow: 'hidden' }}>
-                        <div style={{ width: `${pct}%`, height: '100%', background: 'var(--color-primary)', borderRadius: 4 }} />
+                    <div key={item.id} className={styles.previewRow}>
+                      <span className={styles.previewName}>{item.name}</span>
+                      <div className={styles.previewTrack}>
+                        <div className={styles.previewFill} style={{ width: `${pct}%` }} />
                       </div>
-                      <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', minWidth: 45, textAlign: 'right' }}>{pct}%</span>
+                      <span className={styles.previewPct}>{pct}%</span>
                     </div>
                   );
                 })}

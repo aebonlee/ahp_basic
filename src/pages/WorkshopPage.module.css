@@ -1,0 +1,30 @@
+.evalList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.evalName {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.evalStatus {
+  font-size: 0.8rem;
+}
+
+.evalStatusDone {
+  composes: evalStatus;
+  color: var(--color-success);
+}
+
+.evalStatusPending {
+  composes: evalStatus;
+  color: var(--color-text-muted);
+}

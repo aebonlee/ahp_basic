@@ -3,12 +3,17 @@ import { useProject } from '../hooks/useProjects';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { useProjects } from '../contexts/ProjectContext';
+import { useToast } from '../contexts/ToastContext';
+import { useConfirm } from '../hooks/useConfirm';
 import { PROJECT_STATUS } from '../lib/constants';
 import PageLayout from '../components/layout/PageLayout';
 import ModelPreview from '../components/model/ModelPreview';
 import Button from '../components/common/Button';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useState } from 'react';
+import common from '../styles/common.module.css';
+import styles from './ModelConfirmPage.module.css';
 
 export default function ModelConfirmPage() {
   const { id } = useParams();
@@ -17,6 +22,8 @@ export default function ModelConfirmPage() {
   const { criteria, loading: criteriaLoading, getTree } = useCriteria(id);
   const { alternatives, loading: altLoading } = useAlternatives(id);
   const { updateProject } = useProjects();
+  const toast = useToast();
+  const { confirm, confirmDialogProps } = useConfirm();
   const [confirming, setConfirming] = useState(false);
 
   if (projectLoading || criteriaLoading || altLoading) return <PageLayout><LoadingSpinner /></PageLayout>;
@@ -27,16 +34,16 @@ export default function ModelConfirmPage() {
 
   const handleConfirm = async () => {
     if (!canConfirm) {
-      alert('기준 2개 이상, 대안 2개 이상이 필요합니다.');
+      toast.warning('기준 2개 이상, 대안 2개 이상이 필요합니다.');
       return;
     }
-    if (!window.confirm('모델을 확정하시겠습니까? 확정 후 기준/대안 수정이 제한됩니다.')) return;
+    if (!(await confirm({ title: '모델 확정', message: '모델을 확정하시겠습니까? 확정 후 기준/대안 수정이 제한됩니다.', variant: 'warning' }))) return;
     setConfirming(true);
     try {
       await updateProject(id, { status: PROJECT_STATUS.WAITING });
       navigate(`/admin/project/${id}/eval`);
     } catch (err) {
-      alert('확정 실패: ' + err.message);
+      toast.error('확정 실패: ' + err.message);
     } finally {
       setConfirming(false);
     }
@@ -44,16 +51,16 @@ export default function ModelConfirmPage() {
 
   return (
     <PageLayout>
-      <div style={{ marginBottom: 16 }}>
-        <button onClick={() => navigate(`/admin/project/${id}`)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}>
+      <div className={styles.topBar}>
+        <button onClick={() => navigate(`/admin/project/${id}`)} className={common.backBtn}>
           &larr; 모델 구축으로
         </button>
-        <h1 style={{ fontSize: '1.3rem', fontWeight: 700 }}>{currentProject.name} - 모델 확정</h1>
+        <h1 className={common.pageTitle}>{currentProject.name} - 모델 확정</h1>
       </div>
 
-      <div style={{ background: 'var(--color-surface)', borderRadius: 8, padding: 24, boxShadow: 'var(--shadow-sm)' }}>
-        <h2 style={{ fontSize: '1rem', marginBottom: 16 }}>모델 구조 검토</h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-light)', marginBottom: 16 }}>
+      <div className={common.card}>
+        <h2 className={common.cardTitle}>모델 구조 검토</h2>
+        <p className={styles.meta}>
           기준: {criteria.length}개 | 대안: {alternatives.filter(a => !a.parent_id).length}개
         </p>
 
@@ -64,7 +71,7 @@ export default function ModelConfirmPage() {
           onClose={() => {}}
         />
 
-        <div style={{ marginTop: 24, display: 'flex', gap: 8, justifyContent: 'center' }}>
+        <div className={styles.actions}>
           <Button variant="secondary" onClick={() => navigate(`/admin/project/${id}`)}>
             모델 수정
           </Button>
@@ -78,6 +85,8 @@ export default function ModelConfirmPage() {
           </Button>
         </div>
       </div>
+
+      <ConfirmDialog {...confirmDialogProps} />
     </PageLayout>
   );
 }

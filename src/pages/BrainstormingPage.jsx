@@ -3,6 +3,8 @@ import { useProject } from '../hooks/useProjects';
 import PageLayout from '../components/layout/PageLayout';
 import BrainstormingBoard from '../components/brainstorming/BrainstormingBoard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import common from '../styles/common.module.css';
+import styles from './BrainstormingPage.module.css';
 
 export default function BrainstormingPage() {
   const { id } = useParams();
@@ -14,11 +16,11 @@ export default function BrainstormingPage() {
 
   return (
     <PageLayout wide>
-      <div style={{ marginBottom: 16 }}>
-        <button onClick={() => navigate(`/admin/project/${id}`)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}>
+      <div className={styles.topBar}>
+        <button onClick={() => navigate(`/admin/project/${id}`)} className={common.backBtn}>
           &larr; 모델 구축으로
         </button>
-        <h1 style={{ fontSize: '1.3rem', fontWeight: 700 }}>{currentProject.name} - 브레인스토밍</h1>
+        <h1 className={common.pageTitle}>{currentProject.name} - 브레인스토밍</h1>
       </div>
       <BrainstormingBoard projectId={id} />
     </PageLayout>

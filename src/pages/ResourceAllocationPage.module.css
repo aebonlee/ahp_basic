@@ -1,0 +1,33 @@
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.inputLabel {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.resourceInput {
+  width: 100px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.tdRight {
+  text-align: right;
+  font-family: monospace;
+}
+
+.tdRightBold {
+  text-align: right;
+  font-weight: 600;
+}
+
+.tfootCell {
+  padding: var(--spacing-sm);
+  font-weight: 600;
+}

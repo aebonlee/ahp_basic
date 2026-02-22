@@ -1,0 +1,4 @@
+.statusWarning {
+  color: var(--color-warning);
+  margin-left: var(--spacing-sm);
+}

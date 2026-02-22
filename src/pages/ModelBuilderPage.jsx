@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '../hooks/useProjects';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
+import { useConfirm } from '../hooks/useConfirm';
 import PageLayout from '../components/layout/PageLayout';
 import CriteriaTree from '../components/model/CriteriaTree';
 import CriteriaForm from '../components/model/CriteriaForm';
@@ -11,6 +12,7 @@ import AlternativeForm from '../components/model/AlternativeForm';
 import EvalMethodSelect from '../components/model/EvalMethodSelect';
 import ModelPreview from '../components/model/ModelPreview';
 import Button from '../components/common/Button';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import styles from './ModelBuilderPage.module.css';
 
@@ -28,6 +30,7 @@ export default function ModelBuilderPage() {
   const [criteriaFormMode, setCriteriaFormMode] = useState('add'); // add, edit, addChild
   const [altFormMode, setAltFormMode] = useState('add');
   const [showPreview, setShowPreview] = useState(false);
+  const { confirm, confirmDialogProps } = useConfirm();
 
   if (projectLoading || criteriaLoading || altLoading) {
     return <PageLayout><LoadingSpinner message="모델 데이터 로딩 중..." /></PageLayout>;
@@ -57,7 +60,7 @@ export default function ModelBuilderPage() {
   };
 
   const handleDeleteCriterion = async (id) => {
-    if (!window.confirm('정말 삭제하시겠습니까? 하위 기준도 모두 삭제됩니다.')) return;
+    if (!(await confirm({ title: '기준 삭제', message: '정말 삭제하시겠습니까? 하위 기준도 모두 삭제됩니다.', variant: 'danger' }))) return;
     await deleteCriterion(id);
     setSelectedCriterion(null);
   };
@@ -142,7 +145,7 @@ export default function ModelBuilderPage() {
             onNodeClick={handleAlternativeClick}
             onAddSub={handleAddAlternative}
             onEdit={(alt) => { setAltFormMode('edit'); setSelectedAlternative(alt); setShowAltForm(true); }}
-            onDelete={async (id) => { if (window.confirm('정말 삭제하시겠습니까?')) await deleteAlternative(id); }}
+            onDelete={async (id) => { if (await confirm({ title: '대안 삭제', message: '정말 삭제하시겠습니까?', variant: 'danger' })) await deleteAlternative(id); }}
             selectedId={selectedAlternative?.id}
           />
         </div>
@@ -176,6 +179,8 @@ export default function ModelBuilderPage() {
           onClose={() => setShowPreview(false)}
         />
       )}
+
+      <ConfirmDialog {...confirmDialogProps} />
     </PageLayout>
   );
 }

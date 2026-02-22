@@ -9,6 +9,8 @@ import { calculateAHP } from '../lib/ahpEngine';
 import PageLayout from '../components/layout/PageLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HelpButton from '../components/common/HelpButton';
+import common from '../styles/common.module.css';
+import styles from './ResourceAllocationPage.module.css';
 
 /**
  * Calculate global weight of a criterion through the hierarchy.
@@ -96,27 +98,27 @@ export default function ResourceAllocationPage() {
 
   return (
     <PageLayout>
-      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
+      <h1 className={common.pageTitle}>
         {currentProject?.name} - 자원 배분 <HelpButton helpKey="resourceAllocation" />
       </h1>
 
-      <div style={{ background: 'var(--color-surface)', borderRadius: 8, padding: 24, boxShadow: 'var(--shadow-sm)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-          <label style={{ fontWeight: 500, fontSize: '0.9rem' }}>총 자원량:</label>
+      <div className={common.card}>
+        <div className={styles.inputRow}>
+          <label className={styles.inputLabel}>총 자원량:</label>
           <input
             type="number"
             value={totalResource}
             onChange={(e) => setTotalResource(Number(e.target.value) || 0)}
-            style={{ width: 100, padding: '6px 8px', border: '1px solid var(--color-border)', borderRadius: 4 }}
+            className={styles.resourceInput}
           />
         </div>
 
-        <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse' }}>
+        <table className={common.dataTable}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '2px solid var(--color-border)' }}>대안</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '2px solid var(--color-border)' }}>중요도</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '2px solid var(--color-border)' }}>배분량</th>
+              <th>대안</th>
+              <th style={{ textAlign: 'right' }}>중요도</th>
+              <th style={{ textAlign: 'right' }}>배분량</th>
             </tr>
           </thead>
           <tbody>
@@ -125,11 +127,11 @@ export default function ResourceAllocationPage() {
               const alloc = pct * totalResource;
               return (
                 <tr key={a.name}>
-                  <td style={{ padding: 8, borderBottom: '1px solid var(--color-border)' }}>{a.name}</td>
-                  <td style={{ padding: 8, borderBottom: '1px solid var(--color-border)', textAlign: 'right', fontFamily: 'monospace' }}>
+                  <td>{a.name}</td>
+                  <td className={styles.tdRight}>
                     {(pct * 100).toFixed(2)}%
                   </td>
-                  <td style={{ padding: 8, borderBottom: '1px solid var(--color-border)', textAlign: 'right', fontWeight: 600 }}>
+                  <td className={styles.tdRightBold}>
                     {alloc.toFixed(2)}
                   </td>
                 </tr>
@@ -138,9 +140,9 @@ export default function ResourceAllocationPage() {
           </tbody>
           <tfoot>
             <tr>
-              <td style={{ padding: 8, fontWeight: 600 }}>합계</td>
-              <td style={{ padding: 8, textAlign: 'right' }}>100%</td>
-              <td style={{ padding: 8, textAlign: 'right', fontWeight: 600 }}>{totalResource}</td>
+              <td className={styles.tfootCell}>합계</td>
+              <td className={`${styles.tfootCell} ${styles.tdRight}`}>100%</td>
+              <td className={`${styles.tfootCell} ${styles.tdRightBold}`}>{totalResource}</td>
             </tr>
           </tfoot>
         </table>

@@ -11,6 +11,8 @@ import PageLayout from '../components/layout/PageLayout';
 import ProgressBar from '../components/common/ProgressBar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HelpButton from '../components/common/HelpButton';
+import common from '../styles/common.module.css';
+import styles from './WorkshopPage.module.css';
 
 export default function WorkshopPage() {
   const { id } = useParams();
@@ -65,24 +67,24 @@ export default function WorkshopPage() {
 
   return (
     <PageLayout>
-      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
+      <h1 className={common.pageTitle}>
         {currentProject?.name} - 실시간 워크숍 <HelpButton helpKey="workshopProgress" />
       </h1>
 
-      <div style={{ background: 'var(--color-surface)', borderRadius: 8, padding: 24, boxShadow: 'var(--shadow-sm)' }}>
-        <h2 style={{ fontSize: '1rem', marginBottom: 16 }}>평가자 진행 현황</h2>
+      <div className={common.card}>
+        <h2 className={common.cardTitle}>평가자 진행 현황</h2>
 
         {evaluators.length === 0 ? (
-          <p style={{ color: 'var(--color-text-muted)' }}>등록된 평가자가 없습니다.</p>
+          <p className={common.emptyText}>등록된 평가자가 없습니다.</p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className={styles.evalList}>
             {evaluators.map(ev => {
               const count = progress[ev.id] || 0;
               return (
                 <div key={ev.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 500 }}>{ev.name}</span>
-                    <span style={{ fontSize: '0.8rem', color: ev.completed ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+                  <div className={styles.evalRow}>
+                    <span className={styles.evalName}>{ev.name}</span>
+                    <span className={ev.completed ? styles.evalStatusDone : styles.evalStatusPending}>
                       {ev.completed ? '완료' : `${count} / ${totalRequired}`}
                     </span>
                   </div>

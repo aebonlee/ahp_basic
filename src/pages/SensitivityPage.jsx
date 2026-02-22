@@ -12,6 +12,8 @@ import SensitivityChart from '../components/sensitivity/SensitivityChart';
 import WeightSlider from '../components/sensitivity/WeightSlider';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HelpButton from '../components/common/HelpButton';
+import common from '../styles/common.module.css';
+import styles from './SensitivityPage.module.css';
 
 export default function SensitivityPage() {
   const { id } = useParams();
@@ -99,7 +101,7 @@ export default function SensitivityPage() {
 
   return (
     <PageLayout>
-      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
+      <h1 className={common.pageTitle}>
         {currentProject?.name} - 민감도 분석 <HelpButton helpKey="sensitivityAnalysis" />
       </h1>
 
@@ -117,12 +119,12 @@ export default function SensitivityPage() {
           />
         </>
       ) : (
-        <div style={{ padding: 24, background: 'var(--color-surface)', borderRadius: 8, textAlign: 'center' }}>
-          <p style={{ color: 'var(--color-text-muted)', marginBottom: 8 }}>민감도 분석을 수행할 수 없습니다.</p>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+        <div className={styles.emptyCard}>
+          <p className={styles.emptyTitle}>민감도 분석을 수행할 수 없습니다.</p>
+          <p className={styles.emptyDesc}>
             다음 조건을 확인해주세요:
           </p>
-          <ul style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', textAlign: 'left', display: 'inline-block', marginTop: 8 }}>
+          <ul className={styles.emptyList}>
             <li>최상위 기준이 2개 이상 필요합니다</li>
             <li>대안이 1개 이상 필요합니다</li>
             <li>기준 간 쌍대비교가 완료되어야 합니다</li>

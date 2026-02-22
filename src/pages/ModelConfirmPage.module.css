@@ -1,0 +1,16 @@
+.topBar {
+  margin-bottom: var(--spacing-md);
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.actions {
+  margin-top: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}

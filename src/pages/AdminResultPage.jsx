@@ -15,6 +15,8 @@ import ConsistencyTable from '../components/results/ConsistencyTable';
 import EvaluatorWeightEditor from '../components/admin/EvaluatorWeightEditor';
 import ExportButtons from '../components/results/ExportButtons';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import common from '../styles/common.module.css';
+import styles from './AdminResultPage.module.css';
 
 export default function AdminResultPage() {
   const { id } = useParams();
@@ -151,7 +153,7 @@ export default function AdminResultPage() {
 
   return (
     <PageLayout>
-      <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
+      <h1 className={common.pageTitle}>
         {currentProject?.name} - 집계 결과
       </h1>
 
@@ -163,10 +165,10 @@ export default function AdminResultPage() {
 
       {results && (
         <>
-          <div style={{ margin: '16px 0', padding: 12, borderRadius: 8, background: results.allComplete && results.allConsistent ? 'var(--color-success-bg, #f0fff4)' : 'var(--color-warning-bg, #fffbeb)', fontSize: '0.85rem' }}>
+          <div className={results.allComplete && results.allConsistent ? common.statusBannerSuccess : common.statusBannerWarning}>
             <p>
               완료: {results.completedCells}/{results.totalCells} ({results.totalCells > 0 ? ((results.completedCells / results.totalCells) * 100).toFixed(0) : 0}%)
-              {!results.allComplete && <span style={{ color: 'var(--color-warning)', marginLeft: 8 }}>미완료 항목이 있습니다</span>}
+              {!results.allComplete && <span className={styles.statusWarning}>미완료 항목이 있습니다</span>}
             </p>
             {!isDirectInput && (
               <p>
@@ -174,13 +176,13 @@ export default function AdminResultPage() {
               </p>
             )}
           </div>
-          <div style={{ marginTop: 24 }}>
+          <div className={common.sectionGap}>
             <ExportButtons criteria={criteria} alternatives={alternatives} results={results} />
           </div>
-          <div style={{ marginTop: 24 }}>
+          <div className={common.sectionGap}>
             <ComprehensiveChart criteria={criteria} alternatives={alternatives} results={results} />
           </div>
-          <div style={{ marginTop: 24 }}>
+          <div className={common.sectionGap}>
             <ConsistencyTable results={results} onNavigateToPage={() => {}} />
           </div>
         </>
