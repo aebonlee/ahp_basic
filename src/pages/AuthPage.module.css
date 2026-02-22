@@ -23,6 +23,15 @@
   margin-bottom: var(--spacing-xs);
 }
 
+.titleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.titleLink:hover {
+  opacity: 0.8;
+}
+
 .subtitle {
   text-align: center;
   color: var(--color-text-light);

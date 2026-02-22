@@ -11,7 +11,7 @@ export default function HomePage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <div className={styles.logo}>AHP Basic</div>
+          <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>AHP Basic</div>
           <div className={styles.headerActions}>
             {isLoggedIn ? (
               <Button onClick={() => navigate('/admin')}>대시보드</Button>
