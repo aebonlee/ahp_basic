@@ -75,13 +75,16 @@ export function ProjectProvider({ children }) {
   }, []);
 
   const createProject = useCallback(async (project) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      throw new Error('로그인 세션이 만료되었습니다. 새로고침 후 다시 시도해주세요.');
+    }
     const { data, error } = await supabase
       .from('projects')
       .insert({ ...project, owner_id: user.id, status: 2 })
       .select()
       .single();
-    if (error) throw error;
+    if (error) throw new Error('프로젝트 저장 실패: ' + error.message);
     dispatch({ type: 'ADD_PROJECT', payload: data });
     return data;
   }, []);
@@ -89,11 +92,11 @@ export function ProjectProvider({ children }) {
   const updateProject = useCallback(async (id, updates) => {
     const { data, error } = await supabase
       .from('projects')
-      .update(updates)
+      .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();
-    if (error) throw error;
+    if (error) throw new Error('프로젝트 수정 실패: ' + error.message);
     dispatch({ type: 'UPDATE_PROJECT', payload: data });
     return data;
   }, []);

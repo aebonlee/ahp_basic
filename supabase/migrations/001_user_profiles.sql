@@ -179,8 +179,17 @@ CREATE POLICY "user_profiles_update" ON public.user_profiles
   FOR UPDATE USING (auth.uid() = id);
 
 -- projects 정책
-CREATE POLICY "projects_owner_all" ON public.projects
-  FOR ALL USING (auth.uid() = owner_id);
+CREATE POLICY "projects_owner_select" ON public.projects
+  FOR SELECT USING (auth.uid() = owner_id);
+
+CREATE POLICY "projects_owner_insert" ON public.projects
+  FOR INSERT WITH CHECK (auth.uid() = owner_id);
+
+CREATE POLICY "projects_owner_update" ON public.projects
+  FOR UPDATE USING (auth.uid() = owner_id);
+
+CREATE POLICY "projects_owner_delete" ON public.projects
+  FOR DELETE USING (auth.uid() = owner_id);
 
 CREATE POLICY "projects_evaluator_select" ON public.projects
   FOR SELECT USING (public.is_project_evaluator(id));
