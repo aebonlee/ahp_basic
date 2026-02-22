@@ -8,6 +8,7 @@ import { buildPageSequence } from '../lib/pairwiseUtils';
 import { calculateAHP } from '../lib/ahpEngine';
 import PageLayout from '../components/layout/PageLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import HelpButton from '../components/common/HelpButton';
 
 /**
  * Calculate global weight of a criterion through the hierarchy.
@@ -96,7 +97,7 @@ export default function ResourceAllocationPage() {
   return (
     <PageLayout>
       <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
-        {currentProject?.name} - 자원 배분
+        {currentProject?.name} - 자원 배분 <HelpButton helpKey="resourceAllocation" />
       </h1>
 
       <div style={{ background: 'var(--color-surface)', borderRadius: 8, padding: 24, boxShadow: 'var(--shadow-sm)' }}>

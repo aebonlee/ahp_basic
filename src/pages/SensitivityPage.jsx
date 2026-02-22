@@ -11,6 +11,7 @@ import PageLayout from '../components/layout/PageLayout';
 import SensitivityChart from '../components/sensitivity/SensitivityChart';
 import WeightSlider from '../components/sensitivity/WeightSlider';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import HelpButton from '../components/common/HelpButton';
 
 export default function SensitivityPage() {
   const { id } = useParams();
@@ -99,7 +100,7 @@ export default function SensitivityPage() {
   return (
     <PageLayout>
       <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
-        {currentProject?.name} - 민감도 분석
+        {currentProject?.name} - 민감도 분석 <HelpButton helpKey="sensitivityAnalysis" />
       </h1>
 
       {analysisData ? (

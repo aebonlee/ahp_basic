@@ -10,6 +10,7 @@ import { pairCount } from '../lib/ahpEngine';
 import PageLayout from '../components/layout/PageLayout';
 import ProgressBar from '../components/common/ProgressBar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import HelpButton from '../components/common/HelpButton';
 
 export default function WorkshopPage() {
   const { id } = useParams();
@@ -65,7 +66,7 @@ export default function WorkshopPage() {
   return (
     <PageLayout>
       <h1 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
-        {currentProject?.name} - 실시간 워크숍
+        {currentProject?.name} - 실시간 워크숍 <HelpButton helpKey="workshopProgress" />
       </h1>
 
       <div style={{ background: 'var(--color-surface)', borderRadius: 8, padding: 24, boxShadow: 'var(--shadow-sm)' }}>
