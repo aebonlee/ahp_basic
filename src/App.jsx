@@ -5,6 +5,7 @@ import { EvaluationProvider } from './contexts/EvaluationContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Pages
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -55,8 +56,8 @@ export default function App() {
               <Route path="/eval/project/:id/result" element={<ProtectedRoute><EvalResultPage /></ProtectedRoute>} />
 
               {/* Default */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </EvaluationProvider>
         </ProjectProvider>
