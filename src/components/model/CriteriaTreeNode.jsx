@@ -1,4 +1,4 @@
-import { LEVEL_COLORS, EVAL_METHOD_LABELS } from '../../lib/constants';
+import { LEVEL_COLORS } from '../../lib/constants';
 import styles from './CriteriaTreeNode.module.css';
 
 export default function CriteriaTreeNode({ node, level, onNodeClick, onAddChild, onEdit, onDelete, selectedId }) {
@@ -13,9 +13,6 @@ export default function CriteriaTreeNode({ node, level, onNodeClick, onAddChild,
         onClick={() => onNodeClick(node)}
       >
         <span className={styles.name}>{node.name}</span>
-        {node.eval_method && (
-          <span className={styles.method}>{EVAL_METHOD_LABELS[node.eval_method] || ''}</span>
-        )}
         <div className={styles.actions}>
           <button onClick={(e) => { e.stopPropagation(); onAddChild(node.id); }} title="하위기준 추가">+</button>
           <button onClick={(e) => { e.stopPropagation(); onEdit(node); }} title="수정">&#9998;</button>

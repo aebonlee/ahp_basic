@@ -13,13 +13,13 @@ import { useState } from 'react';
 export default function ModelConfirmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentProject, loading } = useProject(id);
-  const { criteria, getTree } = useCriteria(id);
-  const { alternatives } = useAlternatives(id);
+  const { currentProject, loading: projectLoading } = useProject(id);
+  const { criteria, loading: criteriaLoading, getTree } = useCriteria(id);
+  const { alternatives, loading: altLoading } = useAlternatives(id);
   const { updateProject } = useProjects();
   const [confirming, setConfirming] = useState(false);
 
-  if (loading) return <PageLayout><LoadingSpinner /></PageLayout>;
+  if (projectLoading || criteriaLoading || altLoading) return <PageLayout><LoadingSpinner /></PageLayout>;
   if (!currentProject) return <PageLayout><p>프로젝트를 찾을 수 없습니다.</p></PageLayout>;
 
   const criteriaTree = getTree();

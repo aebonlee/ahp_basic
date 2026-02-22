@@ -1,9 +1,13 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 export function useCriteria(projectId) {
   const [criteria, setCriteria] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Ref to avoid stale closures in callbacks
+  const criteriaRef = useRef(criteria);
+  useEffect(() => { criteriaRef.current = criteria; }, [criteria]);
 
   const fetchCriteria = useCallback(async () => {
     if (!projectId) return;
@@ -20,7 +24,7 @@ export function useCriteria(projectId) {
   useEffect(() => { fetchCriteria(); }, [fetchCriteria]);
 
   const addCriterion = useCallback(async (criterion) => {
-    const maxOrder = criteria.reduce((max, c) => Math.max(max, c.sort_order || 0), 0);
+    const maxOrder = criteriaRef.current.reduce((max, c) => Math.max(max, c.sort_order || 0), 0);
     const { data, error } = await supabase
       .from('criteria')
       .insert({
@@ -33,7 +37,7 @@ export function useCriteria(projectId) {
     if (error) throw error;
     setCriteria(prev => [...prev, data]);
     return data;
-  }, [projectId, criteria]);
+  }, [projectId]);
 
   const updateCriterion = useCallback(async (id, updates) => {
     const { data, error } = await supabase
@@ -48,15 +52,25 @@ export function useCriteria(projectId) {
   }, []);
 
   const deleteCriterion = useCallback(async (id) => {
-    // Delete children recursively
-    const children = criteria.filter(c => c.parent_id === id);
-    for (const child of children) {
-      await deleteCriterion(child.id);
-    }
+    // DB has ON DELETE CASCADE on parent_id, so only delete the root node
     const { error } = await supabase.from('criteria').delete().eq('id', id);
     if (error) throw error;
-    setCriteria(prev => prev.filter(c => c.id !== id));
-  }, [criteria]);
+    // Remove the criterion and all descendants from local state
+    setCriteria(prev => {
+      const toRemove = new Set([id]);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const c of prev) {
+          if (!toRemove.has(c.id) && toRemove.has(c.parent_id)) {
+            toRemove.add(c.id);
+            changed = true;
+          }
+        }
+      }
+      return prev.filter(c => !toRemove.has(c.id));
+    });
+  }, []);
 
   // Build tree structure
   const getTree = useCallback(() => {

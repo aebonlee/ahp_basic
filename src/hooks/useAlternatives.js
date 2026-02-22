@@ -1,9 +1,13 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 export function useAlternatives(projectId) {
   const [alternatives, setAlternatives] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Ref to avoid stale closures in callbacks
+  const alternativesRef = useRef(alternatives);
+  useEffect(() => { alternativesRef.current = alternatives; }, [alternatives]);
 
   const fetchAlternatives = useCallback(async () => {
     if (!projectId) return;
@@ -20,7 +24,7 @@ export function useAlternatives(projectId) {
   useEffect(() => { fetchAlternatives(); }, [fetchAlternatives]);
 
   const addAlternative = useCallback(async (alt) => {
-    const maxOrder = alternatives.reduce((max, a) => Math.max(max, a.sort_order || 0), 0);
+    const maxOrder = alternativesRef.current.reduce((max, a) => Math.max(max, a.sort_order || 0), 0);
     const { data, error } = await supabase
       .from('alternatives')
       .insert({
@@ -33,7 +37,7 @@ export function useAlternatives(projectId) {
     if (error) throw error;
     setAlternatives(prev => [...prev, data]);
     return data;
-  }, [projectId, alternatives]);
+  }, [projectId]);
 
   const updateAlternative = useCallback(async (id, updates) => {
     const { data, error } = await supabase
@@ -48,15 +52,25 @@ export function useAlternatives(projectId) {
   }, []);
 
   const deleteAlternative = useCallback(async (id) => {
-    // Delete children
-    const children = alternatives.filter(a => a.parent_id === id);
-    for (const child of children) {
-      await deleteAlternative(child.id);
-    }
+    // DB has ON DELETE CASCADE on parent_id, so only delete the root node
     const { error } = await supabase.from('alternatives').delete().eq('id', id);
     if (error) throw error;
-    setAlternatives(prev => prev.filter(a => a.id !== id));
-  }, [alternatives]);
+    // Remove the alternative and all descendants from local state
+    setAlternatives(prev => {
+      const toRemove = new Set([id]);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const a of prev) {
+          if (!toRemove.has(a.id) && toRemove.has(a.parent_id)) {
+            toRemove.add(a.id);
+            changed = true;
+          }
+        }
+      }
+      return prev.filter(a => !toRemove.has(a.id));
+    });
+  }, []);
 
   return {
     alternatives,
