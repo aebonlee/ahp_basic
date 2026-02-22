@@ -34,33 +34,45 @@ export default function AdminResultPage() {
   const loadAllData = async () => {
     if (!evaluators.length) return;
 
-    const [compRes, directRes] = await Promise.all([
-      supabase.from('pairwise_comparisons').select('*').eq('project_id', id),
-      supabase.from('direct_input_values').select('*').eq('project_id', id),
-    ]);
+    try {
+      const [compRes, directRes] = await Promise.all([
+        supabase.from('pairwise_comparisons').select('*').eq('project_id', id),
+        supabase.from('direct_input_values').select('*').eq('project_id', id),
+      ]);
 
-    // Pairwise comparisons by evaluator
-    const byEval = {};
-    for (const c of (compRes.data || [])) {
-      if (!byEval[c.evaluator_id]) byEval[c.evaluator_id] = {};
-      byEval[c.evaluator_id][`${c.criterion_id}:${c.row_id}:${c.col_id}`] = c.value;
+      if (compRes.error) {
+        console.error('Failed to load pairwise comparisons:', compRes.error);
+      }
+      if (directRes.error) {
+        console.warn('Failed to load direct input values:', directRes.error);
+      }
+
+      // Pairwise comparisons by evaluator
+      const byEval = {};
+      for (const c of (compRes.data || [])) {
+        if (!byEval[c.evaluator_id]) byEval[c.evaluator_id] = {};
+        byEval[c.evaluator_id][`${c.criterion_id}:${c.row_id}:${c.col_id}`] = c.value;
+      }
+      setAllComparisons(byEval);
+
+      // Direct input values by evaluator
+      const directByEval = {};
+      for (const d of (directRes.data || [])) {
+        if (!directByEval[d.evaluator_id]) directByEval[d.evaluator_id] = {};
+        if (!directByEval[d.evaluator_id][d.criterion_id]) directByEval[d.evaluator_id][d.criterion_id] = {};
+        directByEval[d.evaluator_id][d.criterion_id][d.item_id] = d.value;
+      }
+      setAllDirectInputs(directByEval);
+
+      // Initialize equal weights
+      const w = {};
+      evaluators.forEach(e => { w[e.id] = 1; });
+      setWeights(w);
+    } catch (err) {
+      console.error('loadAllData error:', err);
+    } finally {
+      setLoading(false);
     }
-    setAllComparisons(byEval);
-
-    // Direct input values by evaluator
-    const directByEval = {};
-    for (const d of (directRes.data || [])) {
-      if (!directByEval[d.evaluator_id]) directByEval[d.evaluator_id] = {};
-      if (!directByEval[d.evaluator_id][d.criterion_id]) directByEval[d.evaluator_id][d.criterion_id] = {};
-      directByEval[d.evaluator_id][d.criterion_id][d.item_id] = d.value;
-    }
-    setAllDirectInputs(directByEval);
-
-    // Initialize equal weights
-    const w = {};
-    evaluators.forEach(e => { w[e.id] = 1; });
-    setWeights(w);
-    setLoading(false);
   };
 
   const isDirectInput = currentProject?.eval_method === EVAL_METHOD.DIRECT_INPUT;

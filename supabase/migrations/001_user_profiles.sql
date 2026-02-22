@@ -195,22 +195,49 @@ CREATE POLICY "projects_evaluator_select" ON public.projects
   FOR SELECT USING (public.is_project_evaluator(id));
 
 -- criteria 정책
-CREATE POLICY "criteria_project_owner" ON public.criteria
-  FOR ALL USING (public.is_project_owner(project_id));
+CREATE POLICY "criteria_owner_select" ON public.criteria
+  FOR SELECT USING (public.is_project_owner(project_id));
+
+CREATE POLICY "criteria_owner_insert" ON public.criteria
+  FOR INSERT WITH CHECK (public.is_project_owner(project_id));
+
+CREATE POLICY "criteria_owner_update" ON public.criteria
+  FOR UPDATE USING (public.is_project_owner(project_id));
+
+CREATE POLICY "criteria_owner_delete" ON public.criteria
+  FOR DELETE USING (public.is_project_owner(project_id));
 
 CREATE POLICY "criteria_evaluator_select" ON public.criteria
   FOR SELECT USING (public.is_project_evaluator(project_id));
 
 -- alternatives 정책
-CREATE POLICY "alternatives_project_owner" ON public.alternatives
-  FOR ALL USING (public.is_project_owner(project_id));
+CREATE POLICY "alternatives_owner_select" ON public.alternatives
+  FOR SELECT USING (public.is_project_owner(project_id));
+
+CREATE POLICY "alternatives_owner_insert" ON public.alternatives
+  FOR INSERT WITH CHECK (public.is_project_owner(project_id));
+
+CREATE POLICY "alternatives_owner_update" ON public.alternatives
+  FOR UPDATE USING (public.is_project_owner(project_id));
+
+CREATE POLICY "alternatives_owner_delete" ON public.alternatives
+  FOR DELETE USING (public.is_project_owner(project_id));
 
 CREATE POLICY "alternatives_evaluator_select" ON public.alternatives
   FOR SELECT USING (public.is_project_evaluator(project_id));
 
 -- evaluators 정책
-CREATE POLICY "evaluators_project_owner" ON public.evaluators
-  FOR ALL USING (public.is_project_owner(project_id));
+CREATE POLICY "evaluators_owner_select" ON public.evaluators
+  FOR SELECT USING (public.is_project_owner(project_id));
+
+CREATE POLICY "evaluators_owner_insert" ON public.evaluators
+  FOR INSERT WITH CHECK (public.is_project_owner(project_id));
+
+CREATE POLICY "evaluators_owner_update" ON public.evaluators
+  FOR UPDATE USING (public.is_project_owner(project_id));
+
+CREATE POLICY "evaluators_owner_delete" ON public.evaluators
+  FOR DELETE USING (public.is_project_owner(project_id));
 
 CREATE POLICY "evaluators_self_select" ON public.evaluators
   FOR SELECT USING (user_id = auth.uid());
@@ -229,8 +256,17 @@ CREATE POLICY "comparisons_owner_select" ON public.pairwise_comparisons
   FOR SELECT USING (public.is_project_owner(project_id));
 
 -- brainstorming_items 정책
-CREATE POLICY "brainstorming_project_owner" ON public.brainstorming_items
-  FOR ALL USING (public.is_project_owner(project_id));
+CREATE POLICY "brainstorming_owner_select" ON public.brainstorming_items
+  FOR SELECT USING (public.is_project_owner(project_id));
+
+CREATE POLICY "brainstorming_owner_insert" ON public.brainstorming_items
+  FOR INSERT WITH CHECK (public.is_project_owner(project_id));
+
+CREATE POLICY "brainstorming_owner_update" ON public.brainstorming_items
+  FOR UPDATE USING (public.is_project_owner(project_id));
+
+CREATE POLICY "brainstorming_owner_delete" ON public.brainstorming_items
+  FOR DELETE USING (public.is_project_owner(project_id));
 
 -- evaluation_signatures 정책
 CREATE POLICY "signatures_evaluator_crud" ON public.evaluation_signatures

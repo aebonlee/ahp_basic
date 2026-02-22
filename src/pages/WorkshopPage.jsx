@@ -77,7 +77,7 @@ export default function WorkshopPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {evaluators.map(ev => {
-              const count = progress[ev.user_id] || 0;
+              const count = progress[ev.id] || 0;
               return (
                 <div key={ev.id}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>

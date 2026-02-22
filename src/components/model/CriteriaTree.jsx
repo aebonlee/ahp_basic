@@ -1,5 +1,4 @@
 import CriteriaTreeNode from './CriteriaTreeNode';
-import { LEVEL_COLORS } from '../../lib/constants';
 import styles from './CriteriaTree.module.css';
 
 export default function CriteriaTree({ tree, projectName, onNodeClick, onAddChild, onEdit, onDelete, selectedId }) {
@@ -15,7 +14,6 @@ export default function CriteriaTree({ tree, projectName, onNodeClick, onAddChil
               key={node.id}
               node={node}
               level={0}
-              color={LEVEL_COLORS[0]}
               onNodeClick={onNodeClick}
               onAddChild={onAddChild}
               onEdit={onEdit}
