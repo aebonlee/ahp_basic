@@ -7,6 +7,7 @@ const initialState = {
   criteria: [],
   alternatives: [],
   comparisons: {},
+  directInputValues: {},
   priorities: {},
   crValues: {},
   currentPage: 0,
@@ -29,6 +30,15 @@ function evalReducer(state, action) {
       return {
         ...state,
         comparisons: { ...state.comparisons, [key]: action.payload.value },
+      };
+    }
+    case 'SET_DIRECT_INPUT_VALUES':
+      return { ...state, directInputValues: action.payload };
+    case 'UPDATE_DIRECT_INPUT': {
+      const key = action.payload.key;
+      return {
+        ...state,
+        directInputValues: { ...state.directInputValues, [key]: action.payload.value },
       };
     }
     case 'SET_PRIORITIES':
@@ -60,15 +70,17 @@ export function EvaluationProvider({ children }) {
   const loadProjectData = useCallback(async (projectId) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const [criteriaRes, altRes, compRes] = await Promise.all([
+      const [criteriaRes, altRes, compRes, directRes] = await Promise.all([
         supabase.from('criteria').select('*').eq('project_id', projectId).order('sort_order'),
         supabase.from('alternatives').select('*').eq('project_id', projectId).order('sort_order'),
         supabase.from('pairwise_comparisons').select('*').eq('project_id', projectId),
+        supabase.from('direct_input_values').select('*').eq('project_id', projectId),
       ]);
 
       if (criteriaRes.error) throw criteriaRes.error;
       if (altRes.error) throw altRes.error;
       if (compRes.error) throw compRes.error;
+      // direct_input_values may not exist yet, ignore error
 
       dispatch({ type: 'SET_CRITERIA', payload: criteriaRes.data });
       dispatch({ type: 'SET_ALTERNATIVES', payload: altRes.data });
@@ -79,6 +91,14 @@ export function EvaluationProvider({ children }) {
         compMap[`${c.criterion_id}:${c.row_id}:${c.col_id}`] = c.value;
       }
       dispatch({ type: 'SET_COMPARISONS', payload: compMap });
+
+      // Build direct input values map
+      const directMap = {};
+      for (const d of (directRes.data || [])) {
+        directMap[`${d.criterion_id}:${d.item_id}`] = d.value;
+      }
+      dispatch({ type: 'SET_DIRECT_INPUT_VALUES', payload: directMap });
+
       dispatch({ type: 'SET_LOADING', payload: false });
     } catch (err) {
       dispatch({ type: 'SET_ERROR', payload: err.message });
@@ -103,8 +123,25 @@ export function EvaluationProvider({ children }) {
     if (error) throw error;
   }, []);
 
+  const saveDirectInput = useCallback(async (projectId, evaluatorId, criterionId, itemId, value) => {
+    const key = `${criterionId}:${itemId}`;
+    dispatch({ type: 'UPDATE_DIRECT_INPUT', payload: { key, value } });
+
+    const { error } = await supabase
+      .from('direct_input_values')
+      .upsert({
+        project_id: projectId,
+        evaluator_id: evaluatorId,
+        criterion_id: criterionId,
+        item_id: itemId,
+        value,
+      }, { onConflict: 'project_id,evaluator_id,criterion_id,item_id' });
+
+    if (error) throw error;
+  }, []);
+
   return (
-    <EvaluationContext.Provider value={{ ...state, dispatch, loadProjectData, saveComparison }}>
+    <EvaluationContext.Provider value={{ ...state, dispatch, loadProjectData, saveComparison, saveDirectInput }}>
       {children}
     </EvaluationContext.Provider>
   );

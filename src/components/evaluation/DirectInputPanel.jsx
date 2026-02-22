@@ -3,13 +3,21 @@ import { supabase } from '../../lib/supabaseClient';
 import Button from '../common/Button';
 import styles from './DirectInputPanel.module.css';
 
-export default function DirectInputPanel({ projectId, evaluatorId, criterionId, items }) {
+export default function DirectInputPanel({ projectId, evaluatorId, criterionId, items, onValidationChange }) {
   const [values, setValues] = useState({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadValues();
   }, [criterionId]);
+
+  const isComplete = items.length > 0 && items.every(item => values[item.id] > 0);
+
+  useEffect(() => {
+    if (onValidationChange) {
+      onValidationChange(criterionId, isComplete);
+    }
+  }, [isComplete, criterionId]);
 
   const loadValues = async () => {
     const { data } = await supabase
@@ -49,16 +57,23 @@ export default function DirectInputPanel({ projectId, evaluatorId, criterionId, 
 
   // Normalize values to percentages
   const total = Object.values(values).reduce((sum, v) => sum + (v || 0), 0);
+  const filledCount = items.filter(item => values[item.id] > 0).length;
 
   return (
     <div className={styles.container}>
       <h4 className={styles.title}>직접입력</h4>
-      <p className={styles.desc}>각 항목에 상대적 중요도(점수)를 직접 입력하세요.</p>
+      <p className={styles.desc}>
+        각 항목에 상대적 중요도(점수)를 직접 입력하세요.
+        <span style={{ marginLeft: 8, fontSize: '0.8rem', color: isComplete ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+          ({filledCount}/{items.length} 완료)
+        </span>
+      </p>
 
       <div className={styles.items}>
         {items.map(item => {
           const val = values[item.id] || 0;
           const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
+          const isEmpty = !values[item.id] || values[item.id] <= 0;
           return (
             <div key={item.id} className={styles.row}>
               <span className={styles.label}>{item.name}</span>
@@ -69,6 +84,7 @@ export default function DirectInputPanel({ projectId, evaluatorId, criterionId, 
                 value={values[item.id] || ''}
                 onChange={(e) => handleChange(item.id, e.target.value)}
                 className={styles.input}
+                style={isEmpty ? { borderColor: 'var(--color-warning)' } : undefined}
               />
               <span className={styles.pct}>{pct}%</span>
             </div>

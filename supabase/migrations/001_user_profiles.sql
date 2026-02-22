@@ -114,6 +114,19 @@ CREATE TABLE IF NOT EXISTS public.orders (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- direct_input_values (직접입력 평가)
+CREATE TABLE IF NOT EXISTS public.direct_input_values (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
+  evaluator_id UUID REFERENCES public.evaluators(id) ON DELETE CASCADE,
+  criterion_id UUID,
+  item_id UUID NOT NULL,
+  value FLOAT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(project_id, evaluator_id, criterion_id, item_id)
+);
+
 -- ============================================
 -- 2. RLS 활성화
 -- ============================================
@@ -127,6 +140,7 @@ ALTER TABLE public.pairwise_comparisons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.brainstorming_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.evaluation_signatures ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.direct_input_values ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- 2.5. RLS 순환참조 방지 헬퍼 함수
@@ -237,6 +251,19 @@ CREATE POLICY "orders_admin_select" ON public.orders
       AND user_profiles.role = 'admin'
     )
   );
+
+-- direct_input_values 정책
+CREATE POLICY "direct_input_evaluator_crud" ON public.direct_input_values
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.evaluators
+      WHERE evaluators.id = direct_input_values.evaluator_id
+      AND evaluators.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "direct_input_owner_select" ON public.direct_input_values
+  FOR SELECT USING (public.is_project_owner(project_id));
 
 -- ============================================
 -- 4. 트리거: 신규 사용자 자동 프로필 생성
