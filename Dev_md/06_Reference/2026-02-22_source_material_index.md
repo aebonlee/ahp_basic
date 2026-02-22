@@ -46,9 +46,11 @@
 | 2 | 디자인 | `Dev_md/02_Design/design_system.md` | 색상 팔레트, 타이포그래피, 레이아웃, 컴포넌트 |
 | 3 | 개발일지 | `Dev_md/03_DevLog/2026-02-22_project_init.md` | 초기 프로젝트 설정 기록 |
 | 4 | 개발일지 | `Dev_md/03_DevLog/2026-02-22_source_analysis_complete.md` | 9개 페이지 소스 분석 완료 보고 |
-| 5 | 개발일지 | `Dev_md/03_DevLog/2026-02-22_full_development_plan.md` | 전체 11 Phase 개발 계획 (본 문서) |
-| 6 | 검수 | `Dev_md/04_Inspection/inspection_template.md` | 검수 체크리스트 템플릿 |
-| 7 | 평가 | `Dev_md/05_Evaluation/evaluation_template.md` | 평가 점수 템플릿 |
+| 5 | 개발일지 | `Dev_md/03_DevLog/2026-02-22_full_development_plan.md` | 전체 11 Phase 개발 계획 |
+| 6 | 개발일지 | `Dev_md/03_DevLog/2026-02-22_implementation_complete.md` | 구현 완료 보고 (파일 현황, 테스트 결과) |
+| 7 | 개발일지 | `Dev_md/03_DevLog/2026-02-22_post_deployment_fixes.md` | 배포 후 수정 기록 (인증, 리다이렉트, 버그 수정) |
+| 8 | 검수 | `Dev_md/04_Inspection/inspection_template.md` | 검수 체크리스트 템플릿 |
+| 9 | 평가 | `Dev_md/05_Evaluation/evaluation_template.md` | 평가 점수 템플릿 |
 
 ---
 
@@ -84,6 +86,26 @@
 | `AjaxProcess.aspx?mode=delete` | `supabase.from('criteria').delete()` |
 | `AjaxProcess.aspx?mode=insert` | `supabase.from('criteria').insert()` |
 | 서버 세션 기반 인증 | Supabase Auth (JWT) |
+
+---
+
+### 2.4 www.dreamitbiz.com 분석 자료
+
+| # | 분류 | 파일 경로 | 내용 |
+|---|------|-----------|------|
+| 1 | 인증 패턴 | `Dev_md/06_Reference/www_repo_analysis.md` | Supabase Auth 구조, Google/Kakao OAuth, 프로필 트리거, 관리자 이메일 목록 |
+| 2 | 결제 패턴 | `Dev_md/06_Reference/www_repo_analysis.md` | PortOne V2 SDK, KG Inicis, 카드/계좌이체 |
+| 3 | 가드 패턴 | `Dev_md/06_Reference/www_repo_analysis.md` | AuthGuard, AdminGuard 컴포넌트 |
+
+### 2.5 적용 결과 (2026-02-22 배포 후)
+
+| # | 작업 | 관련 커밋 | 결과 |
+|---|------|-----------|------|
+| 1 | 인증 시스템 적용 | `ea0b592` | Google/Kakao OAuth + 이메일 로그인/회원가입/비밀번호 재설정 |
+| 2 | 랜딩 페이지 | `89e3425` | HomePage.jsx 신규 생성 |
+| 3 | 리다이렉트 수정 | `8a1be2f` | 하위 도메인별 동적 리다이렉트 |
+| 4 | 코드 감사 | `cc2c3b9` | 15개 이슈 분석, 7개 수정 |
+| 5 | 네비게이션 | `0bc2e0f` | 로고 클릭 → 홈 이동 |
 
 ---
 

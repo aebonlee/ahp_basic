@@ -1,7 +1,9 @@
 # 전체 구현 완료 보고
 
 > 작성일: 2026-02-22
+> 최종 수정: 2026-02-22
 > 프로젝트: AHP Basic
+> 배포: https://ahp_basic.dreamitbiz.com
 
 ---
 
@@ -9,25 +11,29 @@
 
 ### 빌드
 - `npx vite build` 성공
-- 번들 크기: 1094KB (recharts + xlsx 포함)
+- 번들 크기: ~1,105KB (recharts + xlsx 포함)
 
 ### 테스트
 - `npx vitest run` → **15/15 테스트 통과**
 - ahpEngine.test.js: 13 테스트
 - ahpBestFit.test.js: 2 테스트
 
-### 버그 수정
-- `InviteLandingPage.jsx`: JavaScript 예약어 `eval` 변수명 → `evalData`로 수정
+### 배포
+- GitHub Pages + 커스텀 도메인 (`ahp_basic.dreamitbiz.com`)
+- GitHub Actions 자동 배포 (main 브랜치 push 시)
+- 총 11개 커밋, 170+ 파일
 
 ---
 
 ## 구현 파일 현황
 
-### 페이지 (16개)
+### 페이지 (18개)
 | 파일 | 라우트 | 역할 |
 |------|--------|------|
-| LoginPage.jsx | /login | 로그인 |
-| SignupPage.jsx | /signup | 회원가입 |
+| HomePage.jsx | / | 랜딩 홈페이지 |
+| LoginPage.jsx | /login | 로그인 (Google/Kakao/이메일) |
+| SignupPage.jsx | /signup, /register | 회원가입 |
+| ForgotPasswordPage.jsx | /forgot-password | 비밀번호 재설정 |
 | AdminDashboard.jsx | /admin | 관리자 대시보드 |
 | ModelBuilderPage.jsx | /admin/project/:id | 모델 구축 |
 | BrainstormingPage.jsx | /admin/project/:id/brain | 브레인스토밍 |
@@ -43,9 +49,9 @@
 | DirectInputPage.jsx | /eval/project/:id (직접입력) | 직접 입력 |
 | EvalResultPage.jsx | /eval/project/:id/result | 평가 결과 |
 
-### 컴포넌트 (39개)
+### 컴포넌트 (41개)
 - Layout: Navbar, Footer, PageLayout (3)
-- Common: Button, Modal, LoadingSpinner, ProgressBar, ProtectedRoute (5)
+- Common: Button, Modal, LoadingSpinner, ProgressBar, ProtectedRoute, AdminGuard (6)
 - Admin: ProjectPanel, ProjectCard, ProjectForm, ParticipantPanel, ParticipantForm, StateTransitionButton, ModeSwitch, EvaluatorWeightEditor (8)
 - Model: CriteriaTree, CriteriaTreeNode, CriteriaForm, AlternativeTree, AlternativeForm, EvalMethodSelect, ModelPreview (7)
 - Brainstorming: BrainstormingBoard, KeywordZone, KeywordItem (3)
@@ -62,18 +68,33 @@
 - Contexts: AuthContext, ProjectContext, EvaluationContext (3)
 - Hooks: useAuth, useProjects, useEvaluators, useCriteria, useAlternatives, useAhpCalculation, usePairwiseComparison (7)
 
-### 유틸리티 (2개)
+### 유틸리티 (4개)
 - formatters.js, validators.js
+- auth.js (인증 유틸), portone.js (결제 유틸)
+
+### DB 마이그레이션 (1개)
+- `supabase/migrations/001_user_profiles.sql` (전체 스키마 + RLS)
 
 ### CI/CD
 - `.github/workflows/deploy.yml`
+- `public/CNAME` (커스텀 도메인)
 
 ---
 
-## 다음 단계
+## 완료 항목
 
-1. Supabase anon key 설정 (`.env` 파일)
-2. Supabase DB 스키마 생성 (SQL 실행)
-3. RLS 정책 설정
-4. GitHub Pages 배포
-5. 통합 테스트 (브라우저)
+- [x] Supabase anon key 설정 (`.env` + GitHub Secrets)
+- [x] GitHub Pages 배포 (커스텀 도메인)
+- [x] www 패턴 인증 시스템 (Google/Kakao OAuth, 이메일)
+- [x] 랜딩 홈페이지
+- [x] 하위 도메인 리다이렉트 동적 생성
+- [x] 전체 코드 감사 및 버그 수정 (15개 검토, 7개 수정)
+- [x] 로고/네비게이션 클릭 동작
+
+## 남은 작업 (사용자 설정)
+
+1. Supabase DB 마이그레이션 SQL 실행
+2. Supabase Redirect URLs 추가 (ahp_basic.dreamitbiz.com)
+3. Google OAuth provider 활성화
+4. Kakao OAuth provider 활성화
+5. PortOne Store ID / Channel Key 설정
