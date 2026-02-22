@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html>
+<head id="Head1"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" /><meta name="description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta name="keywords" content="expertchoice, expert, choice, 콜라보레이션, 콜라보, collaboration, collabo, 협력, AHP, 방법론, 어떻하지,ahp방법론,ahp 프로그램, ahp program, ahp software, ahp 소프트웨어, ahp소프트웨어, AHP소프트웨어, AHP 소프트웨어, AHP프로그램, AHP 프로그램, 목표, 결정, 의사, 프로젝트, 의견, 충돌, 수렴, 어떻할까, 이렇게 하자, i make it, make it, 의사결정 솔루션,대학, 선정, 선택" /><meta property="og:title" content="AHP소프트웨어 I Make It" /><meta property="og:description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta property="og:image" content="../images/roal01.png" /><link rel="SHORTCUT ICON" href="../images/logo_black.png" />
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="../script/ie_trident.js"></script>
+    <title>
+    AHP 프로그램, 'I MAKE IT' 이렇게 하자.
+</title><link rel="Stylesheet" href="../style/imakeit.css" />
+    <!--[if IE 6]>
+        <script language="Javascript">
+            //alert("I Make It을 찾아주셔서 감사합니다. 현재 internet explorer 6버전을 사용중입니다.");
+            location.href ="../alert.html";
+        </script>
+    <![endif]-->
+    <script type="text/jscript">
+        function zoom(type) {
+            var width = Number($('div#chart_div').width());
+            switch (type) {
+                case 0:
+                    //alert('작게');
+                    if (width == 900) alert('최소 크기 입니다. 더 작게 줄일 수 없습니다.');
+                    width -= 200;
+                    if (width < 900) {
+                        width = 900;
+                    }
+                    break;
+                case 1:
+                    //alert('크게');
+                    width += 200;
+                    break;
+            }
+            sessionStorage.setItem('table_width', width);
+            $('div#chart_div').css('width', width + 'px');
+        }
+        onload = function () {
+            var d_t = new Date().getDate();
+            var cri_dt = new Date("June 26, 2021 00:00:00");
+            if (cri_dt > d_t) {
+                //alert("<공지사항>\n6월 25일 23시 경 약 1시간동안 서버 점검으로 인해 사용이 중지됩니다.");
+            }
+            $('.loading').click(function () {
+                $('div#progress').removeClass();
+            });
+            $('span.help_btn').click(function (e) {
+                $('div.help_div>div').removeClass();
+                var num = $(this).attr('data-helpno');
+                $.each($('div.help_div>div'), function (index, item) {
+                    if ($(this).attr('data-helpno') == num) $(this).addClass('help_show');
+                });
+                e.stopPropagation();
+            });
+            $('div.help_close').click(function () {
+                $('div.help_div>div').removeClass();
+            });
+            $('span.helper_span').click(function (e) {
+                $(this).find('span').click();
+                e.stopPropagation();
+            });
+            setInterval(function () {
+                $.ajax({
+                url: '../modules/makeit.asmx/check_manager',
+                data: { e_id: "checker" },
+                type: 'post',
+                success: function (data) {
+
+                },
+                error: function (error) {
+
+                }
+            });
+            }, 300000);
+        };
+    </script>
+    <script src="../script/imakeit_pm.js"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <span>
+                <hgroup onclick="location.replace('default.aspx?key=main');" class="loading">
+                    <h1>
+                        I MAKE IT</h1>
+                    <h2>
+                        AHP Solution</h2>
+                </hgroup>
+            </span>
+            <span id="user_info" class="pointer">
+                <img src="../images/user.png" />
+            </span>
+            <div><span class="pointer" onclick="window.open('license.aspx','license','width=960, height=800, status=yes,resizable=yes, location=no, scrollbars=yes');">계정정보</span><span class="pointer loading" onclick="location.replace('default.aspx?key=qna')">문의/교육신청...</span><span class="pointer" id="lout">로그아웃</span></div>
+        </div>
+    </header>
+    <h2 class="title">델파이/브레인스토밍</h2>
+    <form method="post" action="./default.aspx?key=brain" onkeypress="javascript:return WebForm_FireDefaultButton(event, 'btnNull')" id="form1">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="..." />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+<div class="aspNetHidden">
+    <input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="8C5DDC71" />
+    <input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="..." />
+</div>
+    <div id="main_holder">
+        <div id="project_detail" class="hide">
+            <input type="hidden" name="project_id" id="project_id" value="3946" />
+            <h3>
+                <span class="back pointer" title=" ( 1 / Unlimited ) ">시작하기</span>
+                <span class="helper_span" id="hel00"><span class="pointer help_btn" data-helpno="0">?</span></span>
+                <span id="brain_btn" title="브레인스토밍" onclick="window.open('../modules/brain.aspx', 'brain', 'width=1000, height=800, status=yes, location=no, scrollbars=yes,resizable=yes');">　</span>
+            </h3>
+            <div class="scroll">
+                <table id='project_list'><tr><td data-id='3946' data-name='대학원생의 연구역량' data-desc='대학원생의 연구역량' data-type='10' data-state='2'><div class='ellip pointer'> <b>( 생성중 )</b> 대학원생의 연구역량</div></td></tr></table>
+            </div>
+
+            <div id="pro" class="visibleF">
+                <input type="hidden" name="pro_id" id="pro_id" value="0" />
+                <input type="hidden" name="pro_type" id="pro_type" value="2" />
+                <div id="detail_title">
+                    <input name="pro_name" type="text" id="pro_name" placeholder="프로젝트 이름을 입력합니다." />
+                    <span class="helper_span" id="Span2"><span class="pointer help_btn" data-helpno="2">?</span></span>
+                </div>
+                <div id="detail_main">
+                    <textarea name="pro_desc" rows="4" cols="20" id="pro_desc" placeholder="프로젝트에 관한 설명을 입력합니다.">
+</textarea>
+                    <span class="helper_span" id="Span3"><span class="pointer help_btn" data-helpno="3">?</span></span>
+                </div>
+                <div id="pro_eval">
+                    <span>&nbsp;&nbsp;&nbsp;하위요소 평가방법 : </span>
+                    <select>
+                        <option value="12">쌍대비교-실용</option>
+                        <option value="20">직접입력</option>
+                        <option value="10">쌍대비교-이론</option>
+                    </select>
+                    <br/><b style="color: rgb(153, 0, 0);">평가방법의 차이를 꼭 확인하세요→</b>
+                    <input type="hidden" name="pro_eval_val" id="pro_eval_val" value="12" />
+                    &nbsp;&nbsp;<span class="helper_span" id="Span4"><span class="pointer help_btn" data-helpno="4">?</span></span>
+                </div>
+
+                <div><input type="submit" name="pro_ap" value="생 성" id="pro_ap" data-type="1" class="loading" /></div>
+                <div><input type="submit" name="pro_up" value="수 정" id="pro_up" data-type="2" /></div>
+                <div class="center pointer" data-type="4" id="pro_cancel">취 소</div>
+            </div>
+
+            <div id="pro_2" class="visibleF">
+                <div id="pro_btn">
+                    <span class="btns loading" data-type="3">
+                        프로젝트 관리
+                        <span class="helper_span" id="Span1"><span class="pointer help_btn" data-helpno="1">?</span></span>
+                    </span>
+                    <span class="btns" data-type="2">프로젝트 수정</span>
+                    <input type="submit" name="pro_de" value="프로젝트 삭제" onclick="return confirm(&#39;평가했던 모든 데이터가 삭제 됩니다. 그래도 삭제하시겠습니까?&#39;);" id="pro_de" class="btns" />
+                    <input type="submit" name="pro_st" value="프로젝트 중단/완료" onclick="return pro_de_f();" id="pro_st" class="btns" />
+                    <span class="btns loading" data-type="4">워크숍 진행</span>
+                    <span class="btns loading" data-type="5" style="display:none !important">e-mail발송</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="parti_detail" class="hide">
+            <h3 class="center">
+                <span class="back pointer" title=" ( 1 / Unlimited ) ">평가자 선택</span>
+                <span class="helper_span" id="Span5"><span class="pointer help_btn" data-helpno="5">?</span></span>
+            </h3>
+            <div class="scroll">
+                <table id='parti_list'><tr><td class='pad_10 coB'><span class='check_out' id='all_check'><span></span></span>전 체 선 택<b id='sel_parti'></b></td></tr><tr><td data-id='35239' data-email='aebon260221152729' data-name='관리자' data-tel='' ><div class='ellip pointer'><span class='check_out'><span></span></span>관리자</div></td></tr></table>
+            </div>
+
+            <div id="parti" class="visibleF">
+                <input type="hidden" name="parti_id" id="parti_id" value="0" />
+                <div class="visibleF"><input name="parti_email" type="text" id="parti_email" placeholder="e-mail을 입력합니다." /></div>
+                <div><input name="parti_name" type="text" id="parti_name" placeholder="이름을 입력합니다." /></div>
+                <div class="visibleF"><input name="parti_tel" type="text" id="parti_tel" placeholder="전화번호를 입력합니다." /></div>
+
+                <div><input type="submit" name="parti_up" value="수 정" id="parti_up" data-type="2" class="loading" /></div>
+                <div class="center pointer" data-type="4" id="parti_cancel">취 소</div>
+            </div>
+            <input type="submit" name="mapping_parti" value="평가자 배정" onclick="return parti_check();" id="mapping_parti" class="center coB btns pointer" />
+            <input type="hidden" name="parti_array" id="parti_array" />
+            <input type="hidden" name="parti_array2" id="parti_array2" />
+            <div id="parti2" class="visibleF">
+                <div id="parti_btn">
+                    <span class="btns" data-type="2">평가자 수정</span>
+                    <input type="submit" name="parti_de" value="평가자 삭제" onclick="return confirm(&#39;배정된 프로젝트에서 제외되며 평가했던 데이터가 모두 삭제 됩니다. 그래도 삭제하시겠습니까?&#39;);" id="parti_de" class="btns visibleF" />
+                </div>
+            </div>
+        </div>
+
+<script type='text/javascript' src='https://www.google.com/jsapi'></script>
+<script>
+    var data2 = '[{"Node":"창의력", "Parent":"0","id":"80948"},{"Node":"분석능력", "Parent":"0","id":"80949"},{"Node":"기술능력", "Parent":"0","id":"80950"},{"Node":"문제 해결능력", "Parent":"0","id":"80951"},{"Node":"자료 검색", "Parent":"80948","id":"80952"},{"Node":"사고력", "Parent":"80948","id":"80953"}]';
+    var alt_data2 = ']';
+    var data3;
+    var total;
+    google.load('visualization', '1', { packages: ['orgchart'] });
+    if (data2.length > 10) {
+        //google.setOnLoadCallback(drawChart);
+    }
+
+    $(function () {
+        jQuery.event.props.push('dataTransfer');
+        $('.brain_table').on({
+            dragstart: function (e) {
+                e.stopPropagation();
+                var cl = e.target.classList[0];
+                if (cl != 'brain_ele') return;
+                $(this).addClass('ele_moving');
+                var val = $(this).find('input').val();
+                var type = $(this).attr('data-type');
+                sessionStorage.setItem('val', val);
+                sessionStorage.setItem('type', type);
+            },
+            dragleave: function (e) {
+                if (e.target.classList[0] == "brain_trash") {
+                    $(this).removeClass('trash_over');
+                }
+            },
+            dragenter: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.target.classList[0] == "brain_trash") {
+                    $(this).addClass('trash_over');
+                }
+            },
+            dragover: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            },
+            dragend: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).removeClass('ele_moving');
+            },
+            drop: function (e) {
+                e.stopPropagation();
+                var origin_node = null;
+                var val = sessionStorage.getItem('val');
+                var type = sessionStorage.getItem('type');
+                switch (type) {
+                    case "cri": type = "#cri_brain "; break;
+                    case "alt": type = "#alt_brain "; break;
+                    case "pros": type = "#pros_brain "; break;
+                    case "cons": type = "#cons_brain "; break;
+                }
+
+                $(type + '.brain_ele>input').each(function () {
+                    if ($(this).val() == val) {
+                        if (node == $(this).parent()) return;
+                        origin_node = $(this).parent();
+                        return;
+                    }
+                });
+
+                var node = e.target;
+                if (node.nodeName == 'input' || node.nodeName == 'INPUT' || node.nodeName == 'span' || node.nodeName == 'SPAN') node = e.target.parentNode;
+
+                if (node.classList[0] == "brain_trash") {
+                    $(this).removeClass('trash_over');
+                    origin_node.remove();
+                    return;
+                }
+                var lev = 0;
+                var leal_lev = 0;
+                switch (origin_node.attr('data-type')) {
+                    case "cri":
+                        if (node.attributes['data-type'].value != "cri") return;
+                        var check = true;
+                        var $ele = node;
+                        while (check) {
+                            if ($ele == origin_node[0]) {
+                                check = false;
+                                return;
+                            } else {
+                                if ($ele.classList[0] == "brain_panel") {
+                                    check = false;
+                                } else {
+                                    $ele = $ele.parentNode;
+                                }
+                            }
+                        }
+                        if (origin_node[0] == node) return;
+                        if (node.classList[0] == "brain_ele") lev = node.attributes['data-id'].value;
+                        if (lev == null || lev == undefined) lev = 0;
+                        if (origin_node[0].offsetTop < node.offsetTop && origin_node[0].offsetTop + origin_node[0].offsetHeight > node.offsetTop + node.offsetHeight && origin_node[0].offsetLeft < node.offsetLeft && origin_node[0].offsetLeft + origin_node[0].offsetWidth > node.offsetLeft + node.offsetWidth) return;
+                        if (lev == 0) {
+                            var cur_y = window.event.offsetY;
+                            var cur_x = window.event.offsetX;
+                            origin_node.addClass('abs_ele').css("top", cur_y + "px").css("left", cur_x + "px");
+                        } else origin_node.removeClass('abs_ele');
+                        leal_lev = 1;
+                        try {
+                            leal_lev = Number(node.attributes['data-level'].value) + 1;
+                        } catch(e){}
+                        origin_node.attr('data-pid', lev).attr('data-level', leal_lev).appendTo(node);
+                        $origin_node = origin_node;
+                        $origin_node.find('.brain_ele').each(function () {
+                            $(this).attr('data-level', Number($(this).parent().attr('data-level')) + 1);
+                        });
+                        break;
+                    case "pros": case "cons":
+                        if (node.attributes['data-type'].value != "cri") return;
+                        if (node.classList[0] == "brain_ele") lev = node.attributes[4].value;
+                        var name = prompt('원하시는 기준명을 입력해주세요. \n(기존에 있던 기준명과 같으면 입력 되지 않습니다.)', val);
+                        if (!name) return;
+                        if (name.length < 1) {
+                            alert('한글자 이상 입력해주세요.');
+                        }
+                        var clone_check = true;
+                        $('#cri_brain .brain_panel input').each(function () {
+                            if ($(this).val() == name) {
+                                alert('입력하신 기준명은 이미 추가되어 있습니다.\n다른 기준명을 입력해주세요.');
+                                clone_check = false;
+                                return;
+                            }
+                        });
+                        if (!clone_check) return;
+                        var cri_id = make_cri_id();
+                        var new_ele = $('<div class="brain_ele drag_ele" draggable="true" data-type="cri" data-level="0" data-id="' + cri_id + '" data-pid="' + lev + '" title="' + name + '"><input value="' + name + '" type="text" class="visibleF"><span>' + name + '</span></div>');
+                        if (lev == 0) {
+                            var cur_y = window.event.offsetY;
+                            var cur_x = window.event.offsetX;
+                            new_ele.addClass('abs_ele').css("top", cur_y + "px").css("left", cur_x + "px");
+                        }
+                        new_ele.appendTo(node);
+                        break;
+                }
+            }
+        }, '.drag_ele');
+        $('input.creator').keypress(function (e) {
+            if (e.keyCode == 13) {
+                $(this).parent().parent().find('span.btn').click();
+            } else if (e.keyCode == 27) {
+                $(this).parent().parent().addClass('visibleF').find('input').val('');
+            }
+        });
+        $('.brain_panel').click(function (e) {
+            if ($(this).attr('draggable') == true) {
+                e.stopPropagation();
+                e.preventDefault();
+                return;
+            }
+            var target = $(this).parent().parent().find('span.input_span').parent();
+            if (target.attr('class').length < 10) {
+                target.addClass('visibleF');
+                return;
+            }
+            $('.brain_panel').each(function () {
+                var ex_target = $(this).parent().parent().find('span.input_span').parent();
+                if (ex_target != target) {
+                    $(this).removeClass('panel_select');
+                    ex_target.addClass('visibleF').find('input').val('');
+                }
+            });
+
+            if (target[0].classList[1] == 'visibleF') {
+                var cur_y = window.event.offsetY + 40;
+                var cur_x = window.event.offsetX;
+                sessionStorage.setItem('cur_y', cur_y);
+                sessionStorage.setItem('cur_x', cur_x);
+                var bar_width = 150;
+                if ($(this)[0].offsetWidth > 300) bar_width = 230;
+                if (cur_x > ($(this)[0].offsetWidth - bar_width)) target.removeAttr('style').css("right", "10px");
+                else target.removeAttr('style').css("left", cur_x + "px");
+                target.css("top", (cur_y) + "px").removeClass('visibleF');
+                target.find('input').focus();
+                $(this).addClass('panel_select');
+            } else {
+                target.addClass('visibleF').find('input').val('');
+                $(this).removeClass('panel_select');
+            }
+        });
+
+        $('#brainstorming').on('dblclick', '.brain_ele', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var type = $(this).attr('data-type');
+            $('#' + type + '_input_div').addClass('visibleF');
+            var this_name = $(this).find('input').val();
+            var new_name = prompt('수정할 이름을 입력해주세요.', this_name);
+            if (new_name) {
+                $(this).attr('title', new_name).find('input').eq(0).val(new_name);
+                $(this).find('span').eq(0).html(new_name);
+            }
+        });
+        $('#brainstorming').on('click', '.brain_ele', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var type = $(this).attr('data-type');
+            $('#' + type + '_input_div').addClass('visibleF');
+        });
+        $('#alt_brain').on('click', '.abs_ele', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            input_hide('#alt_brain');
+            $(this).addClass('choice_alt');
+            $('#alt_input_div').addClass('visibleF');
+        });
+        init_setting();
+    });
+    function init_setting() {
+        if (data2.length < 3) return;
+        data3 = JSON.parse(data2);
+        var str = "";
+        for (i = 0; i < data3.length; i++) {
+            str += '<div class="brain_ele drag_ele abs_ele" draggable="true" data-type="cri" data-level="1" data-id="' + data3[i].id + '" data-pid="' + data3[i].Parent + '" title="' + data3[i].Node + '" style="top: 0px; left: ' + (250 * i) + 'px;"><input value="' + data3[i].Node + '" type="text" class="visibleF"><span>' + data3[i].Node + '</span></div>';
+        }
+        $('#cri_brain .brain_panel').append(str);
+        var $parent = null;
+        $('.brain_ele:not([data-pid=0])').each(function () {
+            $parent = $('.brain_ele[data-id="' + $(this).attr('data-pid') + '"]');
+            $(this).removeClass('abs_ele').attr('data-level', Number($parent.attr('data-level')) + 1).appendTo($parent);
+        });
+        if (alt_data2.length < 3) return;
+        var alt_data = JSON.parse(alt_data2);
+        str = "";
+        for (i = 0; i < alt_data.length; i++) {
+            str += '<div title="' + alt_data[i].Node + '" class="brain_ele drag_ele abs_ele" draggable="true" data-type="alt"><input class="visibleF" type="text" value="' + alt_data[i].Node + '"><span>' + alt_data[i].Node + '</span></div>';
+        }
+        $('#alt_brain .brain_panel').append(str);
+    }
+    function input_hide(section_id) {
+        $(section_id+' .abs_ele').each(function () {
+            $(this).removeClass('choice_alt');
+        });
+    }
+    function make_cri_id() {
+        var max = 0;
+        $("#cri_brain .brain_ele").each(function () {
+            var ex_id = Number($(this).attr('data-id'));
+            if (max < ex_id) max = ex_id;
+        });
+        return max + 1;
+    }
+
+    function load_ele(){
+        var altdata3 = JSON.parse(alt_data2);
+        for (i = 1; i < altdata3.length; i++) {
+            brain_make_ele('#alt_brain',altdata3[i].Node);
+        }
+        var data3 = JSON.parse(data2);
+        for (i = 1; i < data3.length; i++) {
+            brain_make_ele("#cri_brain", data3[i].Node, (10*i) , 10);
+        }
+    }
+
+    function brain_make_ele(section_id, node, x, y) {
+        var val = $(section_id + " .input_span>input").val();
+        if(node != undefined) val = node;
+        if (val.length < 1) {
+            $(section_id+" .input_div").addClass('visibleF').find('input').val('');
+            return;
+        } else {
+            var check = false;
+            var title_name = "";
+            var ele = "";
+            var ele_id;
+            var cur_y;
+            var cur_x;
+            switch (section_id) {
+                case "#pros_brain":
+                    title_name = "장점"
+                    ele = '<div class="brain_ele drag_ele abs_ele"  draggable="true" data-type="pros" title="' + val + '"><input value="' + val + '" type="text" class="visibleF"/><span>' + val + '</span></div>';
+                    break;
+                case "#cons_brain":
+                    title_name = "단점"
+                    ele = '<div class="brain_ele drag_ele abs_ele"  draggable="true" data-type="cons" title="' + val + '"><input value="' + val + '" type="text" class="visibleF"/><span>' + val + '</span></div>';
+                    break;
+                case "#cri_brain":
+                    title_name = "기준"
+                    ele_id = make_cri_id();
+                    cur_y = sessionStorage.getItem('cur_y');
+                    cur_x = sessionStorage.getItem('cur_x');
+                    if(cur_x == null || cur_x == undefined || cur_x == 0) {
+                        cur_x = x;
+                        cur_y = y;
+                    } else {
+                        sessionStorage.setItem('cur_y', Number(cur_y) + 30);
+                    }
+                    ele = '<div class="brain_ele drag_ele abs_ele"  draggable="true" data-type="cri" data-level="1" data-id="' + ele_id + '" data-pid="0" title="' + val + '" style="top:' + cur_y + 'px;left:' + cur_x + 'px"><input value="' + val + '" type="text" class="visibleF"/><span>' + val + '</span></div>';
+                    break;
+                case "#alt_brain":
+                    title_name = "대안"
+                    ele = '<div class="brain_ele drag_ele abs_ele"  draggable="true" data-type="alt" title="' + val + '"><input value="' + val + '" type="text" class="visibleF"/><span>' + val + '</span></div>';
+                    break;
+            }
+
+            $(section_id + " .brain_panel input").each(function () {
+                if (val == $(this).val()) {
+                    alert('이미 추가되어 있습니다. 다시 입력해주세요.');
+                    $(section_id + " .input_span>input").val('');
+                    check = true;
+                    return;
+                }
+            });
+            if (!check) {
+                $(section_id + " .brain_panel").append(ele);
+                $(section_id + " .input_span>input").val('').focus();
+            }
+        }
+    }
+    function order_ele(section_id) {
+        var position_x = 10;
+        $(section_id + ' .brain_ele').each(function () {
+            $(this).css('top', position_x + 'px');
+            position_x += 50;
+        });
+    }
+    function trash_list(section_id) {}
+    function hide_table(table_id) {
+        var check = $('#hide_table').attr('data-type');
+        if (check == "1") {
+            $(table_id).parent().attr('style', null);
+            $('#hide_table').attr('data-type', 0).html('접기');
+            $('div#cri_table div.brain_panel').removeAttr('style');
+        } else {
+            $(table_id).parent().css('height', '0px');
+            $('#hide_table').attr('data-type', 1).html('펴기');
+            $('div#cri_table div.brain_panel').css('height', '500px');
+        }
+    }
+    function make_model() {
+        var cri_name_arr = new Array();
+        var cri_id_arr = new Array();
+        var cri_pid_arr = new Array();
+        var alt_name_arr = new Array();
+        $('#cri_brain .brain_ele').each(function () {
+            cri_name_arr.push($(this).attr('title'));
+            cri_id_arr.push($(this).attr('data-id'));
+            cri_pid_arr.push($(this).attr('data-pid'));
+        });
+        $('#alt_brain .brain_ele').each(function () {
+            alt_name_arr.push($(this).attr('title'));
+        });
+        var ex = new Array();
+        ex.push(cri_name_arr);
+        ex.push(cri_id_arr);
+        ex.push(cri_pid_arr);
+        ex.push(alt_name_arr);
+        return ex;
+    }
+    function save_brain(){
+        if(!confirm('새로운 모델이 생성 됩니다. 계속 진행하시겠습니까? \n(이미 만들었던 모델이 있다면 지워집니다.)')) return;
+        var ex = make_model();
+        var cri_name_arr = ex[0];
+        var cri_id_arr = ex[1];
+        var cri_pid_arr = ex[2];
+        var alt_name_arr = ex[3];
+
+        $.ajax({
+            url: 'pm_ajax.asmx/save_brain',
+            type: 'post',
+            data: { cri_name: cri_name_arr + '', cri_id: cri_id_arr + '', cri_pid: cri_pid_arr + '', alt_name: alt_name_arr + '' },
+            success: function (data) {
+                if (data == "fail") alert('프로젝트가 설정되어있지 않습니다. 프로젝트를 생성하신 후에 다시 만들어주세요.');
+                else location.replace('default.aspx');
+            },
+            error: function (error) {}
+        });
+    }
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Node');
+        data.addColumn('string', 'Parent');
+        data.addColumn('string', 'ToolTip');
+        data3 = JSON.parse(data2);
+        for (i = 0; i < data3.length; i++) {
+            data.addRows([[data3[i].Node, data3[i].Parent, data3[i].Tooltip]]);
+        }
+        data.setRowProperty(0, 'style', 'border: #fff');
+        var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
+        chart.draw(data, { size: "large", allowHtml: true, nodeClass: 'model_cri' });
+        if ($('div#chart_div tr:nth-child(2)>td:nth-child(2)').html()) {
+            var col1 = Number($('div#chart_div tr:nth-child(2)>td:nth-child(1)').attr('colspan'));
+            var col2 = Number($('div#chart_div tr:nth-child(2)>td:nth-child(2)').attr('colspan'));
+            var col3 = Number($('div#chart_div tr:nth-child(2)>td:nth-child(3)').attr('colspan'));
+            $('div#chart_div tr:nth-child(2)>td:nth-child(2)').attr('colspan', col1 + col2 + col3);
+            var project_name = "<div id='pro_chart'>" + $('div#chart_div tr:nth-child(2)>td:nth-child(2)').text() + "</div>";
+            $('div#chart_div tr:nth-child(2)>td:nth-child(2)').html(project_name);
+            $('div#chart_div tr:nth-child(2)>td:nth-child(3)').remove();
+            $('div#chart_div tr:nth-child(2)>td:nth-child(1)').remove();
+        } else $('div#chart_div tr:nth-child(2)>td:nth-child(1)').html("<div id='pro_chart'>" + $('div#chart_div tr:nth-child(2)>td:nth-child(1)').text() + "</div>");
+        if (window.sessionStorage) {
+            var position = sessionStorage.getItem('position_ahp');
+            position = parseInt(position);
+            if (!isNaN(position)) {
+                $('div#chart_div').scrollLeft(position);
+            }
+        }
+        if (alt_data2.length > 10) {
+            var altdata = new google.visualization.DataTable();
+            altdata.addColumn('string', 'Node');
+            altdata.addColumn('string', 'Parent');
+            altdata.addColumn('string', 'ToolTip');
+            var altdata3 = JSON.parse(alt_data2);
+            for (i = 0; i < altdata3.length; i++) {
+                if (i < 7) altdata.addRows([[altdata3[i].Node, altdata3[i].Parent, altdata3[i].Tooltip]]);
+                else {
+                    var quo = parseInt(i / 6) - 1;
+                    var namu = i % 6;
+                    altdata.addRows([[altdata3[i].Node, altdata3[(6 * quo) + namu].Node, altdata3[i].Tooltip]]);
+                }
+            }
+            altdata.setRowProperty(0, 'style', 'border-width:0');
+            var chart2 = new google.visualization.OrgChart(document.getElementById('chart_div2'));
+            chart2.draw(altdata, { size: "large", allowHtml: true, nodeClass: 'model_alt' });
+            if ($('div#chart_div2 tr:nth-child(2)>td:nth-child(2)').html()) {
+                $('div#chart_div2 tr:nth-child(2)>td:nth-child(2)').html("<div class='alt_chart_daeahn'>：</div><div>대안</div><div class='alt_chart_daeahn'>：</div>");
+            }
+            else $('div#chart_div2 tr:nth-child(2)>td:nth-child(1)').html("<div class='alt_chart_daeahn'>：</div><div>대안</div><div class='alt_chart_daeahn'>：</div>");
+        }
+    }
+    function brain_desc(){
+        var type = $('#desc_switch').attr('data-type');
+        if(type == 'show'){
+            $('#desc_switch').attr('data-type', 'hide').html('접기');
+            $('#caption_desc').removeClass('visibleF');
+        } else {
+            $('#desc_switch').attr('data-type', 'show').html('간단한 사용방법 보기');
+            $('#caption_desc').addClass('visibleF');
+        }
+    }
+    function show_model(){
+        var btn_type = $('#model_btns').attr('data-type');
+        if (btn_type != 0) {
+            $('#graph_div').addClass('visibleF');
+            $('#model_btns').attr('data-type', '0').html('모델보기');
+            return;
+        }
+        var ex = make_model();
+        var cri_name_arr = ex[0];
+        var cri_id_arr = ex[1];
+        var cri_pid_arr = ex[2];
+        var alt_name_arr = ex[3];
+        data2 = '[{"Node": "목적","Parent": "","Tooltip": "목적"}';
+        for (var i in cri_name_arr) {
+            data2 += ",";
+            var pname;
+            if (cri_pid_arr[i] == "0") pname = '목적';
+            else {
+                for (var j in cri_id_arr) {
+                    if (cri_id_arr[j] == cri_pid_arr[i]) {
+                        pname = cri_name_arr[j];
+                        break;
+                    }
+                }
+            }
+            data2 += '{"Node": "' + cri_name_arr[i] + '","Parent": "' + pname + '","Tooltip": "' + cri_name_arr[i] + '"}';
+        }
+        data2 += ']';
+        alt_data2 = '[{"Node": "대안","Parent": "","Tooltip": ""}';
+        for (var i in alt_name_arr) {
+            alt_data2 += ',{"Node": "' + alt_name_arr[i] + '","Parent": "대안","Tooltip": "' + alt_name_arr[i] + '"}';
+        }
+        alt_data2 += ']';
+        $('#graph_div').removeClass('visibleF');
+        $('#model_btns').attr('data-type', '1').html('모델접기');
+        drawChart();
+        location.href = "#chart_div";
+    }
+    function max_width() {
+        var m_type = $('#max_width').attr('data-type');
+        if (m_type == 0) {
+            hide_table('#alt_table');
+            $('#brainstorming').addClass('max');
+            $('#max_width').attr('style', 'top:-3px');
+            $('span#hide_table').attr('style', 'top:-3px');
+            $('div#cri_table div.brain_panel').css('height', ($('html')[0].offsetHeight - 50) + 'px');
+            $('#max_width').attr('data-type', '1').html("작게 보기");
+        } else {
+            hide_table('#alt_table');
+            $('#brainstorming').removeClass('max');
+            $('#max_width').attr('style', 'top:-13px');
+            $('span#hide_table').attr('style', 'top:-13px');
+            $('div#cri_table div.brain_panel').removeAttr('style');
+            $('#max_width').attr('data-type', '0').html("크게 보기");
+        }
+    }
+</script>
+<style>
+    .google-visualization-orgchart-noderow-large{height:28px}
+    tr:not(:nth-child(2)).google-visualization-orgchart-noderow-large{height:28px}
+    #chart_div2 .google-visualization-orgchart-lineleft,#chart_div2 .google-visualization-orgchart-lineright, #chart_div2 .google-visualization-orgchart-linebottom{border:0}
+    b#helper_b{position:absolute;right:100px;bottom:5px;cursor:pointer;word-spacing:5px;user-select: none;-ms-user-select:none;-moz-user-select: -moz-none;-khtml-user-select: none;-webkit-user-select: none}
+    b#helper_b>span{border:1px solid #ccc; border-radius:4px;background:#eee;color:#777;padding:3px 0}
+    b#helper_b>span>b{padding: 2px 10px}
+    b#helper_b>span>b.switch{color:#38d}
+    #chart_div{position:relative}
+    #lev_div>span{border:1px solid;margin-right:10px;padding:0 6px}
+    div.brain_ele,#lev_div>span{color:#000;background:#fff;border-color:#000}
+    .brain_ele[data-level='1'],#lev_div>span.brain_lev1{background:#BAA65D;color:#000}
+    .brain_ele[data-level='2'],#lev_div>span.brain_lev2{background:#666;color:#fff}
+    .brain_ele[data-level='3'],#lev_div>span.brain_lev3{background:#888;color:#fff}
+    .brain_ele[data-level='4'],#lev_div>span.brain_lev4{background:#ccc}
+    .brain_ele>.brain_ele{margin-top:2px}
+    #lev_div{padding:5px 2px}
+    #max_width{position:absolute;top:-13px;right:3px;z-index:100;}
+    #brainstorming.max{position:fixed;top:0;bottom:0;right:0;left:0;background:#fff;z-index:300;overflow:auto}
+</style>
+<div id="brainstorming">
+    <span id="max_width" onclick="max_width()" data-type="0" class="btn">크게 보기</span>
+    <span id="hide_table" onclick="hide_table('#alt_table')" data-type="0" class="btn visibleF">접기</span>
+    <div class="hide_div">
+        <div class="brain_table" id="alt_table">
+        <div class="brain_caption">
+            <span id="caption_ex">델파이/브레인스토밍 기능을 이용해 모델 만드는 방법</span>
+            <div id="caption_desc" class="visibleF">
+                <ol>
+                    <li>아래에 있는 각 상자 안에 빈공간 어디든 클릭하면 '입력 창'이 나타납니다. </li>
+                    <li>원하는 내용을 입력한 후 '입력'단추를 누릅니다.(대안, 장단점, 판단 기준 순으로 진행합니다.)<br />*장단점을 정리하는 이유는 이를 활용하여 판단 기준을 찾기 위한 것이므로 굳이 중복되거나 반대되는 장단점을 모두 입력하지 않아도 됩니다.</li>
+                    <li>장단점을 참고로하여 판단기준들을 만들어 냅니다.</li>
+                    <li>자식이 될 수 있는 판단 기준들을 부모가 될 수 있는 판단 기준 안으로 끌어 놓습니다</li>
+                    <li>모든 절차가 끝났으면 '모델보기', '모델확정' 단추를 클릭합니다.</li>
+                </ol>
+            </div>
+            <b onclick="brain_desc()" data-type="show" id="desc_switch" class="btn">간단한 사용방법 보기</b>
+            <b onclick="window.open('../data/브레인스토밍.pdf')" class="btn">자세한 사용방법 보기</b>
+        </div>
+        <div class="brain_tr">
+            <div id="alt_brain" class="brain_td">
+                <div class="inner_td">
+                    <div class="brain_input">
+                        <div class="brain_ment"><span>생각하는 <b>대안</b>을 모두 입력해주세요.</span></div>
+                    </div>
+                    <div class="brain_panel drag_ele" data-type="alt"></div>
+                     <div class="brain_trash trash_out drag_ele" onclick="trash_list('#alt_brain')"></div>
+                </div>
+                <div id="alt_input_div" class="input_div visibleF">
+                    <span class="input_span"><input type="text" class="creator" /></span>
+                    <span class="btn" onclick="brain_make_ele('#alt_brain')">입력</span>
+                </div>
+            </div>
+            <div id="pros_brain" class="brain_td">
+                <div class="inner_td">
+                    <div class="brain_input">
+                        <div class="brain_ment"><span>대안의 <b>장점</b>을 모두 입력해주세요.</span></div>
+                    </div>
+                    <div class="brain_panel drag_ele" data-type="pros"></div>
+                     <div class="brain_trash trash_out drag_ele" onclick="trash_list('#pros_brain')"></div>
+                </div>
+                <div id="pros_input_div" class="input_div visibleF">
+                    <span class="input_span"><input type="text" class="creator" /></span>
+                    <span class="btn" onclick="brain_make_ele('#pros_brain')">입력</span>
+                </div>
+            </div>
+            <div id="cons_brain" class="brain_td">
+                <div class="inner_td">
+                    <div class="brain_input">
+                        <div class="brain_ment"><span>대안의 <b>단점</b>을 모두 입력해주세요.</span></div>
+                    </div>
+                    <div class="brain_panel drag_ele" data-type="cons"></div>
+                     <div class="brain_trash trash_out drag_ele" onclick="trash_list('#cons_brain')"></div>
+                </div>
+                <div id="cons_input_div" class="input_div visibleF">
+                    <span class="input_span"><input type="text" class="creator" /></span>
+                    <span class="btn" onclick="brain_make_ele('#cons_brain')">입력</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="brain_table" id="cri_table">
+        <div class="brain_tr">
+            <div id="cri_brain" class="brain_td">
+                <div class="inner_td">
+                    <div class="brain_input">
+                        <div class="brain_ment"><span>아래 빈공간을 클릭하여 생각하는 <b>판단기준</b>을 모두 입력해주세요.</span></div>
+                    </div>
+                    <div class="brain_panel drag_ele" data-type="cri"></div>
+                    <div class="brain_trash trash_out drag_ele" onclick="trash_list('#cri_brain')"></div>
+                </div>
+                <div id="cri_input_div" class="input_div visibleF">
+                    <span class="input_span"><input type="text" class="creator"/></span>
+                    <span class="btn" onclick="brain_make_ele('#cri_brain')">입력</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="lev_div"><span class="brain_lev1"> 1차 기준 </span><span class="brain_lev2"> 2차 기준 </span><span class="brain_lev3"> 3차 기준 </span><span class="brain_lev4"> 4차 기준 </span><span class="brain_lev"> 5차 기준 이상 </span></div>
+    <div class="btn_div">
+        <span class="btn" onclick="show_model()" data-type="0" id="model_btns">모델보기</span>
+        <span class="btn" onclick="save_brain()">모델확정</span>
+    </div>
+    <div id="graph_div" class="visibleF">
+        <div id="chart_div" class=""></div>
+        <div id="chart_div2" class=""></div>
+    </div>
+</div>
+    </div>
+    <div id="mode_div">
+        <span>현재 : 관리자 MODE</span>
+        <span><input type="submit" name="parti_go" value="평가자 MODE로 이동" id="parti_go" /></span>
+    </div>
+    <input type="submit" name="log_out" value="로그아웃" id="log_out" class="btn visibleF" />
+    <div style="display:none;">
+        <input type="submit" name="btnNull" value="" onclick="return false;" id="btnNull" />
+    </div>
+
+<script type="text/javascript">
+//<![CDATA[
+WebForm_AutoFocus('btnNull');//]]>
+</script>
+</form>
+    <footer>
+        <div id="footer_pdf" class="footer_abs" onclick="window.open('../info/files/AHP_IMakeIt_QuickStart.pdf','ahp_quick','status=yes, location=no, scrollbars=yes, fullscreen=yes');">사용방법 다운로드</div>
+        <div id="footer_mail" style="visibility:hidden;" class="footer_abs" onclick="location.replace('default.aspx?key=qna')">교육 및 자문 의뢰</div>
+        <div id="footer_msg"></div>
+        <div>
+            <img src="../images/ahp_round.png"/>
+            <img src="../images/imakeit--footer.gif" id="ex_footer" onclick="if(confirm('회사 홈페이지로 이동합니다.')) location.href='http://www.expertchoice.co.kr/';" />
+        </div>
+    </footer>
+    <div id="progress" class="visibleF">
+        <img src="../images/loading.gif" />
+        <div class="visibleF">약 1~2분정도 소요됩니다.</div>
+    </div>
+    <div class="help_div">
+        <div data-helpno="0">
+            <div class="help_ex">
+                <p class="p_title">시작하기</p>
+                <p>'시작하기'를 활용하여 새로운 프로젝트를 추가하거나, 기존 프로젝트를 선택하여 관리/수정/삭제를 할 수 있습니다.</p>
+                <p class="p_title">프로젝트의 상태</p>
+                <ol>
+                    <li>생성중 : 의사결정 모델 구성요소(기준, 대안) 및 평가자를 구성 중인 상태입니다.</li>
+                    <li>대기중 : 의사결정 모델을 완료한 상태로 평가자 배정을 할 수 있습니다. 평가가 시작되기 전 단계입니다.</li>
+                    <li>평가중 : 의사결정 모델이 완료된 후 평가가 진행 중인 상태입니다. 모델을 수정할 수도 있는데 이 경우 현재까지 평가된 데이터는 삭제됩니다.</li>
+                    <li>평가종료 : 평가자들의 평가를 종료시킨 상태로 더이상 평가를 진행 할 수 없으며 결과 확인만 할 수 있습니다.</li>
+                </ol>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="1">
+            <div class="help_ex">
+                <p class="p_title">프로젝트 관리</p>
+                <p>선택한 프로젝트의 마지막 작업을 읽어옵니다. 모델을 구축 또는 수정하거나 결과를 볼 수 있습니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="2">
+            <div class="help_ex">
+                <p class="p_title">프로젝트 이름</p>
+                <p>프로젝트의 이름은 프로젝트 모델의 목적(목표)을 나타낼 수 있도록 구체적이고 명확하게 하는 것이 중요합니다. </p>
+                <p>예를 들어, '우리 가족에게 가장 적합한 자동차 구매', '김성하에게 가장 적합한 대학(학과) 선정', '노사 모두의 이익을 최대화하는 협상안 선택' 등으로 표현합니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="3">
+            <div class="help_ex">
+                <p class="p_title">프로젝트 설명</p>
+                <p>프로젝트의 이름(목적,목표)에 대한 부연설명입니다. 현재 만드는 프로젝트에 대한 내용을 적어주세요</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="4">
+            <div class="help_ex">
+                <p class="p_title">평가 방법 설정</p>
+                <p>1차 기준들에 대한 평가 방법을 설정합니다. <b style="color: rgb(153, 0, 0);">기본 설정은 쌍대비교-실용</b>입니다.</p>
+                <ol>
+                    <li><b>쌍대비교-실용</b> : (기준에 대하여) 필요한 <b style="color: rgb(153, 0, 0);">최소한의 쌍대비교를 실시</b>하여 상대적 중요도(Priority)를 도출합니다. 실무에 활용시 적합합니다. 대부분의 경우 '쌍대비교-실용'의 활용을 추천합니다.</li>
+                    <li><b>직접입력</b> : 데이터가 있는 경우 <b style="color: rgb(153, 0, 0);">데이터를 입력</b>함으로써 이를 기준으로 중요도(Priority)를 도출합니다. <br /> <br /> *데이터가 있는 경우에도 쌍대비교가 더 바람직할 수 있습니다.</li>
+                    <li><b>쌍대비교-이론</b> : (기준에 대하여) 이론상 필요한 <b style="color: rgb(153, 0, 0);">모든 쌍대비교를 실시</b>하여 상대적 중요도(Priority)를 도출합니다. 논문작성의 경우에 적합합니다.</li>
+                </ol>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="5">
+            <div class="help_ex">
+                <p class="p_title">평가자 선택</p>
+                <p>평가를 진행 할 후보자를 새로 추가할 수 있으며, 이미 추가된 후보자를 선택하여 수정/삭제 할 수 있습니다.</p>
+                <p>평가자로 배정하기 위해서는 배정하고 싶은 후보자들의 메일 주소 앞 네모칸을 클릭하여 선택한 후 아래쪽에 '평가자 배정' 단추를 클릭합니다. 배정된 평가자는 파란색으로 보여집니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="6">
+            <div class="help_ex">
+                <p class="p_title">워크숍</p>
+                <p>워크숍에 대한 설명</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+    </div>
+    <style>
+        div#email_form{position:absolute}
+    </style>
+</body>
+</html>

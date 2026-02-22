@@ -1,0 +1,21 @@
+import styles from './ProgressBar.module.css';
+
+export default function ProgressBar({ value = 0, max = 100, label, color }) {
+  const percent = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+
+  return (
+    <div className={styles.container}>
+      {label && <span className={styles.label}>{label}</span>}
+      <div className={styles.track}>
+        <div
+          className={styles.fill}
+          style={{
+            width: `${percent}%`,
+            backgroundColor: color || 'var(--color-primary)',
+          }}
+        />
+      </div>
+      <span className={styles.text}>{value}/{max}</span>
+    </div>
+  );
+}

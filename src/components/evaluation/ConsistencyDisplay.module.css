@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.pass {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+}
+
+.fail {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.label {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.value {
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.pass .value { color: var(--color-success); }
+.fail .value { color: var(--color-danger); }
+
+.status {
+  font-size: 0.8rem;
+}
+
+.pass .status { color: var(--color-success); }
+.fail .status { color: var(--color-danger); }

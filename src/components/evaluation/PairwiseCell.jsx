@@ -1,0 +1,21 @@
+import styles from '../../styles/pairwise.module.css';
+
+export default function PairwiseCell({ index, isLeft, isCenter, isRight, isSelected, fillPercent, onClick }) {
+  const getBackground = () => {
+    if (isSelected) return 'var(--color-pairwise-selected)';
+    if (isCenter) return 'var(--color-pairwise-equal)';
+    const color = isLeft ? 'var(--color-pairwise-left)' : 'var(--color-pairwise-right)';
+    return `linear-gradient(to top, ${color} ${fillPercent}%, #eee ${fillPercent}%)`;
+  };
+
+  return (
+    <div
+      className={`${styles.cell} ${isSelected ? styles.cellSelected : ''}`}
+      style={{ background: getBackground() }}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
+    />
+  );
+}

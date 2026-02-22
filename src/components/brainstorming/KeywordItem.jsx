@@ -1,0 +1,48 @@
+import { useState } from 'react';
+import styles from './KeywordItem.module.css';
+
+export default function KeywordItem({ item, color, onUpdate, onDelete, onDragStart, onDrop }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(item.text);
+
+  const handleSave = () => {
+    if (text.trim() && text !== item.text) {
+      onUpdate(item.id, text.trim());
+    }
+    setEditing(false);
+  };
+
+  return (
+    <div
+      className={styles.item}
+      draggable={!editing}
+      onDragStart={(e) => {
+        e.dataTransfer.setData('text/plain', item.id);
+        onDragStart();
+      }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDrop(item.id);
+      }}
+      onDoubleClick={() => setEditing(true)}
+    >
+      {editing ? (
+        <input
+          className={styles.editInput}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false); }}
+          autoFocus
+        />
+      ) : (
+        <>
+          <span className={styles.text} style={{ borderLeftColor: color }}>{item.text}</span>
+          <button className={styles.deleteBtn} onClick={() => onDelete(item.id)}>&times;</button>
+        </>
+      )}
+    </div>
+  );
+}

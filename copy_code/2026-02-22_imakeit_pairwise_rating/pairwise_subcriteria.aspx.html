@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+<head id="Head1"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta name="keywords" content="expertchoice, expert, choice, 콜라보레이션, 콜라보, collaboration, collabo, 협력, AHP, 방법론, 어떻하지,ahp방법론,ahp 프로그램, ahp program, ahp software, ahp 소프트웨어, ahp소프트웨어, AHP소프트웨어, AHP 소프트웨어, AHP프로그램, AHP 프로그램, 목표, 결정, 의사, 프로젝트, 의견, 충돌, 수렴, 어떻할까, 이렇게 하자, i make it, make it, 의사결정 솔루션,대학, 선정, 선택" /><meta property="og:title" content="AHP소프트웨어 I Make It" /><meta property="og:description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta property="og:image" content="../images/roal01.png" /><link rel="SHORTCUT ICON" href="../images/logo_black.png" />
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="../script/ie_trident.js"></script>
+    <title>AHP 프로그램, 'I MAKE IT' 이렇게 하자.</title>
+    <link rel="Stylesheet" href="../style/imakeit.css" />
+    <!-- 이 페이지는 2차 기준 쌍대비교 평가 페이지입니다 -->
+    <!-- 평가 대상: 창의력의 하위기준 (자료 검색 vs 사고력) -->
+    <!-- 페이지: 2/6 -->
+    <!-- 기준 ID: 80952 (자료 검색), 80953 (사고력) -->
+    <script>
+        function zoom(type) {
+            var width = Number($('div#chart_div').width());
+            switch (type) {
+                case 0:
+                    if (width == 900) alert(lang_out(85, sessionStorage.getItem("lang")));
+                    width -= 200;
+                    if (width < 900) { width = 900; }
+                    break;
+                case 1:
+                    width += 200;
+                    break;
+            }
+            $('div#chart_div').css('width', width + 'px');
+        }
+        var model_check = "off";
+        x_id = "0";
+        origin_arr = new Array();
+        $(function () {
+            $.each($('div.graph_data>div>span:first-child'), function (index, item) {
+                origin_arr.push($(this).html());
+            });
+            if ($('p#par_p').length == 0) {
+                $('div#project_detail').addClass('visibleF');
+            }
+            var id = $('div#project_detail>input[type=hidden]').val();
+            if (id != "0" && id.length > 0) {
+                $.each($('table#project_list td'), function () {
+                    if ($(this).attr('data-id') == id) {
+                        $(this).addClass('select_project');
+                    }
+                });
+                $('input.cri_name').each(function () {
+                    if ($(this).val().length > 15) {
+                        $('input.cri_name').addClass('wide_ele');
+                        return;
+                    }
+                });
+            }
+            $('span.help_btn').click(function (e) {
+                $('div.help_div>div').removeClass();
+                var num = $(this).attr('data-helpno');
+                $.each($('div.help_div>div'), function (index, item) {
+                    if ($(this).attr('data-helpno') == num) $(this).addClass('help_show');
+                });
+                e.stopPropagation();
+            });
+            $('div.help_close').click(function () {
+                $('div.help_div>div').removeClass();
+            });
+            $('span.helper_span').click(function (e) {
+                $(this).find('span').click();
+                e.stopPropagation();
+            });
+            var check = false;
+            var check2 = false;
+            $('div#project_detail>h3>span').click(function () {
+                var ex_leng = $('#project_list td').length;
+                if (ex_leng == 1) {
+                    var ex_url = $('#project_list td').attr('data-id');
+                    if (ex_url != undefined) {
+                        alert(lang_out(86, sessionStorage.getItem("lang")));
+                        location.replace('default.aspx?id=' + $('#project_list td').attr('data-id'));
+                        return;
+                    }
+                } else if (ex_leng < 1) {
+                    alert("배정된 프로젝트가 이미 마감되었거나 배정된 프로젝트가 없습니다.");
+                    return;
+                }
+                if (check2) {
+                    $('div#project_detail').addClass('hide');
+                    check2 = false;
+                    $('div#pro>input[type=hidden]').val("");
+                } else {
+                    $('div#project_detail').removeClass();
+                    check2 = true;
+                }
+            });
+            $('span#user_info>img').click(function () {
+                if (!check) {
+                    $(this).parent().parent().addClass('show');
+                    check = true;
+                } else {
+                    $(this).parent().parent().removeClass();
+                    check = false;
+                }
+            });
+            $('span#lout').click(function () {
+                if (confirm(lang_out(87, sessionStorage.getItem("lang")))) $('input#log_out').click();
+            });
+            $('.loading input[type=submit]:not(.cri_name)').click(function () {
+                $('div#progress').removeClass();
+            });
+            $('div#project_detail td>div').click(function () {
+                $('div#progress').removeClass();
+                var p_id = $(this).parent().attr('data-id');
+                location.replace('default.aspx?id=' + p_id);
+            });
+            draw_graph();
+            var page = $('span#info_page').html();
+            if (page != undefined) {
+                var page2 = page.split('/');
+                page = page2[0] / page2[1] * 100;
+                $('span#info_page').css('background-image', 'linear-gradient(to right, #efefef ' + page + '%, #fff ' + page + '%)');
+            }
+            $('div.ahp_rating input[type=submit]:not(:nth-child(18n+1))').hover(function () {
+                var ex_num = $(this).attr('class');
+                ex_num = ex_num.split(' ');
+                $('div.ahp_rating span.' + ex_num[0]).css('background-color', 'rgba(30, 250, 200,0.3)');
+                $(this).parent().find('input').eq(0).css('border', '1px solid #38d');
+                $(this).parent().find('input').eq(-2).css('border', '1px solid #e77');
+            }, function () {
+                var ex_num = $(this).attr('class');
+                ex_num = ex_num.split(' ');
+                $('div.ahp_rating span.' + ex_num[0]).attr('style', '');
+                $(this).parent().find('input').eq(0).attr('style', '');
+                $(this).parent().find('input').eq(-2).attr('style', '');
+            });
+            $('span#model_btn3').click(function () {
+                if (model_check == "off") {
+                    $('div#chart_div').addClass('visibleF');
+                    $('div#chart_div_alt').addClass('visibleF');
+                    sessionStorage.setItem('model_check3', "off");
+                    model_check = "on";
+                    $(this).html('<dsdata class="lang" data-id="5">모델보기</dsdata>');
+                    $('div.only_mobile>span.btn').html('<dsdata class="lang" data-id="5">모델보기</dsdata>');
+                } else {
+                    $('div#chart_div').removeClass('visibleF');
+                    $('div#chart_div_alt').removeClass('visibleF');
+                    sessionStorage.setItem('model_check3', "on");
+                    model_check = "off";
+                    $(this).html('<dsdata class="lang" data-id="6">모델접기</dsdata>');
+                    $('div.only_mobile>span.btn').html('<dsdata class="lang" data-id="6">모델접기</dsdata>');
+                }
+                lang_action();
+            });
+            model_check = sessionStorage.getItem('model_check3');
+            if (model_check == null) model_check = "off";
+            $('span#model_btn3').click();
+            setInterval(function () {
+                $.ajax({
+                    url: '../modules/makeit.asmx/check_manager',
+                    data: { e_id: "checker" },
+                    type: 'post',
+                    success: function (data) {},
+                    error: function (error) {}
+                });
+            }, 300000);
+            if ($('#lang_btn').length < 1) change_lang("ko");
+        });
+
+        function move_pa(event) {
+            switch (event.keyCode) {
+                case 13:
+                    $('div#move_div>div>input[type=submit]').click();
+                    return false;
+                    break;
+            }
+        }
+
+        function draw_graph() {
+            var max_pri_graph = 0;
+            $.each($('div.graph_div'), function () {
+                var data = $(this).find('span').eq(2).html();
+                data = Math.round(data * 100000) / 1000;
+                if (max_pri_graph < data) max_pri_graph = data;
+            });
+            max_pri_graph = 180 / max_pri_graph;
+            $.each($('div.graph_div'), function () {
+                var data = $(this).find('span').eq(2).html();
+                data = Math.round(data * 100000) / 1000;
+                $(this).find('span').eq(2).html(data + "%");
+                data = (data * max_pri_graph) + 7;
+                if (data == 7) data = 0;
+                $(this).find('span').eq(1).css('width', data + 'px');
+            });
+            resize();
+            if (x_id != "0") {
+                origin_setting();
+                changing();
+            }
+        }
+
+        function go_page_check() {
+            var ex_number = $('#move_div input[type=text]').val();
+            if (isNaN(ex_number) || ex_number == '' || ex_number == undefined) {
+                alert(lang_out(88, sessionStorage.getItem("lang")));
+                return false;
+            } else {
+                var ex_count = $('#info_page').html().split('/');
+                if (ex_count[0] == ex_number) {
+                    alert(lang_out(89, sessionStorage.getItem("lang")));
+                    return false;
+                } else if (Number(ex_count[1]) < ex_number || ex_number < 1) {
+                    alert(lang_out(90, sessionStorage.getItem("lang")));
+                    return false;
+                }
+            }
+            return cr_check(true);
+        }
+
+        function cr_check(type_direction) {
+            var ex_cr = $('span#cr_val').html();
+            var check = false;
+            if (div_len == check_rating_num) {
+                if (ex_cr == undefined || ex_cr < 0.1) {
+                    sessionStorage.setItem('position', null);
+                    check = true;
+                } else {
+                    var ch_str = lang_out(9, sessionStorage.getItem("lang"));
+                    check = !confirm(ch_str);
+                }
+            } else {
+                if (type_direction) check = true;
+                else {
+                    var ch_str = lang_out(13, sessionStorage.getItem("lang"));
+                    check = !confirm(ch_str);
+                }
+            }
+            if (!type_direction && check && $('#alter_rating').length > 0) {
+                var px = $('#info_page').html().split('/');
+                if (Number(px[0]) == Number(px[1]) - 1) {
+                    $('div#progress').removeClass();
+                    $.ajax({
+                        url: 'par_ajax.asmx/last_alt_save',
+                        type: 'post',
+                        success: function (data) {
+                            location.href = 'rating_alt_sub.aspx';
+                        },
+                        error: function (error) {
+                            $('div#progress').addClass('visibleF');
+                            alert("하위평가 오류입니다. 관리자에 문의해주세요.\n02-707-1070");
+                        }
+                    });
+                    check = false;
+                }
+            }
+            if (check) $('div#progress').removeClass();
+            return check;
+        }
+
+        function cri_popup($this) {
+            $this.css('background', 'rgba(30, 250, 200,0.3)');
+            alert($this.val());
+            $this.css('background', '#fff');
+        }
+
+        function resize() {
+            $.each($('div.graph_div>span:first-child'), function () {
+                var span_text = $(this).text();
+                var span_html = $(this).html();
+                if (!$(this).attr('title')) $(this).attr('title', $(this).text());
+                if (span_text.length > 9) span_text = span_text.substring(0, 8) + "..";
+                if ($(this).text() != $(this).html()) {
+                    var index_num = span_html.indexOf('/span>') + 6;
+                    if (index_num < 12) index_num = 12;
+                    $(this).html(span_html.substring(0, index_num) + span_text);
+                } else $(this).text(span_text);
+            });
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div>
+            <span>
+                <hgroup onclick="location.replace('default.aspx?key=main');">
+                    <h1>I MAKE IT</h1>
+                    <h2>AHP Solution</h2>
+                </hgroup>
+            </span>
+            <span id="user_info" class="pointer">
+                <img src="../images/user.png" />
+            </span>
+            <div>
+                <span class="pointer loading" onclick="location.replace('../modules/mail_form.aspx')">문의/교육신청...</span>
+                <span class="pointer" id="lout">로그아웃</span>
+            </div>
+        </div>
+    </header>
+    <h2 class="title"><dsdata class='lang' data-id='41'>평 가 진 행</dsdata></h2>
+    <form method="post" action="./default.aspx?id=3946" id="form1">
+        <div id="main_holder">
+            <div id="project_detail" class="hide">
+                <input type="hidden" name="project_id" id="project_id" value="3946" />
+                <h3 class="pointer"><span class="back"><dsdata class="lang" data-id="1">시작하기</dsdata></span></h3>
+                <div class="scroll">
+                    <table id='project_list'>
+                        <tr><td data-id='3946' data-name='대학원생의 연구역량' data-desc='대학원생의 연구역량'>
+                            <div class='ellip pointer'><b>( <dsdata class='lang' data-id='152'>평가중</dsdata> )</b> 대학원생의 연구역량</div>
+                        </td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Google OrgChart for sub-criteria tree -->
+            <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+            <script type='text/javascript'>
+                var data2 = '[{"Node":"창의력", "Parent":"","Tooltip":"생각하는 힘"},{"Node":"자료 검색", "Parent":"창의력","Tooltip":"자료 검색"},{"Node":"사고력", "Parent":"창의력","Tooltip":"사고력"}]';
+                var data3;
+                var total;
+                if (data2.length > 10) {
+                    google.load('visualization', '1', { packages: ['orgchart'] });
+                    google.setOnLoadCallback(drawChart);
+                }
+                function drawChart() {
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Node');
+                    data.addColumn('string', 'Parent');
+                    data.addColumn('string', 'ToolTip');
+                    data3 = JSON.parse(data2);
+                    for (i = 0; i < data3.length; i++) {
+                        data.addRows([[data3[i].Node, data3[i].Parent, data3[i].Tooltip]]);
+                    }
+                    data.setRowProperty(0, 'style', 'border:0');
+                    var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
+                    chart.draw(data, { size: "large", allowHtml: true, nodeClass: 'model_cri' });
+                    if ($('div#chart_div tr:nth-child(2)>td:nth-child(2)').html()) {
+                        var col1 = Number($('div#chart_div tr:nth-child(2)>td:nth-child(1)').attr('colspan'));
+                        var col2 = Number($('div#chart_div tr:nth-child(2)>td:nth-child(2)').attr('colspan'));
+                        var col3 = Number($('div#chart_div tr:nth-child(2)>td:nth-child(3)').attr('colspan'));
+                        $('div#chart_div tr:nth-child(2)>td:nth-child(2)').attr('colspan', col1 + col2 + col3);
+                        var project_name = "<div id='pro_chart'>" + $('div#chart_div tr:nth-child(2)>td:nth-child(2)').text() + "</div>";
+                        $('div#chart_div tr:nth-child(2)>td:nth-child(2)').html(project_name);
+                        $('div#chart_div tr:nth-child(2)>td:nth-child(3)').remove();
+                        $('div#chart_div tr:nth-child(2)>td:nth-child(1)').remove();
+                    } else {
+                        $('div#chart_div tr:nth-child(2)>td:nth-child(1)').html("<div id='pro_chart'>" + $('div#chart_div tr:nth-child(2)>td:nth-child(1)').text() + "</div>");
+                    }
+                }
+            </script>
+
+            <!-- Rating logic -->
+            <script>
+                var div_len;
+                var refreshIntervalId;
+                var $this_div_input;
+                var check_rating_num = 0;
+
+                $(function () {
+                    make_check();
+                    div_len = $('div.ahp_rating>div:last-child>div').length;
+                    $('input.direct_val').keypress(function (e) {
+                        switch (e.keyCode) { case 13: direct_save(true); return false; break; }
+                    });
+                    $('input.direct_val').change(function (e) { direct_save(true); return false; });
+                    $('h5#direct_uck').on('click', 'span', function () {
+                        if ($(this).attr('data-un')) {
+                            $('div#converse>input').val("0");
+                        } else {
+                            $('div#converse>input').val("1");
+                        }
+                        direct_save(false);
+                    });
+                    bestfiter(0);
+                });
+
+                function make_check() {
+                    var item_val;
+                    $.each($('div.ahp_rating input[type=hidden]'), function (index, item) {
+                        item_val = $(this).val();
+                        var check = false;
+                        $.each($(this).parent().find('input[type=submit]'), function (index2, item2) {
+                            if (!check) {
+                                if ($(this).val() == item_val) { $(this).addClass('check_rating'); check = true; }
+                                else {
+                                    if (index2 > 9) {
+                                        var item_v = Number(item_val) * (-1);
+                                        if ($(this).val() == item_v) { $(this).addClass('check_rating'); check = true; }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+
+                function direct_save(check) {
+                    $('div#progress').removeClass();
+                    $('div#direct_data>input[type=hidden]').val('');
+                    var num_check = true;
+                    var minus_check = true;
+                    $.each($('.direct_val'), function () {
+                        var ex_num = Number($(this).val());
+                        if (isNaN(ex_num)) { num_check = false; $(this).val(''); return; }
+                        else if (ex_num < 0) { minus_check = false; $(this).val(''); return; }
+                        if (ex_num == 0) ex_num = Number($(this).html());
+                        if (ex_num == NaN || ex_num == undefined) ex_num = "";
+                        var text;
+                        if ($('div#direct_data>input[type=hidden]').val().length > 0) {
+                            text = $('div#direct_data>input[type=hidden]').val() + ',' + ex_num;
+                        } else text = ex_num;
+                        $('div#direct_data>input[type=hidden]').val(text);
+                    });
+                    if (!num_check) { alert(lang_out(126, sessionStorage.getItem("lang"))); $('div#progress').addClass('visibleF'); return; }
+                    else if (!minus_check) { alert(lang_out(180, sessionStorage.getItem("lang"))); $('div#progress').addClass('visibleF'); return; }
+                    var i = $('div#direct_data>input[type=hidden]').val();
+                    if (!check) $('div#direct_data>input').eq(-2).click();
+                    else {
+                        $.ajax({
+                            url: 'par_ajax.asmx/btn_save_direct',
+                            type: 'post',
+                            data: { val: i },
+                            success: function (data) {
+                                try {
+                                    $.each($('div.graph_data>div>span:last-child'), function (index, item) { $(this).html(data[index]); });
+                                    draw_graph();
+                                } catch (e) { alert(lang_out(122, sessionStorage.getItem("lang"))); location.replace('http://imakeit.kr'); }
+                                $('div#progress').addClass('visibleF');
+                            },
+                            error: function (error) { $('div#progress').addClass('visibleF'); alert(lang_out(122, sessionStorage.getItem("lang"))); location.replace('http://imakeit.kr'); }
+                        });
+                    }
+                }
+
+                function btn_ajax_ssang(x, y, x1, x2, i, $item) {
+                    $.ajax({
+                        url: 'par_ajax.asmx/btn_save_ssang',
+                        type: 'post',
+                        data: { cri_st: x, cri_nd: y, row: x1, col: x2, val: i },
+                        success: function (data) {
+                            try {
+                                $.each($('div.graph_data>div>span:last-child'), function (index, item) { $(this).html(data.pri[index]); });
+                                $('span#cr_val').html(data.cr);
+                                draw_graph();
+                                var already_check = false;
+                                var ex_check = $item.attr('class').split(' ');
+                                if (ex_check.length > 1) { if (ex_check[1] == 'check_rating') already_check = true; }
+                                $item.parent().find('input').removeClass('check_rating');
+                                if ($this_div_input != null) {
+                                    var ex_class = $this_div_input.attr('class').split(' ');
+                                    if (ex_class[1] != 'check_rating') $this_div_input.removeClass(ex_class[1]);
+                                }
+                                clearInterval(refreshIntervalId);
+                                if (!already_check) $item.addClass('check_rating');
+                                bestfiter(data.best);
+                            } catch (e) { alert(lang_out(122, sessionStorage.getItem("lang"))); location.replace('http://imakeit.kr'); }
+                            $('div#progress').addClass('visibleF');
+                        },
+                        error: function (error) { alert(lang_out(122, sessionStorage.getItem("lang"))); location.replace('http://imakeit.kr'); }
+                    });
+                }
+
+                function bestfiter(best) {
+                    check_rating_num = 0;
+                    $.each($('div.ahp_rating>div:last-child>div'), function (index, item) {
+                        $.each($(this).find('input'), function (index2, item) {
+                            if (index2 > 0 && index2 < 18) {
+                                var ex_class_name = $(this).attr('class');
+                                if (ex_class_name != null && ex_class_name.length > 10) check_rating_num++;
+                            }
+                        });
+                    });
+                    if (div_len == check_rating_num) {
+                        var cr_now = Number($('span#cr_val').html());
+                        if (cr_now > 0.1) {
+                            $('span#cr_val').css('color', '#a00');
+                            var best_str = "";
+                            var best_name = ["1", "2", "3", "4", "5", "best01", "best02", "best03", "best04", "best05"];
+                            for (var i = 0; i < best.length; i++) {
+                                if (best[i].best_cr < cr_now) best_str += "<span onclick='makeBestFit(" + best[i].best_index + ", " + best[i].best_value + ",$(this))' class='" + best_name[i + 5] + "' title='비일관성비율:" + best[i].best_cr + "'>" + best_name[i] + "</span>";
+                            }
+                            if (best.length > 0) $('span#best_fit_span>span#best_span').html(best_str);
+                            $('span#best_fit_span').removeClass('visibleF');
+                            $('div#congratulation').addClass('visibleF');
+                            $('div#congratulation+img').addClass('visibleF');
+                        } else {
+                            $('span#best_fit_span').addClass('visibleF');
+                            $('div#congratulation').removeClass('visibleF');
+                            $('div#congratulation+img').removeClass('visibleF');
+                            $('span#cr_val').css('color', '#000');
+                        }
+                        $('div.cr_val_div').removeClass('visibleF');
+                        $('div#rating_count_check').addClass('visibleF');
+                        $.ajax({ url: 'par_ajax.asmx/last_cell', type: 'post', success: function (data) {}, error: function (error) {} });
+                    } else {
+                        $('div.cr_val_div').addClass('visibleF');
+                        $('div#rating_count_check').removeClass('visibleF');
+                        $('div#rating_count_check>b').html('<dsdata class="lang" data-id="98">평가를 완료하지 못했습니다.</dsdata> (' + check_rating_num + ' / ' + div_len + ')');
+                        lang_action();
+                    }
+                }
+
+                function makeBestFit(best_index, best_value, $best_num) {
+                    if (best_value == null || best_value == 0) return;
+                    var $this_div = $('div.ahp_rating>div:last-child').find('div').eq(best_index);
+                    var eq_num = 0;
+                    if ($this_div_input != null) {
+                        var ex_class = $this_div_input.attr('class').split(' ');
+                        if (ex_class[1] != 'check_rating') $this_div_input.removeClass(ex_class[1]);
+                    }
+                    clearInterval(refreshIntervalId);
+                    if (best_value < 1) eq_num = (best_value * -1) + 8;
+                    else if (best_value == 1) eq_num = 9;
+                    else eq_num = 10 - best_value;
+                    $this_div_input = $this_div.find('input').eq(eq_num);
+                    var ex_class2 = $this_div_input.attr('class').split(' ');
+                    if (ex_class2[1] != 'check_rating') {
+                        $this_div_input.focus();
+                        refreshIntervalId = setInterval(function () {
+                            var cl_na = $best_num.attr('class');
+                            $this_div_input = $this_div.find('input').eq(eq_num);
+                            var cl_name = $this_div_input.attr('class');
+                            if (cl_name.length < 3) $this_div_input.addClass(cl_na);
+                            else $this_div_input.removeClass(cl_na);
+                        }, 800);
+                    } else alert(lang_out(123, sessionStorage.getItem("lang")));
+                }
+            </script>
+
+            <div class="chart_scroll">
+                <div id="chart_div"></div>
+            </div>
+
+            <div id="criterion_rating">
+                <div class="center">
+                    <span><dsdata class='lang' data-id='137'>현재 평가는 모델의 제 </dsdata>1<dsdata class='lang' data-id='138'>계층 요소 중 하나인 </dsdata><b>'창의력'</b> <dsdata class='lang' data-id='139'>의 하위 평가기준 간의 상대적 중요도를 판단합니다.</dsdata></span><br>
+                    <span><dsdata class='lang' data-id='153'>어느 기준이 상대적으로 얼마만큼 더 중요한지 / 선호되는지 선택해 주십시오.</dsdata></span>
+                    <span class='helper_span'><span class='pointer help_btn' data-helpno='1'>?</span></span>
+                </div>
+                <div class="only_mobile">
+                    <dsdata class="lang" data-id="128">단말기를 '가로보기' 하시면 편리하게 이용할 수 있습니다.</dsdata>
+                    <span class="btn" onclick="$('span#model_btn3').click();">모델보기</span>
+                </div>
+                <div>
+                    <!-- 직접입력 패널 (비활성) -->
+                    <div id="ctl10_direct_pannel" class="ahp_direct loading"></div>
+
+                    <!-- 쌍대비교 평가 그리드 -->
+                    <div id="ctl10_upt_pannel" class="ahp_rating loading">
+                        <!-- 헤더 행 -->
+                        <div>
+                            <span class='cri_name'><dsdata class='lang' data-id='19'>기 준</dsdata></span>
+                            <span class='9'><dsdata class='lang' data-id='20'>극히많이</dsdata></span>
+                            <span class='8'><dsdata class='lang' data-id='21'>대단히많이</dsdata></span>
+                            <span class='7'><dsdata class='lang' data-id='22'>아주많이</dsdata></span>
+                            <span class='6'><dsdata class='lang' data-id='23'>매우많이</dsdata></span>
+                            <span class='5'><dsdata class='lang' data-id='24'>많이</dsdata></span>
+                            <span class='4'><dsdata class='lang' data-id='25'>상당히</dsdata></span>
+                            <span class='3'><dsdata class='lang' data-id='26'>약간</dsdata></span>
+                            <span class='2'><dsdata class='lang' data-id='27'>조금</dsdata></span>
+                            <span class='1'><dsdata class='lang' data-id='28'>동등</dsdata></span>
+                            <span class='-2'><dsdata class='lang' data-id='27'>조금</dsdata></span>
+                            <span class='-3'><dsdata class='lang' data-id='26'>약간</dsdata></span>
+                            <span class='-4'><dsdata class='lang' data-id='25'>상당히</dsdata></span>
+                            <span class='-5'><dsdata class='lang' data-id='24'>많이</dsdata></span>
+                            <span class='-6'><dsdata class='lang' data-id='23'>매우많이</dsdata></span>
+                            <span class='-7'><dsdata class='lang' data-id='22'>아주많이</dsdata></span>
+                            <span class='-8'><dsdata class='lang' data-id='21'>대단히많이</dsdata></span>
+                            <span class='-9'><dsdata class='lang' data-id='20'>극히많이</dsdata></span>
+                            <span class='cri_name'><dsdata class='lang' data-id='19'>기 준</dsdata></span>
+                        </div>
+                        <div style='text-align:center;font-weight:bold;font-size:12px'><dsdata class='lang' data-id='70'></dsdata></div>
+                        <!-- 비교 행: 자료 검색 vs 사고력 -->
+                        <div>
+                            <div>
+                                <input type="submit" name="ctl10$ctl04" value="자료 검색" onclick="cri_popup($(this)); return false;" title="자료 검색" class="cri_name" />
+                                <input type="submit" name="ctl10$ctl05" value="9" onclick="btn_ajax_ssang(80952,80953,0,1,9, $(this)); return false;" class="9" />
+                                <input type="submit" name="ctl10$ctl06" value="8" onclick="btn_ajax_ssang(80952,80953,0,1,8, $(this)); return false;" class="8" />
+                                <input type="submit" name="ctl10$ctl07" value="7" onclick="btn_ajax_ssang(80952,80953,0,1,7, $(this)); return false;" class="7" />
+                                <input type="submit" name="ctl10$ctl08" value="6" onclick="btn_ajax_ssang(80952,80953,0,1,6, $(this)); return false;" class="6" />
+                                <input type="submit" name="ctl10$ctl09" value="5" onclick="btn_ajax_ssang(80952,80953,0,1,5, $(this)); return false;" class="5" />
+                                <input type="submit" name="ctl10$ctl10" value="4" onclick="btn_ajax_ssang(80952,80953,0,1,4, $(this)); return false;" class="4" />
+                                <input type="submit" name="ctl10$ctl11" value="3" onclick="btn_ajax_ssang(80952,80953,0,1,3, $(this)); return false;" class="3" />
+                                <input type="submit" name="ctl10$ctl12" value="2" onclick="btn_ajax_ssang(80952,80953,0,1,2, $(this)); return false;" class="2" />
+                                <input type="submit" name="ctl10$ctl13" value="1" onclick="btn_ajax_ssang(80952,80953,0,1,1, $(this)); return false;" class="1" />
+                                <input type="submit" name="ctl10$ctl14" value="2" onclick="btn_ajax_ssang(80952,80953,0,1,-2, $(this)); return false;" class="-2" />
+                                <input type="submit" name="ctl10$ctl15" value="3" onclick="btn_ajax_ssang(80952,80953,0,1,-3, $(this)); return false;" class="-3" />
+                                <input type="submit" name="ctl10$ctl16" value="4" onclick="btn_ajax_ssang(80952,80953,0,1,-4, $(this)); return false;" class="-4" />
+                                <input type="submit" name="ctl10$ctl17" value="5" onclick="btn_ajax_ssang(80952,80953,0,1,-5, $(this)); return false;" class="-5" />
+                                <input type="submit" name="ctl10$ctl18" value="6" onclick="btn_ajax_ssang(80952,80953,0,1,-6, $(this)); return false;" class="-6" />
+                                <input type="submit" name="ctl10$ctl19" value="7" onclick="btn_ajax_ssang(80952,80953,0,1,-7, $(this)); return false;" class="-7" />
+                                <input type="submit" name="ctl10$ctl20" value="8" onclick="btn_ajax_ssang(80952,80953,0,1,-8, $(this)); return false;" class="-8" />
+                                <input type="submit" name="ctl10$ctl21" value="9" onclick="btn_ajax_ssang(80952,80953,0,1,-9, $(this)); return false;" class="-9" />
+                                <input type="submit" name="ctl10$ctl22" value="사고력" onclick="cri_popup($(this)); return false;" title="사고력" class="cri_name" />
+                                <input type="hidden" name="ctl10$ctl23" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 중요도 그래프 -->
+                    <div>
+                        <div id="ctl10_chart_pannel" class="graph_data">
+                            <div class="graph_div">
+                                <span>자료 검색</span><span></span><span>0.00000</span>
+                            </div>
+                            <div class="graph_div">
+                                <span>사고력</span><span></span><span>0.00000</span>
+                            </div>
+                        </div>
+
+                        <!-- 페이지 네비게이션 -->
+                        <div class="center">
+                            <input type="submit" name="ctl10$ra_pre_btn" value="　　이전" onclick="return cr_check(true);" id="ctl10_ra_pre_btn" class="btn_left back_img_btn back_img_text" />
+                            <span id='info_page'>2/6</span>
+                            <input type="submit" name="ctl10$ra_nex_btn" value="다음　　" onclick="return cr_check();" id="ctl10_ra_nex_btn" class="btn_right back_img_btn back_img_text" />
+
+                            <div id="rating_count_check"><b><dsdata class="lang" data-id="98">평가를 완료하지 못했습니다.</dsdata></b></div>
+                            <div id="move_div">
+                                <div>
+                                    <span><dsdata class="lang" data-id="8">원하는 페이지로 바로 이동</dsdata> : </span>
+                                    <input name="ctl10$move_p" type="text" id="ctl10_move_p" placeholder="입력" onkeypress="return move_pa(event)" />
+                                    <input type="submit" name="ctl10$move_page_btn" value="이동" onclick="return go_page_check();" id="ctl10_move_page_btn" class="btn" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="save_data"><dsdata class="lang" data-id="99">데이터는 실시간으로 저장됩니다</dsdata></div>
+            </div>
+
+            <!-- 모델 보기/접기 버튼 -->
+            <div id="ahp_btn">
+                <span class='btn' id='model_btn3'><dsdata class="lang" data-id="6">모델접기</dsdata></span>
+                <span onclick="window.open('../modules/ahp_model_3.aspx','ahp_model','status=yes, location=no, scrollbars=yes,resizable=yes');" class="btn"><dsdata class="lang" data-id="7">프로젝트 전체 모델 보기</dsdata></span>
+            </div>
+        </div>
+
+        <!-- MODE 전환 -->
+        <div id="mode_div">
+            <span>현재 : 평가자 MODE</span>
+            <span onclick="javascript: $('div#progress').removeClass();location.href='../pm/default.aspx?key=main';">관리자 MODE로 이동</span>
+        </div>
+        <input type="submit" name="log_out" value="로그아웃" id="log_out" class="btn visibleF" />
+    </form>
+
+    <footer>
+        <div id="footer_pdf" class="footer_abs" onclick="window.open('../info/files/AHP_IMakeIt_QuickStart.pdf','ahp_quick','status=yes, location=no, scrollbars=yes, fullscreen=yes');"><dsdata class="lang" data-id="83">사용방법 다운로드</dsdata></div>
+        <div id="footer_mail" style="visibility:hidden;" class="footer_abs" onclick="location.replace('default.aspx?key=qna')"><dsdata class="lang" data-id="84">교육 및 자문 의뢰</dsdata></div>
+        <div id="footer_msg"><dsdata class="lang" data-id="82"></dsdata></div>
+        <div>
+            <img src="../images/ahp_round.png"/>
+            <img src="../images/imakeit--footer.gif" id="ex_footer" onclick="if(confirm('회사 홈페이지로 이동합니다.')) location.href='http://www.expertchoice.co.kr/';" />
+        </div>
+    </footer>
+
+    <!-- 로딩 오버레이 -->
+    <div id="progress" class="visibleF">
+        <img src="../images/loading.gif" />
+    </div>
+
+    <!-- 도움말 -->
+    <div class="help_div">
+        <div data-helpno="0">
+            <div class="help_ex">
+                <p class="p_title"><dsdata class="lang" data-id="91">판단의 타당성 점검 (비일관성비율)</dsdata></p>
+                <p><dsdata class="lang" data-id="92">판단의 일관성을 논리적으로 검증합니다. 비일관성비율이 0.1보다 높은 경우에는 재판단이 필요함을 나타냅니다.</dsdata></p>
+                <p class="p_title"><dsdata class='lang' data-id='10'>판단 도우미</dsdata></p>
+                <p><dsdata class="lang" data-id="81">비일관성비율의 개선에 가장 큰 영향을 미치는 순서에 따라 1,2,3...으로 표시됩니다.</dsdata></p>
+                <p><dsdata class="lang" data-id="93">만일 추천 셀보다 기존에 선택한 셀이 더 타당하다고 생각되면 기존의 셀을 유지하고 다음 순서의 번호를 선택합니다.</dsdata></p>
+                <p><dsdata class="lang" data-id="94">한편, 추천 셀을 그대로 수용하지 않고 약간만 수정하고자 할 경우에는 기존 셀과 추천 셀 사이에 있는 적절한 셀을 선택합니다.</dsdata></p>
+            </div>
+            <div class="btn help_close"><dsdata class="lang" data-id="45">닫기</dsdata></div>
+        </div>
+    </div>
+    <div class="help_div">
+        <div data-helpno="1">
+            <div class="help_ex">
+                <p class="p_title"><dsdata class="lang" data-id="41">평가 진행</dsdata></p>
+                <p><dsdata class="lang" data-id="95">1.왼쪽 요소나 오른쪽 요소 중 하나에만 중요한 정도를 선택합니다.</dsdata></p>
+                <p><dsdata class="lang" data-id="96">2.선택한 후, 한 번 더 클릭하면 취소됩니다.</dsdata></p>
+                <p><dsdata class="lang" data-id="97">3.모든 문항에 대해 판단하여야 합니다. 판단을 할 수 없는 일부 문항은 생략할 수도 있습니다.</dsdata></p>
+            </div>
+            <div class="btn help_close"><dsdata class="lang" data-id="45">닫기</dsdata></div>
+        </div>
+    </div>
+    <script src="../script/lan.js"></script>
+</body>
+</html>

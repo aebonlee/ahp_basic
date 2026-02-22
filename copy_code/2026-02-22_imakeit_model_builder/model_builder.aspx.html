@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head id="Head1"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" /><meta name="description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta name="keywords" content="expertchoice, expert, choice, 콜라보레이션, 콜라보, collaboration, collabo, 협력, AHP, 방법론, 어떻하지,ahp방법론,ahp 프로그램, ahp program, ahp software, ahp 소프트웨어, ahp소프트웨어, AHP소프트웨어, AHP 소프트웨어, AHP프로그램, AHP 프로그램, 목표, 결정, 의사, 프로젝트, 의견, 충돌, 수렴, 어떻할까, 이렇게 하자, i make it, make it, 의사결정 솔루션,대학, 선정, 선택" /><meta property="og:title" content="AHP소프트웨어 I Make It" /><meta property="og:description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta property="og:image" content="../images/roal01.png" /><link rel="SHORTCUT ICON" href="../images/logo_black.png" />
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="../script/ie_trident.js"></script>
+    <title>AHP 프로그램, 'I MAKE IT' 이렇게 하자.</title>
+    <link rel="Stylesheet" href="../style/imakeit.css" />
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script src="../script/imakeit_pm.js"></script>
+</head>
+<body>
+    <!-- 이 페이지는 모델구축(Model Builder) 페이지입니다 -->
+    <!-- action URL: default.aspx?id=3946 (프로젝트 ID 기반) -->
+    <!-- title: 모델구축 -->
+
+    <header>
+        <div>
+            <span>
+                <hgroup onclick="location.replace('default.aspx?key=main');" class="loading">
+                    <h1>I MAKE IT</h1>
+                    <h2>AHP Solution</h2>
+                </hgroup>
+            </span>
+            <span id="user_info" class="pointer">
+                <img src="../images/user.png" />
+            </span>
+            <div>
+                <span class="pointer" onclick="window.open('license.aspx','license','width=960, height=800, status=yes,resizable=yes, location=no, scrollbars=yes');">계정정보</span>
+                <span class="pointer loading" onclick="location.replace('default.aspx?key=qna')">문의/교육신청...</span>
+                <span class="pointer" id="lout">로그아웃</span>
+            </div>
+        </div>
+    </header>
+
+    <h2 class="title">모델구축</h2>
+
+    <form method="post" action="./default.aspx?id=3946" id="form1">
+        <!-- ASP.NET ViewState/EventValidation 생략 -->
+
+        <div id="main_holder">
+            <!-- 프로젝트 패널 (좌측) -->
+            <div id="project_detail" class="hide">
+                <input type="hidden" name="project_id" id="project_id" value="3946" />
+                <h3>
+                    <span class="back pointer">시작하기</span>
+                    <span class="helper_span"><span class="pointer help_btn" data-helpno="0">?</span></span>
+                    <span id="brain_btn" title="브레인스토밍" onclick="window.open('../modules/brain.aspx', 'brain', 'width=1000, height=800');">　</span>
+                </h3>
+                <div class="scroll">
+                    <table id='project_list'>
+                        <tr><td data-id='3946' data-name='대학원생의 연구역량' data-desc='대학원생의 연구역량' data-type='10' data-state='2'>
+                            <div class='ellip pointer'><b>( 생성중 )</b> 대학원생의 연구역량</div>
+                        </td></tr>
+                    </table>
+                </div>
+                <!-- 프로젝트 생성/수정 폼 -->
+                <div id="pro" class="visibleF">
+                    <input type="hidden" name="pro_id" id="pro_id" value="0" />
+                    <input type="hidden" name="pro_type" id="pro_type" value="2" />
+                    <div id="detail_title">
+                        <input name="pro_name" type="text" id="pro_name" placeholder="프로젝트 이름을 입력합니다." />
+                    </div>
+                    <div id="detail_main">
+                        <textarea name="pro_desc" rows="4" cols="20" id="pro_desc" placeholder="프로젝트에 관한 설명을 입력합니다."></textarea>
+                    </div>
+                    <div id="pro_eval">
+                        <span>&nbsp;&nbsp;&nbsp;하위요소 평가방법 : </span>
+                        <select>
+                            <option value="12">쌍대비교-실용</option>
+                            <option value="20">직접입력</option>
+                            <option value="10">쌍대비교-이론</option>
+                        </select>
+                        <input type="hidden" name="pro_eval_val" id="pro_eval_val" value="12" />
+                    </div>
+                    <div><input type="submit" name="pro_ap" value="생 성" id="pro_ap" /></div>
+                    <div><input type="submit" name="pro_up" value="수 정" id="pro_up" /></div>
+                    <div id="pro_cancel">취 소</div>
+                </div>
+                <!-- 프로젝트 관리 메뉴 -->
+                <div id="pro_2" class="visibleF">
+                    <div id="pro_btn">
+                        <span class="btns loading" data-type="3">프로젝트 관리</span>
+                        <span class="btns" data-type="2">프로젝트 수정</span>
+                        <input type="submit" name="pro_de" value="프로젝트 삭제" id="pro_de" class="btns" />
+                        <input type="submit" name="pro_st" value="프로젝트 중단/완료" id="pro_st" class="btns" />
+                        <span class="btns loading" data-type="4">워크숍 진행</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 평가자 패널 (좌측) -->
+            <div id="parti_detail" class="hide">
+                <h3 class="center">
+                    <span class="back pointer">평가자 선택</span>
+                </h3>
+                <div class="scroll">
+                    <table id='parti_list'>
+                        <tr><td class='pad_10 coB'><span class='check_out' id='all_check'><span></span></span>전 체 선 택</td></tr>
+                        <tr><td data-id='35239' data-email='aebon260221152729' data-name='관리자' data-tel=''>
+                            <div class='ellip pointer'><span class='check_out'><span></span></span>관리자</div>
+                        </td></tr>
+                    </table>
+                </div>
+                <div id="parti" class="visibleF">
+                    <input type="hidden" name="parti_id" id="parti_id" value="0" />
+                    <div><input name="parti_email" type="text" id="parti_email" placeholder="e-mail을 입력합니다." /></div>
+                    <div><input name="parti_name" type="text" id="parti_name" placeholder="이름을 입력합니다." /></div>
+                    <div><input name="parti_tel" type="text" id="parti_tel" placeholder="전화번호를 입력합니다." /></div>
+                </div>
+                <input type="submit" name="mapping_parti" value="평가자 배정" id="mapping_parti" />
+            </div>
+
+            <!-- ===== 모델구축 메인 영역 (핵심) ===== -->
+
+            <!-- 브레인스토밍 안내 -->
+            <p id="brain_msg">
+                <span>델파이/브레인스토밍</span>(모델연동) 기능을 사용하려면
+                <b onclick="location.href='default.aspx?key=brain';">여기를</b> 클릭해주세요.
+            </p>
+
+            <!-- 기준 트리 차트 (Google Visualization OrgChart) -->
+            <div id="chart_scroll">
+                <div id="chart_div"></div>
+                <div id="chart_zoom">
+                    <span onclick="zoom(0)">-</span>
+                    <span onclick="zoom(1)">+</span>
+                </div>
+            </div>
+
+            <!-- 기준 관리 패널 -->
+            <div id="cri" class="visibleF">
+                <div id="cri_btn">
+                    <span class="btns" data-type="0">하위기준추가</span>
+                    <span class="btns" data-type="1">선택기준수정</span>
+                    <input type="submit" name="ctl10$cri_de" value="선택기준삭제" id="ctl10_cri_de" class="btns" />
+                </div>
+                <div id="cri_field" class="visibleF">
+                    <input type="hidden" name="ctl10$cri_par" id="ctl10_cri_par" value="0" />
+                    <div><input name="ctl10$cri_name" type="text" id="ctl10_cri_name" placeholder="기준(목적, 전략 등) 입력" /></div>
+                    <div><textarea name="ctl10$cri_desc" rows="2" cols="20" id="ctl10_cri_desc" placeholder="기준에 대한 설명 입력"></textarea></div>
+                    <div id="cri_eval">
+                        <span><label>하위요소 평가방법</label></span>
+                        <select>
+                            <option value="10">쌍대비교-이론</option>
+                            <option value="20">직접입력</option>
+                            <option value="12">쌍대비교-실용</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="submit_group">
+                    <input type="submit" name="ctl10$cri_ap" value="기준추가" id="ctl10_cri_ap" />
+                    <input type="submit" name="ctl10$cri_up" value="선택기준수정" id="ctl10_cri_up" />
+                </div>
+            </div>
+
+            <!-- 평가방법 히든 필드 -->
+            <div class="visibleF" id="eval_div">
+                <input type="hidden" name="ctl10$eval_type_id" id="ctl10_eval_type_id" value="10" />
+                <input type="hidden" name="ctl10$eval_type_opt" id="ctl10_eval_type_opt" value="0" />
+            </div>
+
+            <!-- 대안 트리 차트 -->
+            <div id="chart_div2"></div>
+
+            <!-- 대안 관리 패널 -->
+            <div id="alt" class="visibleF">
+                <div id="alt_btn">
+                    <span class="btns" data-type="0">대안추가</span>
+                    <span class="btns" data-type="1">대안수정</span>
+                    <input type="submit" name="ctl10$alt_de" value="대안삭제" id="ctl10_alt_de" class="btns" />
+                    <span class="btns" data-type="3">하위대안추가</span>
+                </div>
+                <div id="alt_field">
+                    <input type="hidden" name="ctl10$alt_id" id="ctl10_alt_id" value="0" />
+                    <div id="alt_field_name">
+                        <input name="ctl10$alt_name" type="text" id="ctl10_alt_name" placeholder="대안 입력" />
+                    </div>
+                    <div id="sub_alt_field_name">
+                        <input name="ctl10$sub_alt_name" type="text" id="ctl10_sub_alt_name" placeholder="하위 대안 입력" />
+                    </div>
+                </div>
+                <div id="alt_submit_group">
+                    <input type="submit" name="ctl10$alt_ap" value="대안추가" id="ctl10_alt_ap" />
+                    <input type="submit" name="ctl10$alt_up" value="대안수정" id="ctl10_alt_up" />
+                    <input type="submit" name="ctl10$sub_alt_ap" value="하위대안추가" id="ctl10_sub_alt_ap" />
+                </div>
+            </div>
+
+            <!-- 모델 완료 버튼 -->
+            <div class="btn_div">
+                기준, 대안 및 평가자 배정 등이 완료되었으면
+                <input type="submit" name="ctl10$model_f" value="여기를" id="ctl10_model_f" class="msg_btn" />
+                클릭하여 모델 만들기를 완료합니다.
+            </div>
+
+            <!-- 하위대안 삭제 액션 -->
+            <div id="sub_div_action">
+                <input type="hidden" name="ctl10$id_alt" id="ctl10_id_alt" value="0" />
+                <input type="submit" name="ctl10$sub_delete_action" value="Button" id="ctl10_sub_delete_action" class="visibleF" />
+            </div>
+        </div>
+
+        <!-- MODE 전환 -->
+        <div id="mode_div">
+            <span>현재 : 관리자 MODE</span>
+            <span><input type="submit" name="parti_go" value="평가자 MODE로 이동" id="parti_go" /></span>
+        </div>
+        <input type="submit" name="log_out" value="로그아웃" id="log_out" class="btn visibleF" />
+    </form>
+
+    <footer>
+        <div id="footer_pdf" class="footer_abs">사용방법 다운로드</div>
+        <div id="footer_mail" class="footer_abs">교육 및 자문 의뢰</div>
+    </footer>
+</body>
+</html>

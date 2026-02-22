@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head id="Head1"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0,  minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" /><meta name="description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta name="keywords" content="expertchoice, expert, choice, 콜라보레이션, 콜라보, collaboration, collabo, 협력, AHP, 방법론, 어떻하지,ahp방법론,ahp 프로그램, ahp program, ahp software, ahp 소프트웨어, ahp소프트웨어, AHP소프트웨어, AHP 소프트웨어, AHP프로그램, AHP 프로그램, 목표, 결정, 의사, 프로젝트, 의견, 충돌, 수렴, 어떻할까, 이렇게 하자, i make it, make it, 의사결정 솔루션,대학, 선정, 선택" /><meta property="og:title" content="AHP소프트웨어 I Make It" /><meta property="og:description" content="AHP 방법론을 활용한 WEB APPLICATION 입니다. 중요한 선택의 순간에 함께하겠습니다." /><meta property="og:image" content="../images/roal01.png" /><link rel="SHORTCUT ICON" href="../images/logo_black.png" />
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="../script/ie_trident.js"></script>
+    <title>
+    AHP 프로그램, 'I MAKE IT' 이렇게 하자.
+</title><link rel="Stylesheet" href="../style/imakeit.css" />
+    <!--[if IE 6]>
+        <script language="Javascript">
+            //alert("I Make It을 찾아주셔서 감사합니다. 현재 internet explorer 6버전을 사용중입니다.");
+            location.href ="../alert.html";
+        </script>
+    <![endif]-->
+    <script type="text/jscript">
+        function zoom(type) {
+            var width = Number($('div#chart_div').width());
+            switch (type) {
+                case 0:
+                    //alert('작게');
+                    if (width == 900) alert('최소 크기 입니다. 더 작게 줄일 수 없습니다.');
+                    width -= 200;
+                    if (width < 900) {
+                        width = 900;
+                    }
+                    break;
+                case 1:
+                    //alert('크게');
+                    width += 200;
+                    break;
+            }
+            sessionStorage.setItem('table_width', width);
+            $('div#chart_div').css('width', width + 'px');
+        }
+        onload = function () {
+            var d_t = new Date().getDate();
+            var cri_dt = new Date("June 26, 2021 00:00:00");
+            if (cri_dt > d_t) {
+                //alert("<공지사항>\n6월 25일 23시 경 약 1시간동안 서버 점검으로 인해 사용이 중지됩니다.");
+            }
+            $('.loading').click(function () {
+                $('div#progress').removeClass();
+            });
+            $('span.help_btn').click(function (e) {
+                $('div.help_div>div').removeClass();
+                var num = $(this).attr('data-helpno');
+                $.each($('div.help_div>div'), function (index, item) {
+                    if ($(this).attr('data-helpno') == num) $(this).addClass('help_show');
+                });
+                e.stopPropagation();
+            });
+            $('div.help_close').click(function () {
+                $('div.help_div>div').removeClass();
+            });
+            $('span.helper_span').click(function (e) {
+                $(this).find('span').click();
+                e.stopPropagation();
+            });
+            setInterval(function () {
+                $.ajax({
+                url: '../modules/makeit.asmx/check_manager',
+                data: { e_id: "checker" },
+                type: 'post',
+                success: function (data) {
+
+                },
+                error: function (error) {
+
+                }
+            });
+            }, 300000);
+        };
+    </script>
+    <script src="../script/imakeit_pm.js"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <span>
+                <hgroup onclick="location.replace('default.aspx?key=main');" class="loading">
+                    <h1>
+                        I MAKE IT</h1>
+                    <h2>
+                        AHP Solution</h2>
+                </hgroup>
+            </span>
+            <span id="user_info" class="pointer">
+                <img src="../images/user.png" />
+            </span>
+            <div><span class="pointer" onclick="window.open('license.aspx','license','width=960, height=800, status=yes,resizable=yes, location=no, scrollbars=yes');">계정정보</span><span class="pointer loading" onclick="location.replace('default.aspx?key=qna')">문의/교육신청...</span><span class="pointer" id="lout">로그아웃</span></div>
+        </div>
+    </header>
+    <h2 class="title"></h2>
+    <form method="post" action="./default.aspx" onkeypress="javascript:return WebForm_FireDefaultButton(event, 'btnNull')" id="form1">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="" />
+</div>
+
+    <div id="main_holder">
+        <div id="project_detail" class="hide">
+            <input type="hidden" name="project_id" id="project_id" />
+            <h3>
+                <span class="back pointer" title=" ( 1 / Unlimited ) ">시작하기</span>
+                <span class="helper_span" id="hel00"><span class="pointer help_btn" data-helpno="0">?</span></span>
+                <span id="brain_btn" title="브레인스토밍" onclick="window.open('../modules/brain.aspx', 'brain', 'width=1000, height=800, status=yes, location=no, scrollbars=yes,resizable=yes');">　</span>
+            </h3>
+            <div class="scroll">
+                <table id='project_list'><tr><td data-id='3946' data-name='대학원생의 연구역량' data-desc='대학원생의 연구역량' data-type='10' data-state='2'><div class='ellip pointer'> <b>( 생성중 )</b> 대학원생의 연구역량</div></td></tr></table>
+            </div>
+
+            <div id="pro" class="visibleF">
+                <input type="hidden" name="pro_id" id="pro_id" value="0" />
+                <input type="hidden" name="pro_type" id="pro_type" value="2" />
+                <div id="detail_title">
+                    <input name="pro_name" type="text" id="pro_name" placeholder="프로젝트 이름을 입력합니다." />
+                    <span class="helper_span" id="Span2"><span class="pointer help_btn" data-helpno="2">?</span></span>
+                </div>
+                <div id="detail_main">
+                    <textarea name="pro_desc" rows="4" cols="20" id="pro_desc" placeholder="프로젝트에 관한 설명을 입력합니다.">
+</textarea>
+                    <span class="helper_span" id="Span3"><span class="pointer help_btn" data-helpno="3">?</span></span>
+                </div>
+                <div id="pro_eval">
+                    <span>&nbsp;&nbsp;&nbsp;하위요소 평가방법 : </span>
+                    <select>
+                        <option value="12">쌍대비교-실용</option>
+                        <option value="20">직접입력</option>
+                        <option value="10">쌍대비교-이론</option>
+                    </select>
+                    <br/><b style="color: rgb(153, 0, 0);">평가방법의 차이를 꼭 확인하세요→</b>
+                    <input type="hidden" name="pro_eval_val" id="pro_eval_val" value="12" />
+                    &nbsp;&nbsp;<span class="helper_span" id="Span4"><span class="pointer help_btn" data-helpno="4">?</span></span>
+                </div>
+
+                <div><input type="submit" name="pro_ap" value="생 성" id="pro_ap" data-type="1" class="loading" /></div>
+                <div><input type="submit" name="pro_up" value="수 정" id="pro_up" data-type="2" /></div>
+                <div class="center pointer" data-type="4" id="pro_cancel">취 소</div>
+            </div>
+
+            <div id="pro_2" class="visibleF">
+                <div id="pro_btn">
+                    <span class="btns loading" data-type="3">
+                        프로젝트 관리
+                        <span class="helper_span" id="Span1"><span class="pointer help_btn" data-helpno="1">?</span></span>
+                    </span>
+                    <span class="btns" data-type="2">프로젝트 수정</span>
+                    <input type="submit" name="pro_de" value="프로젝트 삭제" onclick="return confirm('평가했던 모든 데이터가 삭제 됩니다. 그래도 삭제하시겠습니까?');" id="pro_de" class="btns" />
+                    <input type="submit" name="pro_st" value="프로젝트 중단/완료" onclick="return pro_de_f();" id="pro_st" class="btns" />
+                    <span class="btns loading" data-type="4">워크숍 진행</span>
+                    <span class="btns loading" data-type="5" style="display:none !important">e-mail발송</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="parti_detail" class="hide">
+            <h3 class="center">
+                <span class="back pointer" title=" ( 1 / Unlimited ) ">평가자 선택</span>
+                <span class="helper_span" id="Span5"><span class="pointer help_btn" data-helpno="5">?</span></span>
+            </h3>
+            <div class="scroll">
+                <table id='parti_list'><tr><td class='pad_10 coB'><span class='check_out' id='all_check'><span></span></span>전 체 선 택<b id='sel_parti'></b></td></tr><tr><td data-id='35239' data-email='aebon260221152729' data-name='관리자' data-tel='' ><div class='ellip pointer'><span class='check_out'><span></span></span>관리자</div></td></tr></table>
+            </div>
+
+            <div id="parti" class="visibleF">
+                <input type="hidden" name="parti_id" id="parti_id" value="0" />
+                <div class="visibleF"><input name="parti_email" type="text" id="parti_email" placeholder="e-mail을 입력합니다." /></div>
+                <div><input name="parti_name" type="text" id="parti_name" placeholder="이름을 입력합니다." /></div>
+                <div class="visibleF"><input name="parti_tel" type="text" id="parti_tel" placeholder="전화번호를 입력합니다." /></div>
+
+                <div><input type="submit" name="parti_up" value="수 정" id="parti_up" data-type="2" class="loading" /></div>
+                <div class="center pointer" data-type="4" id="parti_cancel">취 소</div>
+            </div>
+            <input type="submit" name="mapping_parti" value="평가자 배정" onclick="return parti_check();" id="mapping_parti" class="center coB btns pointer" />
+            <input type="hidden" name="parti_array" id="parti_array" />
+            <input type="hidden" name="parti_array2" id="parti_array2" />
+            <div id="parti2" class="visibleF">
+                <div id="parti_btn">
+                    <span class="btns" data-type="2">평가자 수정</span>
+                    <input type="submit" name="parti_de" value="평가자 삭제" onclick="return confirm('배정된 프로젝트에서 제외되며 평가했던 데이터가 모두 삭제 됩니다. 그래도 삭제하시겠습니까?');" id="parti_de" class="btns visibleF" />
+                </div>
+            </div>
+        </div>
+
+<script>
+    $(function () {
+        $('div#main_holder').prepend($('div#mode_div'));
+        var end = $('div#explain_total2>input[type=hidden]').val();
+        if (end != "0") {
+            $('div#pm_main_div').html("");
+            setTimeout(function () {
+                $('input#log_out').click();
+            }, 100);
+        }
+        window.moveTo(0, 0);
+        window.resizeTo(screen.width, screen.height);
+        window.focus();
+        var str = [
+            "가장 먼저 할 일은 프로젝트를 생성하는 것입니다. <br>(이미 프로젝트를 생성한 경우에는 프로젝트를 수정, 삭제 및 중단/완료합니다.)",
+            "그런 다음, 모델을 구축합니다. 이를 위해 기준과 대안들을 생성합니다. <br>또한 평가에 참여할 평가자를 추가/배정하거나, 기존 평가자를 수정/삭제합니다. ",
+            "모델 구축과 평가자 배정이 완료되면, 평가자들이 평가를 시작할 수 있게 됩니다. <br>평가를 시작할 수 있음을 알리는 e-mail을 각 평가자에게 자동 발송할 수 있습니다.",
+            "평가자들이 입력한 내용과 진행 정도, 최종 결과 등을 확인합니다. <br>또한 그 결과를 저장 및 출력할 수 있습니다. ",
+            "위 목록 위에 마우스를 올려놓으면 자세한 설명을 보실 수 있습니다."
+        ];
+        $('div#introduce li').hover(function () {
+            var id = $(this).attr('data-id');
+            $('p#intro_msg_p').html(str[id]);
+        }, function () {
+            $('p#intro_msg_p').html(str[4]);
+        });
+        sessionStorage.setItem('table_width', null);
+        sessionStorage.setItem('position_ahp', null);
+    });
+</script>
+<div id="explain_total2">
+    <input type="hidden" name="ctl10$end" id="ctl10_end" value="0" />
+    <div id="ctl10_explain_total2_left" class="left">
+    <span class='arrow_up'></span>① [시작하기]를 클릭하여 새로운 프로젝트를 추가하거나, 기존 프로젝트를 관리합니다.
+        <div class="btn2_div"><input type="submit" name="ctl10$Button1" value="닫기" id="ctl10_Button1" class="pointer" /></div>
+    </div>
+</div>
+<h4 id="moblie">위에 있는 [시작하기]를 클릭한 후 원하는 프로젝트를 선택하여 평가를 시작해주세요.</h4>
+<div id="pm_main_div">
+    <hgroup>
+        <h3>'더 좋은 판단과 선택'을 지원하는 I MAKE IT에 오신 것을 환영합니다.</h3>
+        <h3>오늘도 행복한 하루를 보내시기 바랍니다.</h3>
+    </hgroup>
+    <div id="ceo_intro">
+        <p>AHP 방법론을 기반으로 한 의사결정 소프트웨어인 IMakeIt은 (주)디시전사이언스의 약 20년에 걸친 경험 및 know-how와 고객님의 의견을 기반으로 만들어진 소중한 결과물입니다.</p>
+        <h4>"복잡한 것을 간단명료하게 만드는 것이 가치 있는 것이다!"</h4>
+        <p>대부분의 경우, 겉모양이 화려하고 쓰지도 않을 수많은 기능을 가진 것을 선호하고 선뜻 대가를 지급합니다. 그러나 화려한 겉모양을 벗겨 내어 실체를 이해하고 수많은 기능을 익히기 위해서는 많은 노력이 필요합니다.</p>
+        <p>AHP 방법론 역시 난해한 설명을 이해하고 복잡한 과정을 거쳐야 하기 때문에 활용이 쉽지 않았습니다. IMakeIt은 논리 전개, 화면 배치, 사용자 인터페이스, 컬러 코딩, 기능 설명, 글자의 크기에 이르기까지 한국적 정서에 맞추어 편하게 사용하실 수 있도록 많은 논의와 피드백을 거쳐 다듬었습니다.</p>
+        <p>간결한 절차를 따라 하기만 하면 누구나 쉽게 AHP 분석 결과에 도달할 수 있습니다.</p>
+    </div>
+    <div id="introduce">
+        <h2>프로젝트 관리 과정 소개</h2>
+        <ul>
+           <li data-id="0"><span>1</span><span>프로젝트 생성</span></li>
+           <li data-id="1"><span>2</span><span>모델 구축 및<br />평가자 추가/배정</span></li>
+           <li data-id="2"><span>3</span><span>평가 시작</span></li>
+           <li data-id="3"><span>4</span><span>결과 보기</span></li>
+        </ul>
+        <div>
+            <p id="intro_msg_p">위 목록 위에 마우스를 올려놓으면 자세한 설명을 보실 수 있습니다.</p>
+        </div>
+    </div>
+</div>
+    </div>
+    <div id="mode_div">
+        <span>현재 : 관리자 MODE</span>
+        <span><input type="submit" name="parti_go" value="평가자 MODE로 이동" id="parti_go" /></span>
+    </div>
+    <input type="submit" name="log_out" value="로그아웃" id="log_out" class="btn visibleF" />
+    <footer>
+        <div id="footer_pdf" class="footer_abs" onclick="window.open('../info/files/AHP_IMakeIt_QuickStart.pdf','ahp_quick','status=yes, location=no, scrollbars=yes, fullscreen=yes');">사용방법 다운로드</div>
+        <div id="footer_mail" style="visibility:hidden;" class="footer_abs" onclick="location.replace('default.aspx?key=qna')">교육 및 자문 의뢰</div>
+        <div id="footer_msg"></div>
+        <div>
+            <img src="../images/ahp_round.png"/>
+            <img src="../images/imakeit--footer.gif" id="ex_footer" onclick="if(confirm('회사 홈페이지로 이동합니다.')) location.href='http://www.expertchoice.co.kr/';" />
+        </div>
+    </footer>
+    <div id="progress" class="visibleF">
+        <img src="../images/loading.gif" />
+        <div class="visibleF">약 1~2분정도 소요됩니다.</div>
+    </div>
+    <div class="help_div">
+        <div data-helpno="0">
+            <div class="help_ex">
+                <p class="p_title">시작하기</p>
+                <p>'시작하기'를 활용하여 새로운 프로젝트를 추가하거나, 기존 프로젝트를 선택하여 관리/수정/삭제를 할 수 있습니다.</p>
+                <p class="p_title">프로젝트의 상태</p>
+                <ol>
+                    <li>생성중 : 의사결정 모델 구성요소(기준, 대안) 및 평가자를 구성 중인 상태입니다.</li>
+                    <li>대기중 : 의사결정 모델을 완료한 상태로 평가자 배정을 할 수 있습니다.</li>
+                    <li>평가중 : 모델이 완료된 후 평가가 진행 중인 상태입니다.</li>
+                    <li>평가종료 : 평가자들의 평가를 종료시킨 상태입니다.</li>
+                </ol>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="1">
+            <div class="help_ex">
+                <p class="p_title">프로젝트 관리</p>
+                <p>선택한 프로젝트의 마지막 작업을 읽어옵니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="2">
+            <div class="help_ex">
+                <p class="p_title">프로젝트 이름</p>
+                <p>프로젝트의 이름은 목적(목표)을 나타낼 수 있도록 구체적이고 명확하게 합니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="3">
+            <div class="help_ex">
+                <p class="p_title">프로젝트 설명</p>
+                <p>프로젝트의 이름(목적,목표)에 대한 부연설명입니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="4">
+            <div class="help_ex">
+                <p class="p_title">평가 방법 설정</p>
+                <p>1차 기준들에 대한 평가 방법을 설정합니다. 기본 설정은 쌍대비교-실용입니다.</p>
+                <ol>
+                    <li><b>쌍대비교-실용</b> : 필요한 최소한의 쌍대비교를 실시하여 상대적 중요도를 도출합니다.</li>
+                    <li><b>직접입력</b> : 데이터를 입력함으로써 중요도를 도출합니다.</li>
+                    <li><b>쌍대비교-이론</b> : 이론상 필요한 모든 쌍대비교를 실시하여 상대적 중요도를 도출합니다.</li>
+                </ol>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+        <div data-helpno="5">
+            <div class="help_ex">
+                <p class="p_title">평가자 선택</p>
+                <p>평가를 진행할 후보자를 새로 추가하거나, 이미 추가된 후보자를 선택하여 수정/삭제 할 수 있습니다.</p>
+            </div>
+            <div class="btn help_close">닫기</div>
+        </div>
+    </div>
+</body>
+</html>
