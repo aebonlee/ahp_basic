@@ -45,18 +45,27 @@ export default function EvalResultPage() {
     let totalCells = 0;
     let completedCells = 0;
 
-    for (const page of pageSequence) {
+    const incompletePages = [];
+    const inconsistentPages = [];
+
+    for (let pageIdx = 0; pageIdx < pageSequence.length; pageIdx++) {
+      const page = pageSequence[pageIdx];
       const itemIds = page.items.map(i => i.id);
       const values = {};
+      const expectedPairs = (itemIds.length * (itemIds.length - 1)) / 2;
+      let pageCells = 0;
+      let pageCompleted = 0;
 
       for (let i = 0; i < itemIds.length; i++) {
         for (let j = i + 1; j < itemIds.length; j++) {
           const key = `${page.parentId}:${itemIds[i]}:${itemIds[j]}`;
           const calcKey = `${itemIds[i]}:${itemIds[j]}`;
           totalCells++;
+          pageCells++;
           if (comparisons[key] !== undefined) {
             values[calcKey] = comparisons[key] === 0 ? 1 : comparisons[key];
             completedCells++;
+            pageCompleted++;
           }
         }
       }
@@ -69,8 +78,15 @@ export default function EvalResultPage() {
         isConsistent: ahp.cr <= CR_THRESHOLD,
       };
 
-      if (ahp.cr > CR_THRESHOLD && itemIds.length > 2) allConsistent = false;
-      if (Object.keys(values).length < (itemIds.length * (itemIds.length - 1)) / 2) allComplete = false;
+      const pageComplete = Object.keys(values).length >= expectedPairs;
+      if (!pageComplete) {
+        incompletePages.push({ pageIdx, name: page.parentName, completed: pageCompleted, total: pageCells });
+        allComplete = false;
+      }
+      if (ahp.cr > CR_THRESHOLD && itemIds.length > 2) {
+        inconsistentPages.push({ pageIdx, name: page.parentName, cr: ahp.cr });
+        allConsistent = false;
+      }
     }
 
     return {
@@ -80,6 +96,8 @@ export default function EvalResultPage() {
       allComplete,
       totalCells,
       completedCells,
+      incompletePages,
+      inconsistentPages,
     };
   }, [criteria, alternatives, comparisons]);
 
@@ -146,6 +164,57 @@ export default function EvalResultPage() {
           />
         )}
       </div>
+
+      {/* Review Section: incomplete / inconsistent pages */}
+      {(results.incompletePages.length > 0 || results.inconsistentPages.length > 0) && (
+        <div className={styles.reviewSection}>
+          <h3 className={styles.reviewTitle}>재점검 필요 항목</h3>
+
+          {results.incompletePages.length > 0 && (
+            <div className={styles.reviewGroup}>
+              <h4 className={styles.reviewSubtitle}>미완료 항목</h4>
+              {results.incompletePages.map(p => (
+                <div key={p.pageIdx} className={styles.reviewItem}>
+                  <div className={styles.reviewInfo}>
+                    <span className={styles.reviewName}>{p.name}</span>
+                    <span className={styles.reviewBadge} data-type="incomplete">
+                      {p.completed}/{p.total} 완료
+                    </span>
+                  </div>
+                  <button
+                    className={styles.reviewBtn}
+                    onClick={() => navigate(`/eval/project/${id}#page=${p.pageIdx}`)}
+                  >
+                    돌아가기
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {results.inconsistentPages.length > 0 && (
+            <div className={styles.reviewGroup}>
+              <h4 className={styles.reviewSubtitle}>비일관성 초과 항목</h4>
+              {results.inconsistentPages.map(p => (
+                <div key={p.pageIdx} className={styles.reviewItem}>
+                  <div className={styles.reviewInfo}>
+                    <span className={styles.reviewName}>{p.name}</span>
+                    <span className={styles.reviewBadge} data-type="inconsistent">
+                      CR {p.cr.toFixed(3)}
+                    </span>
+                  </div>
+                  <button
+                    className={styles.reviewBtn}
+                    onClick={() => navigate(`/eval/project/${id}#page=${p.pageIdx}`)}
+                  >
+                    돌아가기
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <SignaturePanel
         projectId={id}
