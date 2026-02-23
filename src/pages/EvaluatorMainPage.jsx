@@ -21,10 +21,11 @@ export default function EvaluatorMainPage() {
 
   const loadAssignedProjects = async () => {
     if (!user) return;
+    // user_id 또는 email로 평가자 매칭
     const { data: evaluators } = await supabase
       .from('evaluators')
-      .select('project_id, completed')
-      .eq('user_id', user.id);
+      .select('id, project_id, completed, user_id')
+      .or(`user_id.eq.${user.id},email.eq.${user.email}`);
 
     if (!evaluators || evaluators.length === 0) {
       setProjects([]);
@@ -32,12 +33,19 @@ export default function EvaluatorMainPage() {
       return;
     }
 
-    const projectIds = evaluators.map(e => e.project_id);
+    // user_id 미연결 평가자 자동 연결
+    for (const ev of evaluators) {
+      if (!ev.user_id) {
+        await supabase.from('evaluators').update({ user_id: user.id }).eq('id', ev.id);
+      }
+    }
+
+    const projectIds = [...new Set(evaluators.map(e => e.project_id))];
     const { data: projectData } = await supabase
       .from('projects')
       .select('*')
       .in('id', projectIds)
-      .eq('status', PROJECT_STATUS.EVALUATING);
+      .in('status', [PROJECT_STATUS.EVALUATING, PROJECT_STATUS.WAITING]);
 
     const enriched = (projectData || []).map(p => ({
       ...p,

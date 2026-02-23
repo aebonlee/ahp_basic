@@ -29,15 +29,20 @@ export default function InviteLandingPage() {
     setProject(data);
 
     if (user) {
-      // Already logged in - check if assigned
+      // user_id 또는 email로 평가자 매칭
       const { data: evalData } = await supabase
         .from('evaluators')
         .select('*')
         .eq('project_id', token)
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
+        .limit(1)
         .single();
 
       if (evalData) {
+        // user_id 미연결이면 자동 연결
+        if (!evalData.user_id) {
+          await supabase.from('evaluators').update({ user_id: user.id }).eq('id', evalData.id);
+        }
         setStatus('ready');
       } else {
         setStatus('not_assigned');

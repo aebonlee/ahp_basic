@@ -22,9 +22,19 @@ export function useEvaluators(projectId) {
   }, [fetchEvaluators]);
 
   const addEvaluator = useCallback(async (evaluator) => {
+    // 이메일로 기존 가입 유저 찾아서 user_id 자동 연결
+    let userId = null;
+    if (evaluator.email) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('email', evaluator.email)
+        .single();
+      if (profile) userId = profile.id;
+    }
     const { data, error } = await supabase
       .from('evaluators')
-      .insert({ ...evaluator, project_id: projectId })
+      .insert({ ...evaluator, project_id: projectId, user_id: userId })
       .select()
       .single();
     if (error) throw error;
