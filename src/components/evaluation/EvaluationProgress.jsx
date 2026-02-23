@@ -9,7 +9,7 @@ export default function EvaluationProgress({ current, total, pageSequence, compa
     for (const pair of page.pairs) {
       totalPairs++;
       const key = `${page.parentId}:${pair.left.id}:${pair.right.id}`;
-      if (comparisons[key] !== undefined && comparisons[key] !== 0) {
+      if (comparisons[key] !== undefined) {
         completedPairs++;
       }
     }

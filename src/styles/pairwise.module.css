@@ -47,12 +47,12 @@
 }
 
 .rowAnswered {
-  background: rgba(57, 153, 51, 0.06);
+  background: rgba(34, 197, 94, 0.06);
 }
 
 .rowUnanswered {
-  background: rgba(255, 153, 0, 0.06);
-  border-left: 3px solid var(--color-warning);
+  background: rgba(245, 158, 11, 0.05);
+  border-left: 3px solid #f59e0b;
 }
 
 .labelLeft {

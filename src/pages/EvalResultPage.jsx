@@ -54,8 +54,8 @@ export default function EvalResultPage() {
           const key = `${page.parentId}:${itemIds[i]}:${itemIds[j]}`;
           const calcKey = `${itemIds[i]}:${itemIds[j]}`;
           totalCells++;
-          if (comparisons[key] !== undefined && comparisons[key] !== 0) {
-            values[calcKey] = comparisons[key];
+          if (comparisons[key] !== undefined) {
+            values[calcKey] = comparisons[key] === 0 ? 1 : comparisons[key];
             completedCells++;
           }
         }

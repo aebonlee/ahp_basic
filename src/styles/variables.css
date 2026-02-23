@@ -5,28 +5,28 @@
   --color-primary-dark: #004499;
 
   /* Pairwise comparison */
-  --color-pairwise-left: #38d;
-  --color-pairwise-right: #e77;
-  --color-pairwise-selected: rgba(30, 250, 200, 0.3);
-  --color-pairwise-selected-border: #009;
-  --color-pairwise-equal: #eee;
+  --color-pairwise-left: #3b82f6;
+  --color-pairwise-right: #ef4444;
+  --color-pairwise-selected: rgba(59, 130, 246, 0.2);
+  --color-pairwise-selected-border: #1d4ed8;
+  --color-pairwise-equal: #f1f5f9;
 
   /* Results */
-  --color-priority-bar: #3a2;
-  --color-level-1: #a0a;
-  --color-level-2: #0aa;
-  --color-level-3: #fa0;
-  --color-level-4: #e55;
-  --color-level-5: #5a5;
+  --color-priority-bar: #2563eb;
+  --color-level-1: #7c3aed;
+  --color-level-2: #0891b2;
+  --color-level-3: #d97706;
+  --color-level-4: #dc2626;
+  --color-level-5: #16a34a;
 
   /* Status colors */
-  --color-creating: #999;
-  --color-waiting: #f90;
-  --color-evaluating: #0a0;
-  --color-completed: #06c;
-  --color-danger: #e33;
-  --color-success: #393;
-  --color-warning: #f90;
+  --color-creating: #94a3b8;
+  --color-waiting: #f59e0b;
+  --color-evaluating: #22c55e;
+  --color-completed: #2563eb;
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
 
   /* UI colors */
   --color-bg: #f5f5f5;

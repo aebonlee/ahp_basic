@@ -12,6 +12,8 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
   const toast = useToast();
   const { confirm, confirmDialogProps } = useConfirm();
 
+  const percent = totalCells > 0 ? Math.round((completedCells / totalCells) * 100) : 0;
+
   const handleSign = async () => {
     let msg = '평가를 완료하시겠습니까?';
     if (!allComplete) msg = `아직 미완료 항목이 있습니다 (${completedCells}/${totalCells}). 그래도 완료하시겠습니까?`;
@@ -30,6 +32,7 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
         .update({ completed: true })
         .eq('id', evaluatorId);
       setSigned(true);
+      toast.success('평가가 완료되었습니다.');
     } catch (err) {
       toast.error('완료 처리 실패: ' + err.message);
     } finally {
@@ -39,21 +42,44 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
 
   return (
     <div className={styles.signaturePanel}>
-      <div className={styles.signatureInfo}>
-        <span>평가 진행: {completedCells}/{totalCells}</span>
-        {!allConsistent && <span className={styles.warn}>비일관성 항목이 있습니다</span>}
+      {/* Progress Section */}
+      <div className={styles.sigProgress}>
+        <div className={styles.sigProgressHeader}>
+          <span className={styles.sigProgressLabel}>평가 진행</span>
+          <span className={styles.sigProgressValue}>
+            {completedCells}/{totalCells} ({percent}%)
+          </span>
+        </div>
+        <div className={styles.sigProgressBar}>
+          <div
+            className={styles.sigProgressFill}
+            style={{ width: `${percent}%` }}
+            data-complete={percent === 100 ? '' : undefined}
+          />
+        </div>
+        {!allConsistent && (
+          <span className={styles.sigWarn}>비일관성 기준 초과 항목이 있습니다</span>
+        )}
       </div>
-      {signed ? (
-        <div className={styles.signedMsg}>평가가 완료되었습니다.</div>
-      ) : (
-        <Button
-          variant="success"
-          loading={loading}
-          onClick={handleSign}
-        >
-          평가 완료
-        </Button>
-      )}
+
+      {/* Action Section */}
+      <div className={styles.sigAction}>
+        {signed ? (
+          <div className={styles.sigComplete}>
+            <span className={styles.sigCompleteIcon}>{'\u2714'}</span>
+            평가가 완료되었습니다
+          </div>
+        ) : (
+          <Button
+            variant="success"
+            loading={loading}
+            onClick={handleSign}
+          >
+            평가 완료
+          </Button>
+        )}
+      </div>
+
       <ConfirmDialog {...confirmDialogProps} />
     </div>
   );

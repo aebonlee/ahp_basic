@@ -23,16 +23,19 @@ export default function PairwiseRow({ pair, parentId, projectId, evaluatorId }) 
   const { comparisons, saveComparison } = useEvaluation();
 
   const compKey = `${parentId}:${pair.left.id}:${pair.right.id}`;
-  const currentValue = comparisons[compKey] || 0;
+  const rawValue = comparisons[compKey];
+  // value 0 in DB = old "equal" bug data → treat as 1 (equal)
+  const currentValue = rawValue === undefined ? null : (rawValue === 0 ? 1 : rawValue);
 
   const handleCellClick = useCallback(async (cellIndex) => {
+    if (!evaluatorId) return; // guard: don't save without valid evaluatorId
     const newValue = getCellValue(cellIndex);
     await saveComparison(projectId, evaluatorId, parentId, pair.left.id, pair.right.id, newValue);
   }, [projectId, evaluatorId, parentId, pair, saveComparison]);
 
   // Determine which cell is selected
   const getSelectedIndex = () => {
-    if (currentValue === 0) return -1; // not selected
+    if (currentValue === null) return -1; // not selected
     if (currentValue === 1 || currentValue === -1) return 8; // equal
     if (currentValue < 0) return 9 + currentValue; // -9→0, -8→1, ..., -2→7
     return currentValue + 7; // 2→9, 3→10, ..., 9→16
