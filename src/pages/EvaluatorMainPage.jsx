@@ -21,36 +21,52 @@ export default function EvaluatorMainPage() {
 
   const loadAssignedProjects = async () => {
     if (!user) return;
-    // user_id 또는 email로 평가자 매칭
+
+    // 1) 평가자로 배정된 프로젝트 (user_id 또는 email 매칭)
     const { data: evaluators } = await supabase
       .from('evaluators')
       .select('id, project_id, completed, user_id')
       .or(`user_id.eq.${user.id},email.eq.${user.email}`);
 
-    if (!evaluators || evaluators.length === 0) {
-      setProjects([]);
-      setLoading(false);
-      return;
-    }
-
     // user_id 미연결 평가자 자동 연결
-    for (const ev of evaluators) {
-      if (!ev.user_id) {
-        await supabase.from('evaluators').update({ user_id: user.id }).eq('id', ev.id);
+    if (evaluators) {
+      for (const ev of evaluators) {
+        if (!ev.user_id) {
+          await supabase.from('evaluators').update({ user_id: user.id }).eq('id', ev.id);
+        }
       }
     }
 
-    const projectIds = [...new Set(evaluators.map(e => e.project_id))];
-    const { data: projectData } = await supabase
+    // 2) 본인 소유 프로젝트도 포함 (관리자가 직접 평가 테스트 가능)
+    const { data: ownedProjects } = await supabase
       .from('projects')
       .select('*')
-      .in('id', projectIds)
-      .in('status', [PROJECT_STATUS.EVALUATING, PROJECT_STATUS.WAITING]);
+      .eq('owner_id', user.id)
+      .in('status', [PROJECT_STATUS.CREATING, PROJECT_STATUS.WAITING, PROJECT_STATUS.EVALUATING]);
 
-    const enriched = (projectData || []).map(p => ({
-      ...p,
-      completed: evaluators.find(e => e.project_id === p.id)?.completed || false,
-    }));
+    // 배정된 프로젝트 ID 목록
+    const assignedIds = [...new Set((evaluators || []).map(e => e.project_id))];
+
+    // 배정된 프로젝트 로드
+    let assignedProjects = [];
+    if (assignedIds.length > 0) {
+      const { data } = await supabase
+        .from('projects')
+        .select('*')
+        .in('id', assignedIds)
+        .in('status', [PROJECT_STATUS.WAITING, PROJECT_STATUS.EVALUATING]);
+      assignedProjects = data || [];
+    }
+
+    // 병합 (중복 제거)
+    const allMap = {};
+    for (const p of assignedProjects) allMap[p.id] = p;
+    for (const p of (ownedProjects || [])) allMap[p.id] = p;
+
+    const enriched = Object.values(allMap).map(p => {
+      const ev = (evaluators || []).find(e => e.project_id === p.id);
+      return { ...p, completed: ev?.completed || false, hasEvaluator: !!ev };
+    });
 
     setProjects(enriched);
     setLoading(false);
@@ -84,7 +100,18 @@ export default function EvaluatorMainPage() {
                     결과 보기
                   </Button>
                 ) : (
-                  <Button onClick={() => navigate(`/eval/project/${p.id}`)}>
+                  <Button onClick={async () => {
+                    // 평가자 레코드 없으면 자동 생성 (소유자 직접 평가)
+                    if (!p.hasEvaluator) {
+                      await supabase.from('evaluators').insert({
+                        project_id: p.id,
+                        user_id: user.id,
+                        name: user.user_metadata?.full_name || user.email,
+                        email: user.email,
+                      });
+                    }
+                    navigate(`/eval/project/${p.id}`);
+                  }}>
                     평가하기
                   </Button>
                 )}
