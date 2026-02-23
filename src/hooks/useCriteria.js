@@ -3,21 +3,27 @@ import { supabase } from '../lib/supabaseClient';
 
 export function useCriteria(projectId) {
   const [criteria, setCriteria] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!projectId);
+  const [error, setError] = useState(null);
 
   // Ref to avoid stale closures in callbacks
   const criteriaRef = useRef(criteria);
   useEffect(() => { criteriaRef.current = criteria; }, [criteria]);
 
   const fetchCriteria = useCallback(async () => {
-    if (!projectId) return;
+    if (!projectId) { setLoading(false); return; }
     setLoading(true);
-    const { data, error } = await supabase
+    setError(null);
+    const { data, error: fetchError } = await supabase
       .from('criteria')
       .select('*')
       .eq('project_id', projectId)
       .order('sort_order');
-    if (!error) setCriteria(data || []);
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      setCriteria(data || []);
+    }
     setLoading(false);
   }, [projectId]);
 
@@ -102,6 +108,7 @@ export function useCriteria(projectId) {
   return {
     criteria,
     loading,
+    error,
     fetchCriteria,
     addCriterion,
     updateCriterion,

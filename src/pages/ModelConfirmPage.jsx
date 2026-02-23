@@ -19,8 +19,8 @@ export default function ModelConfirmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentProject, loading: projectLoading } = useProject(id);
-  const { criteria, loading: criteriaLoading, getTree } = useCriteria(id);
-  const { alternatives, loading: altLoading } = useAlternatives(id);
+  const { criteria, loading: criteriaLoading, error: criteriaError, getTree } = useCriteria(id);
+  const { alternatives, loading: altLoading, error: altError } = useAlternatives(id);
   const { updateProject } = useProjects();
   const toast = useToast();
   const { confirm, confirmDialogProps } = useConfirm();
@@ -57,9 +57,23 @@ export default function ModelConfirmPage() {
 
       <div className={common.card}>
         <h2 className={common.cardTitle}>모델 구조 검토</h2>
+
+        {(criteriaError || altError) && (
+          <p className={styles.errorMsg}>
+            데이터 로딩 오류: {criteriaError || altError}
+          </p>
+        )}
+
         <p className={styles.meta}>
           기준: {rootCriteria.length}개 (하위 포함 {criteria.length}개) | 대안: {rootAlternatives.length}개
         </p>
+
+        {!canConfirm && !criteriaError && !altError && (
+          <p className={styles.hintMsg}>
+            모델 확정을 위해 루트 기준 2개 이상, 대안 2개 이상이 필요합니다.
+            (현재: 루트 기준 {rootCriteria.length}개, 대안 {rootAlternatives.length}개)
+          </p>
+        )}
 
         <ModelPreview
           projectName={currentProject.name}

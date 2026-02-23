@@ -3,21 +3,27 @@ import { supabase } from '../lib/supabaseClient';
 
 export function useAlternatives(projectId) {
   const [alternatives, setAlternatives] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!projectId);
+  const [error, setError] = useState(null);
 
   // Ref to avoid stale closures in callbacks
   const alternativesRef = useRef(alternatives);
   useEffect(() => { alternativesRef.current = alternatives; }, [alternatives]);
 
   const fetchAlternatives = useCallback(async () => {
-    if (!projectId) return;
+    if (!projectId) { setLoading(false); return; }
     setLoading(true);
-    const { data, error } = await supabase
+    setError(null);
+    const { data, error: fetchError } = await supabase
       .from('alternatives')
       .select('*')
       .eq('project_id', projectId)
       .order('sort_order');
-    if (!error) setAlternatives(data || []);
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      setAlternatives(data || []);
+    }
     setLoading(false);
   }, [projectId]);
 
@@ -75,6 +81,7 @@ export function useAlternatives(projectId) {
   return {
     alternatives,
     loading,
+    error,
     fetchAlternatives,
     addAlternative,
     updateAlternative,
