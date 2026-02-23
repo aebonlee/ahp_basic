@@ -22,41 +22,51 @@ function TreeDisplay({ nodes, level = 0 }) {
   );
 }
 
-export default function ModelPreview({ projectName, criteriaTree, alternatives, onClose }) {
+function PreviewContent({ projectName, criteriaTree, alternatives }) {
+  return (
+    <div className={styles.preview}>
+      <div className={styles.section}>
+        <h3 className={styles.root}>{projectName}</h3>
+        {criteriaTree.length > 0 ? (
+          <TreeDisplay nodes={criteriaTree} />
+        ) : (
+          <p className={styles.empty}>기준이 없습니다.</p>
+        )}
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.altRoot}>：대안：</h3>
+        {alternatives.length > 0 ? (
+          <ul className={styles.altList}>
+            {alternatives.filter(a => !a.parent_id).map(alt => (
+              <li key={alt.id}>
+                <span className={styles.altName}>{alt.name}</span>
+                {alternatives.filter(s => s.parent_id === alt.id).length > 0 && (
+                  <ul className={styles.subAltList}>
+                    {alternatives.filter(s => s.parent_id === alt.id).map(sub => (
+                      <li key={sub.id}>{sub.name}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className={styles.empty}>대안이 없습니다.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ModelPreview({ projectName, criteriaTree, alternatives, onClose, inline }) {
+  if (inline) {
+    return <PreviewContent projectName={projectName} criteriaTree={criteriaTree} alternatives={alternatives} />;
+  }
+
   return (
     <Modal isOpen onClose={onClose} title="모델 미리보기" width="700px">
-      <div className={styles.preview}>
-        <div className={styles.section}>
-          <h3 className={styles.root}>{projectName}</h3>
-          {criteriaTree.length > 0 ? (
-            <TreeDisplay nodes={criteriaTree} />
-          ) : (
-            <p className={styles.empty}>기준이 없습니다.</p>
-          )}
-        </div>
-
-        <div className={styles.section}>
-          <h3 className={styles.altRoot}>：대안：</h3>
-          {alternatives.length > 0 ? (
-            <ul className={styles.altList}>
-              {alternatives.filter(a => !a.parent_id).map(alt => (
-                <li key={alt.id}>
-                  <span className={styles.altName}>{alt.name}</span>
-                  {alternatives.filter(s => s.parent_id === alt.id).length > 0 && (
-                    <ul className={styles.subAltList}>
-                      {alternatives.filter(s => s.parent_id === alt.id).map(sub => (
-                        <li key={sub.id}>{sub.name}</li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles.empty}>대안이 없습니다.</p>
-          )}
-        </div>
-      </div>
+      <PreviewContent projectName={projectName} criteriaTree={criteriaTree} alternatives={alternatives} />
     </Modal>
   );
 }

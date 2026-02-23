@@ -64,7 +64,7 @@ export default function ModelConfirmPage() {
           projectName={currentProject.name}
           criteriaTree={criteriaTree}
           alternatives={alternatives}
-          onClose={() => {}}
+          inline
         />
 
         <div className={styles.actions}>
