@@ -4,11 +4,12 @@
   justify-content: center;
   gap: var(--spacing-xs);
   border: none;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  transition: all var(--transition-fast);
+  border-radius: var(--radius-round);
+  font-weight: 600;
+  transition: all var(--transition-smooth);
   white-space: nowrap;
   user-select: none;
+  letter-spacing: -0.01em;
 }
 
 .btn:disabled {
@@ -17,41 +18,58 @@
 }
 
 /* Sizes */
-.sm { padding: 4px 10px; font-size: 0.8rem; }
-.md { padding: 8px 16px; font-size: 0.9rem; }
-.lg { padding: 12px 24px; font-size: 1rem; }
+.sm { padding: 5px 14px; font-size: 0.8rem; }
+.md { padding: 8px 20px; font-size: 0.88rem; }
+.lg { padding: 12px 28px; font-size: 1rem; }
 
 /* Variants */
 .primary {
   background: var(--color-primary);
   color: #fff;
+  box-shadow: var(--shadow-violet);
 }
-.primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-violet-lg);
+  transform: translateY(-1px);
+}
 
 .secondary {
-  background: var(--color-bg);
+  background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
-.secondary:hover:not(:disabled) { background: var(--color-border); }
+.secondary:hover:not(:disabled) {
+  background: var(--color-bg);
+  border-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
 
 .danger {
   background: var(--color-danger);
   color: #fff;
 }
-.danger:hover:not(:disabled) { opacity: 0.85; }
+.danger:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
 
 .success {
   background: var(--color-success);
   color: #fff;
 }
-.success:hover:not(:disabled) { opacity: 0.85; }
+.success:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
 
 .ghost {
   background: transparent;
   color: var(--color-primary);
 }
-.ghost:hover:not(:disabled) { background: rgba(0, 102, 204, 0.08); }
+.ghost:hover:not(:disabled) {
+  background: var(--color-primary-bg);
+}
 
 /* Spinner */
 .spinner {

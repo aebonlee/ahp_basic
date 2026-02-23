@@ -7,25 +7,28 @@
 
 .title {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
 }
 
 .tabs {
   display: flex;
   gap: 0;
   margin-bottom: var(--spacing-lg);
-  border-bottom: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border-light);
 }
 
 .tab {
   background: none;
   border: none;
   padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: 1.05rem;
-  color: var(--color-text-light);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-smooth);
 }
 
 .tab:hover {
@@ -35,7 +38,7 @@
 .activeTab {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .content {
@@ -47,14 +50,14 @@
 /* Review Section */
 .reviewSection {
   margin-top: var(--spacing-lg);
-  background: #fffbeb;
+  background: var(--color-accent-bg);
   border: 1px solid #fde68a;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
 }
 
 .reviewTitle {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #92400e;
   margin-bottom: var(--spacing-md);
@@ -69,8 +72,8 @@
 }
 
 .reviewSubtitle {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 700;
   color: #78350f;
   margin-bottom: var(--spacing-sm);
 }
@@ -81,7 +84,7 @@
   justify-content: space-between;
   padding: var(--spacing-sm) var(--spacing-md);
   background: #fff;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid #fde68a;
   margin-bottom: var(--spacing-xs);
 }
@@ -93,16 +96,17 @@
 }
 
 .reviewName {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
   color: var(--color-text);
 }
 
 .reviewBadge {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 2px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 10px;
   border-radius: var(--radius-round);
+  font-family: var(--font-mono);
 }
 
 .reviewBadge[data-type="incomplete"] {
@@ -118,19 +122,22 @@
 }
 
 .reviewBtn {
-  background: #2563eb;
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  padding: 6px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
+  padding: 6px 18px;
+  border-radius: var(--radius-round);
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: all var(--transition-smooth);
+  box-shadow: var(--shadow-violet);
 }
 
 .reviewBtn:hover {
-  background: #1d4ed8;
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-violet-lg);
 }
 
 @media (max-width: 768px) {

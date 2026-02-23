@@ -1,21 +1,23 @@
 .card {
   background: var(--color-surface);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
 }
 
 .cardTitle {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: var(--spacing-md);
+  color: var(--color-text);
 }
 
 .legend {
   display: flex;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-light);
 }
 
@@ -28,7 +30,7 @@
 .legendColor {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .barList {
@@ -46,70 +48,72 @@
 .barLabel {
   width: 160px;
   text-align: right;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 0;
+  color: var(--color-text);
 }
 
 .barTrack {
   flex: 1;
-  height: 18px;
-  background: #e5e7eb;
-  border-radius: 2px;
+  height: 20px;
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .barFill {
   height: 100%;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   transition: width var(--transition-normal);
   min-width: 1px;
 }
 
 .barValue {
-  width: 60px;
+  width: 64px;
   text-align: right;
-  font-size: 0.92rem;
-  font-family: monospace;
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
   flex-shrink: 0;
+  color: var(--color-text-light);
 }
 
 /* Table */
 .table {
   width: 100%;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .table th,
 .table td {
   padding: var(--spacing-sm) var(--spacing-md);
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .table th {
   font-weight: 600;
   color: var(--color-text-light);
-  font-size: 0.9rem;
-  background: #f8fafc;
+  font-size: 0.85rem;
+  background: var(--color-bg);
 }
 
 .failRow {
   background: #fef2f2;
 }
 
-.passLabel { color: var(--color-success); font-weight: 500; }
-.failLabel { color: var(--color-danger); font-weight: 500; }
+.passLabel { color: var(--color-success); font-weight: 600; }
+.failLabel { color: var(--color-danger); font-weight: 600; }
 .skip { color: var(--color-text-muted); }
 
 .crBadge {
   font-size: 0.75rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--color-text-muted);
   margin-left: var(--spacing-sm);
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 /* Detail */
@@ -122,7 +126,7 @@
 .resultBlock {
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .resultBlock:last-child {
@@ -131,8 +135,9 @@
 
 .blockTitle {
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  color: var(--color-text);
 }
 
 /* Signature Panel */
@@ -140,9 +145,9 @@
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
   background: var(--color-surface);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -158,11 +163,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .sigProgressLabel {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--color-text);
 }
@@ -171,32 +176,32 @@
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-primary);
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .sigProgressBar {
-  height: 10px;
-  background: #e5e7eb;
-  border-radius: 5px;
+  height: 8px;
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-round);
   overflow: hidden;
 }
 
 .sigProgressFill {
   height: 100%;
-  background: linear-gradient(90deg, #f59e0b, #f97316);
-  border-radius: 5px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark));
+  border-radius: var(--radius-round);
   transition: width 0.3s ease;
 }
 
 .sigProgressFill[data-complete] {
-  background: linear-gradient(90deg, #22c55e, #16a34a);
+  background: linear-gradient(90deg, var(--color-success), #059669);
 }
 
 .sigWarn {
   display: block;
   margin-top: 6px;
-  font-size: 0.85rem;
-  color: #dc2626;
+  font-size: 0.82rem;
+  color: var(--color-danger);
   font-weight: 500;
 }
 
@@ -208,9 +213,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--color-success);
 }
 
 .sigCompleteIcon {

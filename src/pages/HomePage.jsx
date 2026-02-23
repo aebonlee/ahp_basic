@@ -17,8 +17,8 @@ export default function HomePage() {
               <Button onClick={() => navigate('/admin')}>대시보드</Button>
             ) : (
               <>
-                <Button variant="secondary" onClick={() => navigate('/login')}>로그인</Button>
-                <Button onClick={() => navigate('/register')}>회원가입</Button>
+                <Button variant="ghost" onClick={() => navigate('/login')}>로그인</Button>
+                <Button onClick={() => navigate('/register')}>시작하기</Button>
               </>
             )}
           </div>
@@ -27,12 +27,12 @@ export default function HomePage() {
 
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
-          AHP 의사결정 분석<br />
-          <span>쉽고 빠르게</span>
+          체계적 의사결정을 위한<br />
+          <span>AHP 분석 플랫폼</span>
         </h1>
         <p className={styles.heroDesc}>
-          다기준 의사결정 문제를 체계적으로 분석하는 AHP(Analytic Hierarchy Process) 도구입니다.<br />
-          기준 설정부터 쌍대비교, 결과 분석까지 한 곳에서 진행하세요.
+          다기준 의사결정 문제를 계층적으로 분석하고,
+          쌍대비교를 통해 최적의 대안을 도출하세요.
         </p>
         <div className={styles.heroCta}>
           {isLoggedIn ? (
@@ -47,7 +47,8 @@ export default function HomePage() {
       </section>
 
       <section className={styles.features}>
-        <h2 className={styles.sectionTitle}>주요 기능</h2>
+        <h2 className={styles.sectionTitle}>핵심 기능</h2>
+        <p className={styles.sectionSubtitle}>AHP 분석의 전 과정을 하나의 플랫폼에서</p>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>📊</div>
@@ -57,7 +58,7 @@ export default function HomePage() {
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>⚖️</div>
             <h3>쌍대비교 평가</h3>
-            <p>17점 척도의 쌍대비교 그리드로 정밀한 평가를 수행합니다. 실시간 CR 계산 및 Best-fit 추천을 제공합니다.</p>
+            <p>17점 척도의 쌍대비교 그리드로 정밀한 평가를 수행하고, 실시간 CR 계산으로 일관성을 검증합니다.</p>
           </div>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>👥</div>
@@ -84,6 +85,7 @@ export default function HomePage() {
 
       <section className={styles.steps}>
         <h2 className={styles.sectionTitle}>사용 방법</h2>
+        <p className={styles.sectionSubtitle}>4단계로 완성하는 의사결정 분석</p>
         <div className={styles.stepList}>
           <div className={styles.step}>
             <div className={styles.stepNum}>1</div>

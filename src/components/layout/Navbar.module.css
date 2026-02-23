@@ -1,8 +1,8 @@
 .navbar {
-  background: linear-gradient(to top, var(--color-header-gradient-end) 0%, var(--color-header-gradient-start) 6%);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--color-dark);
+  border-bottom: 1px solid var(--color-dark-border);
   padding: 0 var(--spacing-lg);
-  height: 60px;
+  height: 56px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -20,55 +20,62 @@
 .logo {
   cursor: pointer;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--spacing-sm);
   user-select: none;
 }
 
 .logoText {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #ffffff;
+  letter-spacing: -0.02em;
 }
 
 .logoSub {
-  font-size: 0.85rem;
-  color: var(--color-text-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary-light);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .modeBtn {
-  background: var(--color-mode-switch);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-dark);
   border: none;
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: opacity var(--transition-fast);
+  padding: 5px 14px;
+  border-radius: var(--radius-round);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  transition: all var(--transition-fast);
 }
 
 .modeBtn:hover {
-  opacity: 0.85;
+  background: var(--color-accent-light);
+  transform: translateY(-1px);
 }
 
 .userInfo {
-  font-size: 0.85rem;
-  color: var(--color-text-light);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
 
 .logoutBtn {
   background: none;
-  border: 1px solid var(--color-border);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  color: var(--color-text-light);
+  border: 1px solid var(--color-dark-border);
+  padding: 5px 14px;
+  border-radius: var(--radius-round);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
   transition: all var(--transition-fast);
 }
 
@@ -92,6 +99,6 @@
   }
 
   .actions {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
   }
 }

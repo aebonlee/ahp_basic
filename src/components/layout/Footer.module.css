@@ -1,9 +1,9 @@
 .footer {
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
+  background: var(--color-dark);
+  border-top: 1px solid var(--color-dark-border);
   padding: var(--spacing-md) var(--spacing-lg);
   margin-top: auto;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
 }
 
@@ -17,8 +17,9 @@
 
 .links a {
   color: var(--color-text-muted);
+  transition: color var(--transition-fast);
 }
 
 .links a:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-light);
 }

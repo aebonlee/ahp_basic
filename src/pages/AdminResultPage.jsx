@@ -120,8 +120,8 @@ export default function AdminResultPage() {
           for (let i = 0; i < itemIds.length; i++) {
             for (let j = i + 1; j < itemIds.length; j++) {
               const key = `${page.parentId}:${itemIds[i]}:${itemIds[j]}`;
-              if (comps[key]) {
-                values[`${itemIds[i]}:${itemIds[j]}`] = comps[key];
+              if (comps[key] !== undefined) {
+                values[`${itemIds[i]}:${itemIds[j]}`] = comps[key] === 0 ? 1 : comps[key];
                 evalCompletedPairs++;
               }
             }

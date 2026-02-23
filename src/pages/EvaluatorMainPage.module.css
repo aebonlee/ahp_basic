@@ -3,26 +3,45 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl) var(--spacing-xl);
+  background:
+    radial-gradient(ellipse at 0% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+    linear-gradient(135deg, var(--color-dark) 0%, #292524 50%, var(--color-dark) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl) var(--spacing-2xl);
   margin-bottom: var(--spacing-xl);
   color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .bannerContent {
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .bannerTitle {
   font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
 }
 
 .bannerDesc {
-  font-size: 1rem;
-  opacity: 0.85;
+  font-size: 0.95rem;
+  opacity: 0.6;
 }
 
 /* ─── Empty State ─── */
@@ -33,9 +52,10 @@
   justify-content: center;
   min-height: 340px;
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--spacing-2xl);
   text-align: center;
+  border: 1px solid var(--color-border-light);
 }
 
 .emptyIcon {
@@ -44,13 +64,13 @@
 
 .emptyTitle {
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--spacing-sm);
 }
 
 .emptyDesc {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--color-text-muted);
   max-width: 320px;
 }
@@ -72,35 +92,36 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.01em;
 }
 
 .sectionDot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .sectionDot[data-type="active"] {
-  background: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
 }
 
 .sectionDot[data-type="done"] {
-  background: #94a3b8;
+  background: var(--color-text-muted);
 }
 
 .sectionCount {
-  background: var(--color-bg);
-  color: var(--color-text-light);
-  font-size: 0.82rem;
-  font-weight: 600;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
   padding: 2px 10px;
   border-radius: var(--radius-round);
-  margin-left: 2px;
+  margin-left: 4px;
 }
 
 /* ─── Card Grid ─── */
@@ -116,20 +137,43 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+  transition: all var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  opacity: 0;
+  transition: opacity var(--transition-smooth);
 }
 
 .card:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .cardCompleted {
-  opacity: 0.75;
+  opacity: 0.65;
+}
+
+.cardCompleted::before {
+  background: var(--color-text-muted);
 }
 
 .cardCompleted:hover {
@@ -144,53 +188,54 @@
 }
 
 .statusChip {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: var(--radius-round);
   background: #ecfdf5;
-  color: #166534;
+  color: #065f46;
 }
 
 .statusChip[data-status="6"] {
-  background: #fff7ed;
-  color: #9a3412;
+  background: var(--color-accent-bg);
+  color: #92400e;
 }
 
 .statusChip[data-status="1"] {
   background: #ecfdf5;
-  color: #166534;
+  color: #065f46;
 }
 
 .statusChip[data-status="2"] {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--color-bg-alt);
+  color: var(--color-text-light);
 }
 
 .statusChip[data-status="done"] {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--color-bg-alt);
+  color: var(--color-text-muted);
 }
 
 .methodBadge {
-  font-size: 0.78rem;
-  font-weight: 500;
-  background: #eff6ff;
-  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
   padding: 2px 10px;
   border-radius: var(--radius-round);
   white-space: nowrap;
 }
 
 .cardTitle {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text);
   line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 .cardDesc {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--color-text-light);
   line-height: 1.5;
   display: -webkit-box;
@@ -212,6 +257,7 @@
     gap: var(--spacing-md);
     align-items: flex-start;
     padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
   }
 
   .bannerTitle {
