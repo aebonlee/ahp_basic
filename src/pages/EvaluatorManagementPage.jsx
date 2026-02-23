@@ -55,7 +55,11 @@ export default function EvaluatorManagementPage() {
 
   const handleDeleteEvaluator = async (evalId) => {
     if (!(await confirm({ title: '평가자 삭제', message: '삭제하시겠습니까?', variant: 'danger' }))) return;
-    deleteEvaluator(evalId);
+    try {
+      await deleteEvaluator(evalId);
+    } catch (err) {
+      toast.error('삭제 실패: ' + err.message);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
-import { buildCanvasTree, computeLayout } from '../../lib/hierarchyLayout';
+import { buildCanvasTree, computeLayout, computeHorizontalLayout } from '../../lib/hierarchyLayout';
 import CanvasNode from './CanvasNode';
 import styles from './HierarchyCanvas.module.css';
 
@@ -7,6 +7,7 @@ export default function HierarchyCanvas({
   projectName,
   criteriaTree,
   alternatives,
+  orientation = 'vertical',
   onAddCriterion,
   onEditCriterion,
   onDeleteCriterion,
@@ -18,13 +19,15 @@ export default function HierarchyCanvas({
   const [contextMenu, setContextMenu] = useState(null);
   const wrapperRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(800);
+  const [containerHeight, setContainerHeight] = useState(400);
 
-  // Measure container width
+  // Measure container
   useEffect(() => {
     if (!wrapperRef.current) return;
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
         setContainerWidth(entry.contentRect.width);
+        setContainerHeight(entry.contentRect.height);
       }
     });
     ro.observe(wrapperRef.current);
@@ -34,10 +37,13 @@ export default function HierarchyCanvas({
   // Build tree and compute layout
   const layout = useMemo(() => {
     const { goalNode, altNodes } = buildCanvasTree(projectName, criteriaTree, alternatives);
+    if (orientation === 'horizontal') {
+      return computeHorizontalLayout(goalNode, altNodes, containerHeight);
+    }
     return computeLayout(goalNode, altNodes, containerWidth);
-  }, [projectName, criteriaTree, alternatives, containerWidth]);
+  }, [projectName, criteriaTree, alternatives, containerWidth, containerHeight, orientation]);
 
-  const { nodes, connections, canvasWidth, canvasHeight, separatorY } = layout;
+  const { nodes, connections, canvasWidth, canvasHeight, separatorY, separatorX } = layout;
 
   // Build a node lookup map for connection line rendering
   const nodeMap = useMemo(() => {
@@ -133,21 +139,34 @@ export default function HierarchyCanvas({
 
   // Render SVG connection lines
   const renderConnections = () => {
+    const isHorizontal = orientation === 'horizontal';
+
     return connections.map((conn, i) => {
       const from = nodeMap[conn.from];
       const to = nodeMap[conn.to];
       if (!from || !to) return null;
 
-      const x1 = from.x + from.width / 2;
-      const y1 = from.y + from.height;
-      const x2 = to.x + to.width / 2;
-      const y2 = to.y;
-
       const isActive = selectedId === conn.from || selectedId === conn.to;
       const isAlt = conn.type === 'alternative';
 
-      const midY = (y1 + y2) / 2;
-      const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+      let d;
+      if (isHorizontal) {
+        // Right edge → Left edge (horizontal bezier)
+        const x1 = from.x + from.width;
+        const y1 = from.y + from.height / 2;
+        const x2 = to.x;
+        const y2 = to.y + to.height / 2;
+        const midX = (x1 + x2) / 2;
+        d = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
+      } else {
+        // Bottom edge → Top edge (vertical bezier)
+        const x1 = from.x + from.width / 2;
+        const y1 = from.y + from.height;
+        const x2 = to.x + to.width / 2;
+        const y2 = to.y;
+        const midY = (y1 + y2) / 2;
+        d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+      }
 
       return (
         <path
@@ -200,7 +219,17 @@ export default function HierarchyCanvas({
           height={canvasHeight}
         >
           {renderConnections()}
-          {/* Separator line between criteria and alternatives */}
+          {/* Vertical separator (horizontal layout) */}
+          {separatorX && (
+            <line
+              x1={separatorX}
+              y1={40}
+              x2={separatorX}
+              y2={canvasHeight - 40}
+              className={styles.separatorLine}
+            />
+          )}
+          {/* Horizontal separator (vertical layout) */}
           {separatorY && (
             <line
               x1={40}

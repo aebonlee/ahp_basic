@@ -2,6 +2,64 @@
 
 ---
 
+## 2026-02-24 (5차) — 모델 확정 버그 수정 & 캔버스 세로/가로 전환 & 전체 점검
+
+### 변경 요약
+모델 확정 버튼 비활성화 버그 수정, 계층 캔버스에 세로/가로 레이아웃 전환 기능 추가, 전체 8개 페이지 점검.
+
+### 커밋 목록
+| 커밋 | 내용 |
+|------|------|
+| `57d10e8` | evaluators 테이블에 없는 phone 컬럼 제거 |
+| (이번) | 모델 확정 버그 수정 + 캔버스 가로형 + 전체 점검 |
+
+### 주요 변경
+
+**모델 확정 버튼 비활성화 버그 수정**
+- 원인: `canConfirm`이 `criteria.length >= 2 && alternatives.length >= 2`로 하위 기준/대안 포함 전체 개수를 체크
+- 사용자가 루트 기준 3개 + 루트 대안 3개를 넣어도, 실제 조건이 의도와 달랐음
+- 수정: `rootCriteria.filter(c => !c.parent_id).length >= 2` (루트 기준/대안 기준)
+- 표시 텍스트 개선: "기준: 3개 (하위 포함 7개) | 대안: 3개"
+
+**캔버스 세로/가로 레이아웃 전환**
+- `hierarchyLayout.js`에 `computeHorizontalLayout()` 함수 추가
+- 가로형: Goal(왼쪽) → Criteria(중간) → Alternatives(오른쪽), 좌→우 Bezier 연결선
+- 세로형: 기존 상→하 레이아웃 유지
+- 구분선: 세로형은 가로 점선, 가로형은 세로 점선
+- 툴바에 세로/가로 아이콘 토글 버튼 추가 (SVG 아이콘)
+
+**평가자 추가 버그 수정 (이전 커밋)**
+- `ParticipantForm`에서 DB에 없는 `phone` 컬럼 제거
+- 에러: "Could not find the 'phone' column of 'evaluators' in the schema cache"
+
+**전체 페이지 점검 결과**
+| 페이지 | 상태 |
+|--------|------|
+| 1. 모델 구축 | OK + 가로/세로 전환 추가 |
+| 2. 브레인스토밍 | OK |
+| 3. 모델 확정 | 수정 (canConfirm 로직) |
+| 4. 평가자 관리 | 수정 (phone 제거 + 삭제 에러 처리) |
+| 5. 실시간 워크숍 | OK |
+| 6. 집계 결과 | OK |
+| 7. 민감도 분석 | OK |
+| 8. 자원 배분 | OK |
+
+### 수정 파일 (6개)
+| 파일 | 변경 내용 |
+|------|-----------|
+| `src/pages/ModelConfirmPage.jsx` | canConfirm → 루트 기준/대안 기준, 표시 텍스트 개선 |
+| `src/lib/hierarchyLayout.js` | `computeHorizontalLayout()` 추가, 세로형에 orientation 필드 추가 |
+| `src/components/model/HierarchyCanvas.jsx` | orientation prop, 가로형 Bezier 커브, 세로 구분선 지원 |
+| `src/pages/ModelBuilderPage.jsx` | orientation 상태 + 세로/가로 토글 버튼 |
+| `src/pages/ModelBuilderPage.module.css` | orientationToggle, toggleBtn, toggleActive 스타일 |
+| `src/pages/EvaluatorManagementPage.jsx` | deleteEvaluator에 await + try/catch 추가 |
+
+### 검증
+- `npm run build` — 빌드 성공
+- `npm run test` — 38개 테스트 전체 통과
+
+---
+
 ## 2026-02-23 (4차) — 프로젝트 대시보드 워크플로우 가이드 & UX 개선
 
 ### 변경 요약

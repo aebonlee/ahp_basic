@@ -28,6 +28,7 @@ export default function ModelBuilderPage() {
   const [criteriaFormMode, setCriteriaFormMode] = useState('add'); // add, edit, addChild
   const [altFormMode, setAltFormMode] = useState('add');
   const [showPreview, setShowPreview] = useState(false);
+  const [orientation, setOrientation] = useState('vertical');
   const { confirm, confirmDialogProps } = useConfirm();
 
   if (projectLoading || criteriaLoading || altLoading) {
@@ -111,6 +112,38 @@ export default function ModelBuilderPage() {
       <div className={styles.canvasToolbar}>
         <Button size="sm" onClick={() => handleAddCriterion(null)}>+ 기준 추가</Button>
         <Button size="sm" variant="secondary" onClick={() => handleAddAlternative(null)}>+ 대안 추가</Button>
+        <div className={styles.orientationToggle}>
+          <button
+            className={`${styles.toggleBtn} ${orientation === 'vertical' ? styles.toggleActive : ''}`}
+            onClick={() => setOrientation('vertical')}
+            title="세로형"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="6" y="1" width="4" height="3" rx="0.5" />
+              <rect x="2" y="7" width="4" height="3" rx="0.5" />
+              <rect x="10" y="7" width="4" height="3" rx="0.5" />
+              <line x1="8" y1="4" x2="8" y2="5.5" stroke="currentColor" strokeWidth="1" />
+              <line x1="4" y1="5.5" x2="12" y2="5.5" stroke="currentColor" strokeWidth="1" />
+              <line x1="4" y1="5.5" x2="4" y2="7" stroke="currentColor" strokeWidth="1" />
+              <line x1="12" y1="5.5" x2="12" y2="7" stroke="currentColor" strokeWidth="1" />
+            </svg>
+          </button>
+          <button
+            className={`${styles.toggleBtn} ${orientation === 'horizontal' ? styles.toggleActive : ''}`}
+            onClick={() => setOrientation('horizontal')}
+            title="가로형"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="6" width="3" height="4" rx="0.5" />
+              <rect x="7" y="2" width="3" height="4" rx="0.5" />
+              <rect x="7" y="10" width="3" height="4" rx="0.5" />
+              <line x1="4" y1="8" x2="5.5" y2="8" stroke="currentColor" strokeWidth="1" />
+              <line x1="5.5" y1="4" x2="5.5" y2="12" stroke="currentColor" strokeWidth="1" />
+              <line x1="5.5" y1="4" x2="7" y2="4" stroke="currentColor" strokeWidth="1" />
+              <line x1="5.5" y1="12" x2="7" y2="12" stroke="currentColor" strokeWidth="1" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className={styles.canvasContainer}>
@@ -118,6 +151,7 @@ export default function ModelBuilderPage() {
           projectName={currentProject.name}
           criteriaTree={criteriaTree}
           alternatives={alternatives}
+          orientation={orientation}
           onAddCriterion={handleAddCriterion}
           onEditCriterion={handleEditCriterion}
           onDeleteCriterion={handleDeleteCriterion}

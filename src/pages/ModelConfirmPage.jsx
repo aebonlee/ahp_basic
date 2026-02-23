@@ -30,11 +30,13 @@ export default function ModelConfirmPage() {
   if (!currentProject) return <ProjectLayout><p>프로젝트를 찾을 수 없습니다.</p></ProjectLayout>;
 
   const criteriaTree = getTree();
-  const canConfirm = criteria.length >= 2 && alternatives.length >= 2;
+  const rootCriteria = criteria.filter(c => !c.parent_id);
+  const rootAlternatives = alternatives.filter(a => !a.parent_id);
+  const canConfirm = rootCriteria.length >= 2 && rootAlternatives.length >= 2;
 
   const handleConfirm = async () => {
     if (!canConfirm) {
-      toast.warning('기준 2개 이상, 대안 2개 이상이 필요합니다.');
+      toast.warning('루트 기준 2개 이상, 대안 2개 이상이 필요합니다.');
       return;
     }
     if (!(await confirm({ title: '모델 확정', message: '모델을 확정하시겠습니까? 확정 후 기준/대안 수정이 제한됩니다.', variant: 'warning' }))) return;
@@ -56,7 +58,7 @@ export default function ModelConfirmPage() {
       <div className={common.card}>
         <h2 className={common.cardTitle}>모델 구조 검토</h2>
         <p className={styles.meta}>
-          기준: {criteria.length}개 | 대안: {alternatives.filter(a => !a.parent_id).length}개
+          기준: {rootCriteria.length}개 (하위 포함 {criteria.length}개) | 대안: {rootAlternatives.length}개
         </p>
 
         <ModelPreview
