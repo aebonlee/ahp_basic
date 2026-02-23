@@ -9,6 +9,13 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
 import styles from './EvaluatorMainPage.module.css';
 
+const STATUS_ICONS = {
+  [PROJECT_STATUS.WAITING]: '\u23F3',
+  [PROJECT_STATUS.EVALUATING]: '\u25B6',
+  [PROJECT_STATUS.CREATING]: '\u270F',
+  [PROJECT_STATUS.COMPLETED]: '\u2714',
+};
+
 export default function EvaluatorMainPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -72,10 +79,17 @@ export default function EvaluatorMainPage() {
     setLoading(false);
   };
 
+  const activeProjects = projects.filter(p => !p.completed);
+  const completedProjects = projects.filter(p => p.completed);
+
   return (
     <PageLayout>
-      <div className={styles.header}>
-        <h1 className={styles.title}>평가자 화면</h1>
+      {/* Hero Banner */}
+      <div className={styles.banner}>
+        <div className={styles.bannerContent}>
+          <h1 className={styles.bannerTitle}>AHP 평가</h1>
+          <p className={styles.bannerDesc}>배정된 프로젝트에 대해 쌍대비교 평가를 진행합니다.</p>
+        </div>
         <ModeSwitch />
       </div>
 
@@ -83,41 +97,88 @@ export default function EvaluatorMainPage() {
         <LoadingSpinner message="프로젝트 로딩 중..." />
       ) : projects.length === 0 ? (
         <div className={styles.empty}>
-          <p>배정된 평가 프로젝트가 없습니다.</p>
+          <div className={styles.emptyIcon}>
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <rect x="8" y="12" width="48" height="40" rx="4" stroke="#cbd5e1" strokeWidth="2" fill="#f8fafc"/>
+              <path d="M20 28h24M20 36h16" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="48" cy="48" r="12" fill="#e0e7ff" stroke="#6366f1" strokeWidth="2"/>
+              <path d="M44 48h8M48 44v8" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h3 className={styles.emptyTitle}>배정된 평가가 없습니다</h3>
+          <p className={styles.emptyDesc}>프로젝트 관리자가 평가자로 배정하면 여기에 표시됩니다.</p>
         </div>
       ) : (
-        <div className={styles.projectList}>
-          {projects.map(p => (
-            <div key={p.id} className={styles.projectCard}>
-              <div className={styles.projectInfo}>
-                <h3>{p.name}</h3>
-                <p>{p.description}</p>
-                <span className={styles.method}>{EVAL_METHOD_LABELS[p.eval_method]}</span>
-              </div>
-              <div className={styles.projectAction}>
-                {p.completed ? (
-                  <Button variant="secondary" onClick={() => navigate(`/eval/project/${p.id}/result`)}>
-                    결과 보기
-                  </Button>
-                ) : (
-                  <Button onClick={async () => {
-                    // 평가자 레코드 없으면 자동 생성 (소유자 직접 평가)
-                    if (!p.hasEvaluator) {
-                      await supabase.from('evaluators').insert({
-                        project_id: p.id,
-                        user_id: user.id,
-                        name: user.user_metadata?.full_name || user.email,
-                        email: user.email,
-                      });
-                    }
-                    navigate(`/eval/project/${p.id}`);
-                  }}>
-                    평가하기
-                  </Button>
-                )}
+        <div className={styles.sections}>
+          {/* Active Projects */}
+          {activeProjects.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.sectionDot} data-type="active" />
+                진행 중인 평가
+                <span className={styles.sectionCount}>{activeProjects.length}</span>
+              </h2>
+              <div className={styles.cardGrid}>
+                {activeProjects.map(p => (
+                  <div key={p.id} className={styles.card}>
+                    <div className={styles.cardHeader}>
+                      <span className={styles.statusChip} data-status={p.status}>
+                        {STATUS_ICONS[p.status]} {PROJECT_STATUS_LABELS[p.status]}
+                      </span>
+                      <span className={styles.methodBadge}>{EVAL_METHOD_LABELS[p.eval_method]}</span>
+                    </div>
+                    <h3 className={styles.cardTitle}>{p.name}</h3>
+                    {p.description && <p className={styles.cardDesc}>{p.description}</p>}
+                    <div className={styles.cardFooter}>
+                      <Button onClick={async () => {
+                        if (!p.hasEvaluator) {
+                          await supabase.from('evaluators').insert({
+                            project_id: p.id,
+                            user_id: user.id,
+                            name: user.user_metadata?.full_name || user.email,
+                            email: user.email,
+                          });
+                        }
+                        navigate(`/eval/project/${p.id}`);
+                      }}>
+                        평가 시작하기
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Completed Projects */}
+          {completedProjects.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.sectionDot} data-type="done" />
+                완료된 평가
+                <span className={styles.sectionCount}>{completedProjects.length}</span>
+              </h2>
+              <div className={styles.cardGrid}>
+                {completedProjects.map(p => (
+                  <div key={p.id} className={`${styles.card} ${styles.cardCompleted}`}>
+                    <div className={styles.cardHeader}>
+                      <span className={styles.statusChip} data-status="done">
+                        {'\u2714'} 평가 완료
+                      </span>
+                      <span className={styles.methodBadge}>{EVAL_METHOD_LABELS[p.eval_method]}</span>
+                    </div>
+                    <h3 className={styles.cardTitle}>{p.name}</h3>
+                    {p.description && <p className={styles.cardDesc}>{p.description}</p>}
+                    <div className={styles.cardFooter}>
+                      <Button variant="secondary" onClick={() => navigate(`/eval/project/${p.id}/result`)}>
+                        결과 보기
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </PageLayout>

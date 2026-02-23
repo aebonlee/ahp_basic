@@ -1,6 +1,5 @@
 /**
  * 풍선도움말 콘텐츠 데이터
- * 원본 imakeit.kr의 help_div 내용을 그대로 이식
  */
 const helpData = {
   projectStart: {

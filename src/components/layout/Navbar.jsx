@@ -26,7 +26,7 @@ export default function Navbar() {
       <div className={styles.inner}>
         <div className={styles.logo} onClick={() => navigate(isAdmin ? '/admin' : '/eval')}>
           <span className={styles.logoText}>AHP Basic</span>
-          <span className={styles.logoSub}>I Make It</span>
+          <span className={styles.logoSub}>Decision Analysis</span>
         </div>
 
         {user && (

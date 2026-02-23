@@ -117,7 +117,7 @@ export default function HomePage() {
       </section>
 
       <footer className={styles.footer}>
-        <p>AHP Basic - I Make It &copy; {new Date().getFullYear()} DreamIT Biz</p>
+        <p>AHP Basic &copy; {new Date().getFullYear()} DreamIT Biz</p>
       </footer>
     </div>
   );
