@@ -7,6 +7,7 @@ import { useEvaluation } from '../contexts/EvaluationContext';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { calculateAHP } from '../lib/ahpEngine';
 import { sensitivityAnalysis } from '../lib/sensitivityAnalysis';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import SensitivityChart from '../components/sensitivity/SensitivityChart';
 import WeightSlider from '../components/sensitivity/WeightSlider';
@@ -100,9 +101,9 @@ export default function SensitivityPage() {
   if (projLoading || loading) return <PageLayout><LoadingSpinner /></PageLayout>;
 
   return (
-    <PageLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>
-        {currentProject?.name} - 민감도 분석 <HelpButton helpKey="sensitivityAnalysis" />
+        민감도 분석 <HelpButton helpKey="sensitivityAnalysis" />
       </h1>
 
       {analysisData ? (
@@ -131,6 +132,6 @@ export default function SensitivityPage() {
           </ul>
         </div>
       )}
-    </PageLayout>
+    </ProjectLayout>
   );
 }

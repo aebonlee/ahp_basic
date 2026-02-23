@@ -6,6 +6,7 @@ import { useProjects } from '../contexts/ProjectContext';
 import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../hooks/useConfirm';
 import { PROJECT_STATUS } from '../lib/constants';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import ParticipantForm from '../components/admin/ParticipantForm';
 import Button from '../components/common/Button';
@@ -26,7 +27,7 @@ export default function EvaluatorManagementPage() {
   const [starting, setStarting] = useState(false);
 
   if (projLoading || evalLoading) return <PageLayout><LoadingSpinner /></PageLayout>;
-  if (!currentProject) return <PageLayout><p>프로젝트를 찾을 수 없습니다.</p></PageLayout>;
+  if (!currentProject) return <ProjectLayout><p>프로젝트를 찾을 수 없습니다.</p></ProjectLayout>;
 
   const inviteUrl = `${window.location.origin}${window.location.pathname}#/eval/invite/${id}`;
 
@@ -59,13 +60,8 @@ export default function EvaluatorManagementPage() {
   };
 
   return (
-    <PageLayout>
-      <div className={styles.topBar}>
-        <button onClick={() => navigate(`/admin/project/${id}`)} className={common.backBtn}>
-          &larr; 모델 구축으로
-        </button>
-        <h1 className={common.pageTitle}>{currentProject.name} - 평가자 관리</h1>
-      </div>
+    <ProjectLayout projectName={currentProject.name}>
+      <h1 className={common.pageTitle}>평가자 관리</h1>
 
       <div className={common.cardSpaced}>
         <div className={styles.listHeader}>
@@ -117,15 +113,12 @@ export default function EvaluatorManagementPage() {
       </div>
 
       <div className={common.actionRow}>
-        <Button variant="secondary" onClick={() => navigate(`/admin/project/${id}/confirm`)}>
-          모델 확정으로
-        </Button>
         <Button variant="success" loading={starting} onClick={handleStartEvaluation}>
           평가 시작
         </Button>
       </div>
 
       <ConfirmDialog {...confirmDialogProps} />
-    </PageLayout>
+    </ProjectLayout>
   );
 }

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useProject } from '../hooks/useProjects';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { useConfirm } from '../hooks/useConfirm';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import CriteriaForm from '../components/model/CriteriaForm';
 import AlternativeForm from '../components/model/AlternativeForm';
@@ -17,7 +18,6 @@ import styles from './ModelBuilderPage.module.css';
 
 export default function ModelBuilderPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { currentProject, loading: projectLoading } = useProject(id);
   const { criteria, loading: criteriaLoading, addCriterion, updateCriterion, deleteCriterion, getTree } = useCriteria(id);
   const { alternatives, loading: altLoading, addAlternative, updateAlternative, deleteAlternative } = useAlternatives(id);
@@ -36,7 +36,7 @@ export default function ModelBuilderPage() {
   }
 
   if (!currentProject) {
-    return <PageLayout><p>프로젝트를 찾을 수 없습니다.</p></PageLayout>;
+    return <ProjectLayout><p>프로젝트를 찾을 수 없습니다.</p></ProjectLayout>;
   }
 
   const criteriaTree = getTree();
@@ -97,21 +97,12 @@ export default function ModelBuilderPage() {
   };
 
   return (
-    <PageLayout wide>
+    <ProjectLayout projectName={currentProject.name}>
       <div className={styles.header}>
-        <div>
-          <button className={styles.backBtn} onClick={() => navigate('/admin')}>&larr; 목록</button>
-          <h1 className={styles.title}>{currentProject.name} - 모델 구축</h1>
-        </div>
+        <h1 className={styles.title}>모델 구축</h1>
         <div className={styles.headerActions}>
-          <Button size="sm" variant="secondary" onClick={() => navigate(`/admin/project/${id}/brain`)}>
-            브레인스토밍
-          </Button>
           <Button size="sm" variant="secondary" onClick={() => setShowPreview(true)}>
             모델 보기
-          </Button>
-          <Button size="sm" onClick={() => navigate(`/admin/project/${id}/confirm`)}>
-            모델 확정
           </Button>
         </div>
       </div>
@@ -167,6 +158,6 @@ export default function ModelBuilderPage() {
       )}
 
       <ConfirmDialog {...confirmDialogProps} />
-    </PageLayout>
+    </ProjectLayout>
   );
 }

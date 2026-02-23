@@ -9,6 +9,7 @@ import { aggregateComparisons } from '../lib/ahpAggregation';
 import { aggregateDirectInputs } from '../lib/directInputEngine';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { EVAL_METHOD, CR_THRESHOLD } from '../lib/constants';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import ComprehensiveChart from '../components/results/ComprehensiveChart';
 import ConsistencyTable from '../components/results/ConsistencyTable';
@@ -152,9 +153,9 @@ export default function AdminResultPage() {
   }
 
   return (
-    <PageLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>
-        {currentProject?.name} - 집계 결과
+        집계 결과
       </h1>
 
       <EvaluatorWeightEditor
@@ -187,6 +188,6 @@ export default function AdminResultPage() {
           </div>
         </>
       )}
-    </PageLayout>
+    </ProjectLayout>
   );
 }

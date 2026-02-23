@@ -7,6 +7,7 @@ import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { pairCount } from '../lib/ahpEngine';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import ProgressBar from '../components/common/ProgressBar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -66,9 +67,9 @@ export default function WorkshopPage() {
   if (projLoading) return <PageLayout><LoadingSpinner /></PageLayout>;
 
   return (
-    <PageLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>
-        {currentProject?.name} - 실시간 워크숍 <HelpButton helpKey="workshopProgress" />
+        실시간 워크숍 <HelpButton helpKey="workshopProgress" />
       </h1>
 
       <div className={common.card}>
@@ -99,6 +100,6 @@ export default function WorkshopPage() {
           </div>
         )}
       </div>
-    </PageLayout>
+    </ProjectLayout>
   );
 }

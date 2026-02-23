@@ -7,19 +7,6 @@
   gap: var(--spacing-sm);
 }
 
-.backBtn {
-  background: none;
-  border: none;
-  color: var(--color-primary);
-  font-size: 0.85rem;
-  padding: 0;
-  margin-bottom: var(--spacing-xs);
-}
-
-.backBtn:hover {
-  text-decoration: underline;
-}
-
 .title {
   font-size: 1.3rem;
   font-weight: 700;

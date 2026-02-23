@@ -6,6 +6,7 @@ import { useProjects } from '../contexts/ProjectContext';
 import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../hooks/useConfirm';
 import { PROJECT_STATUS } from '../lib/constants';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import ModelPreview from '../components/model/ModelPreview';
 import Button from '../components/common/Button';
@@ -27,7 +28,7 @@ export default function ModelConfirmPage() {
   const [confirming, setConfirming] = useState(false);
 
   if (projectLoading || criteriaLoading || altLoading) return <PageLayout><LoadingSpinner /></PageLayout>;
-  if (!currentProject) return <PageLayout><p>프로젝트를 찾을 수 없습니다.</p></PageLayout>;
+  if (!currentProject) return <ProjectLayout><p>프로젝트를 찾을 수 없습니다.</p></ProjectLayout>;
 
   const criteriaTree = getTree();
   const canConfirm = criteria.length >= 2 && alternatives.length >= 2;
@@ -50,13 +51,8 @@ export default function ModelConfirmPage() {
   };
 
   return (
-    <PageLayout>
-      <div className={styles.topBar}>
-        <button onClick={() => navigate(`/admin/project/${id}`)} className={common.backBtn}>
-          &larr; 모델 구축으로
-        </button>
-        <h1 className={common.pageTitle}>{currentProject.name} - 모델 확정</h1>
-      </div>
+    <ProjectLayout projectName={currentProject.name}>
+      <h1 className={common.pageTitle}>모델 확정</h1>
 
       <div className={common.card}>
         <h2 className={common.cardTitle}>모델 구조 검토</h2>
@@ -87,6 +83,6 @@ export default function ModelConfirmPage() {
       </div>
 
       <ConfirmDialog {...confirmDialogProps} />
-    </PageLayout>
+    </ProjectLayout>
   );
 }

@@ -6,6 +6,7 @@ import { useCriteria } from '../hooks/useCriteria';
 import { useEvaluation } from '../contexts/EvaluationContext';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { calculateAHP } from '../lib/ahpEngine';
+import ProjectLayout from '../components/layout/ProjectLayout';
 import PageLayout from '../components/layout/PageLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HelpButton from '../components/common/HelpButton';
@@ -97,9 +98,9 @@ export default function ResourceAllocationPage() {
   if (projLoading || loading) return <PageLayout><LoadingSpinner /></PageLayout>;
 
   return (
-    <PageLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>
-        {currentProject?.name} - 자원 배분 <HelpButton helpKey="resourceAllocation" />
+        자원 배분 <HelpButton helpKey="resourceAllocation" />
       </h1>
 
       <div className={common.card}>
@@ -147,6 +148,6 @@ export default function ResourceAllocationPage() {
           </tfoot>
         </table>
       </div>
-    </PageLayout>
+    </ProjectLayout>
   );
 }
