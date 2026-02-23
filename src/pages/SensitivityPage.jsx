@@ -39,7 +39,7 @@ export default function SensitivityPage() {
       const rootValues = {};
       for (let i = 0; i < rootIds.length; i++) {
         for (let j = i + 1; j < rootIds.length; j++) {
-          const key = `root:${rootIds[i]}:${rootIds[j]}`;
+          const key = `${id}:${rootIds[i]}:${rootIds[j]}`;
           if (comparisons[key]) rootValues[`${rootIds[i]}:${rootIds[j]}`] = comparisons[key];
         }
       }

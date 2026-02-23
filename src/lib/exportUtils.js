@@ -92,7 +92,7 @@ function getCriteriaGlobal(criteria, criterionId, results) {
     current = criteria.find(c => c.id === current.parent_id);
   }
   for (const node of chain) {
-    const parentId = node.parent_id || 'root';
+    const parentId = node.parent_id || results.goalId;
     const pr = results.pageResults[parentId];
     if (pr) {
       const idx = pr.items.findIndex(i => i.id === node.id);

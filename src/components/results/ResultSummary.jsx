@@ -14,7 +14,7 @@ export default function ResultSummary({ criteria, alternatives, results }) {
     }
 
     for (const node of chain) {
-      const parentId = node.parent_id || 'root';
+      const parentId = node.parent_id || results.goalId;
       const pageResult = results.pageResults[parentId];
       if (pageResult) {
         const idx = pageResult.items.findIndex(i => i.id === node.id);

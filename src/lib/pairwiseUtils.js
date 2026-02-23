@@ -3,13 +3,15 @@
  * Each page compares siblings under a common parent.
  * Returns array of { parentId, parentName, items: [{id, name}], pairs }
  */
-export function buildPageSequence(criteria, alternatives) {
+export function buildPageSequence(criteria, alternatives, goalId = null) {
   const pages = [];
 
   // Group criteria by parent
+  // Root-level criteria (no parent_id) use goalId (project UUID) as parentId
+  // so that criterion_id in DB is a valid UUID, not the string 'root'.
   const byParent = {};
   for (const c of criteria) {
-    const parentId = c.parent_id || 'root';
+    const parentId = c.parent_id || goalId || 'goal';
     if (!byParent[parentId]) byParent[parentId] = [];
     byParent[parentId].push(c);
   }

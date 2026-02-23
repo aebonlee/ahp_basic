@@ -51,8 +51,8 @@ export default function PairwiseRatingPage() {
   }, [id, evaluatorId, loadProjectData]);
 
   const pageSequence = useMemo(
-    () => buildPageSequence(criteria, alternatives),
-    [criteria, alternatives]
+    () => buildPageSequence(criteria, alternatives, id),
+    [criteria, alternatives, id]
   );
 
   // Per-page completion status for navigator dots

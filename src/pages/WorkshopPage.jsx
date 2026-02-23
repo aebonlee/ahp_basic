@@ -59,7 +59,7 @@ export default function WorkshopPage() {
   // Calculate total required comparisons
   const totalRequired = useMemo(() => {
     if (criteria.length === 0) return 0;
-    const pages = buildPageSequence(criteria, alternatives);
+    const pages = buildPageSequence(criteria, alternatives, id);
     return pages.reduce((sum, page) => sum + pairCount(page.items.length), 0);
   }, [criteria, alternatives]);
 

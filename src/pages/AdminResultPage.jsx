@@ -84,7 +84,7 @@ export default function AdminResultPage() {
     if (!isDirectInput && Object.keys(allComparisons).length === 0) return null;
     if (isDirectInput && Object.keys(allDirectInputs).length === 0) return null;
 
-    const pageSequence = buildPageSequence(criteria, alternatives);
+    const pageSequence = buildPageSequence(criteria, alternatives, id);
     const pageResults = {};
 
     let totalCells = 0;
@@ -144,8 +144,8 @@ export default function AdminResultPage() {
 
     const allComplete = totalCells > 0 && completedCells >= totalCells;
 
-    return { pageResults, pageSequence, allConsistent, allComplete, totalCells, completedCells };
-  }, [criteria, alternatives, allComparisons, allDirectInputs, weights, isDirectInput]);
+    return { goalId: id, pageResults, pageSequence, allConsistent, allComplete, totalCells, completedCells };
+  }, [id, criteria, alternatives, allComparisons, allDirectInputs, weights, isDirectInput]);
 
   if (projLoading || loading) {
     return <ProjectLayout><LoadingSpinner message="집계 결과 로딩 중..." /></ProjectLayout>;

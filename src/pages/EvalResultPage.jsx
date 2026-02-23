@@ -38,7 +38,7 @@ export default function EvalResultPage() {
   const results = useMemo(() => {
     if (criteria.length === 0) return null;
 
-    const pageSequence = buildPageSequence(criteria, alternatives);
+    const pageSequence = buildPageSequence(criteria, alternatives, id);
     const pageResults = {};
     let allConsistent = true;
     let allComplete = true;
@@ -90,6 +90,7 @@ export default function EvalResultPage() {
     }
 
     return {
+      goalId: id,
       pageResults,
       pageSequence,
       allConsistent,
@@ -99,7 +100,7 @@ export default function EvalResultPage() {
       incompletePages,
       inconsistentPages,
     };
-  }, [criteria, alternatives, comparisons]);
+  }, [id, criteria, alternatives, comparisons]);
 
   if (loading || !results) {
     return <PageLayout><LoadingSpinner message="결과 계산 중..." /></PageLayout>;

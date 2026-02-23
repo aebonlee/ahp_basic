@@ -16,7 +16,7 @@ import styles from './ResourceAllocationPage.module.css';
  * Calculate global weight of a criterion through the hierarchy.
  * Walks up the parent chain, multiplying local priorities at each level.
  */
-function getCriteriaGlobal(criteria, criterionId, comparisons) {
+function getCriteriaGlobal(criteria, criterionId, comparisons, goalId) {
   const criterion = criteria.find(c => c.id === criterionId);
   if (!criterion) return 0;
 
@@ -30,7 +30,7 @@ function getCriteriaGlobal(criteria, criterionId, comparisons) {
 
   let global = 1;
   for (const node of chain) {
-    const parentId = node.parent_id || 'root';
+    const parentId = node.parent_id || goalId;
     // Find siblings under same parent
     const siblings = criteria.filter(c => (c.parent_id || null) === (node.parent_id || null));
     if (siblings.length < 2) continue;
@@ -74,7 +74,7 @@ export default function ResourceAllocationPage() {
       let totalScore = 0;
       for (const leaf of leafCriteria) {
         // Get global weight of this leaf criterion
-        const criteriaGlobal = getCriteriaGlobal(criteria, leaf.id, comparisons);
+        const criteriaGlobal = getCriteriaGlobal(criteria, leaf.id, comparisons, id);
 
         // Get alternative priority under this leaf
         const altValues = {};

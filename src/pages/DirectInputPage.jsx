@@ -31,8 +31,8 @@ export default function DirectInputPage() {
   }, [id, evaluatorId, loadProjectData]);
 
   const pages = useMemo(
-    () => buildPageSequence(criteria, alternatives),
-    [criteria, alternatives]
+    () => buildPageSequence(criteria, alternatives, id),
+    [criteria, alternatives, id]
   );
 
   const handleValidationChange = useCallback((criterionId, isComplete) => {
