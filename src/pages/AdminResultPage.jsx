@@ -12,6 +12,8 @@ import { EVAL_METHOD, CR_THRESHOLD } from '../lib/constants';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import ComprehensiveChart from '../components/results/ComprehensiveChart';
 import ConsistencyTable from '../components/results/ConsistencyTable';
+import ResultSummary from '../components/results/ResultSummary';
+import DetailView from '../components/results/DetailView';
 import EvaluatorWeightEditor from '../components/admin/EvaluatorWeightEditor';
 import ExportButtons from '../components/results/ExportButtons';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -147,6 +149,37 @@ export default function AdminResultPage() {
     return { goalId: id, pageResults, pageSequence, allConsistent, allComplete, totalCells, completedCells };
   }, [id, criteria, alternatives, allComparisons, allDirectInputs, weights, isDirectInput]);
 
+  // Per-evaluator individual CR values (pairwise only)
+  const evaluatorCRs = useMemo(() => {
+    if (isDirectInput || !results) return null;
+    if (evaluators.length === 0) return null;
+
+    const rows = [];
+    for (const page of results.pageSequence) {
+      const itemIds = page.items.map(i => i.id);
+      if (itemIds.length < 2) continue;
+
+      const evalCRs = evaluators.map(ev => {
+        const comps = allComparisons[ev.id] || {};
+        const values = {};
+        for (let i = 0; i < itemIds.length; i++) {
+          for (let j = i + 1; j < itemIds.length; j++) {
+            const key = `${page.parentId}:${itemIds[i]}:${itemIds[j]}`;
+            if (comps[key] !== undefined) {
+              values[`${itemIds[i]}:${itemIds[j]}`] = comps[key] === 0 ? 1 : comps[key];
+            }
+          }
+        }
+        const agg = aggregateComparisons(itemIds, [{ values, weight: 1 }]);
+        return agg.cr;
+      });
+
+      rows.push({ parentName: page.parentName, evalCRs });
+    }
+
+    return rows;
+  }, [results, evaluators, allComparisons, isDirectInput]);
+
   if (projLoading || loading) {
     return <ProjectLayout><LoadingSpinner message="집계 결과 로딩 중..." /></ProjectLayout>;
   }
@@ -183,8 +216,49 @@ export default function AdminResultPage() {
             <ComprehensiveChart criteria={criteria} alternatives={alternatives} results={results} />
           </div>
           <div className={common.sectionGap}>
+            <ResultSummary criteria={criteria} alternatives={alternatives} results={results} />
+          </div>
+          <div className={common.sectionGap}>
+            <DetailView criteria={criteria} alternatives={alternatives} results={results} onNavigateToPage={() => {}} />
+          </div>
+          <div className={common.sectionGap}>
             <ConsistencyTable results={results} onNavigateToPage={() => {}} />
           </div>
+          {evaluatorCRs && evaluatorCRs.length > 0 && (
+            <div className={common.sectionGap}>
+              <div className={common.card}>
+                <h3 className={common.cardTitle}>평가자별 개인 CR 비교</h3>
+                <div className={styles.crTableWrap}>
+                  <table className={common.dataTable}>
+                    <thead>
+                      <tr>
+                        <th>비교 항목</th>
+                        {evaluators.map(ev => (
+                          <th key={ev.id} style={{ textAlign: 'center' }}>{ev.name}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {evaluatorCRs.map((row, idx) => (
+                        <tr key={idx}>
+                          <td>{row.parentName}</td>
+                          {row.evalCRs.map((cr, ci) => (
+                            <td
+                              key={ci}
+                              className={cr > CR_THRESHOLD ? styles.crFail : styles.crPass}
+                              style={{ textAlign: 'center' }}
+                            >
+                              {cr.toFixed(4)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </ProjectLayout>

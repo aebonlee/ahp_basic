@@ -97,6 +97,35 @@ export default function SensitivityPage() {
     }
   }, [criteria, alternatives, comparisons, selectedCriterion]);
 
+  // Rank switching points: find weight values where the #1 alternative changes
+  const switchingPoints = useMemo(() => {
+    if (!analysisData) return [];
+    const { data, mainAlts, rootCriteria, basePriorities } = analysisData;
+    const safeCriterionIndex = Math.min(selectedCriterion, rootCriteria.length - 1);
+    const currentWeight = basePriorities[safeCriterionIndex];
+
+    // Find current #1
+    const currentScores = data.find(d => Math.abs(d.weight - currentWeight) < 0.015);
+    if (!currentScores) return [];
+
+    const currentTopIdx = currentScores.scores.indexOf(Math.max(...currentScores.scores));
+    const points = [];
+
+    let prevTopIdx = null;
+    for (const point of data) {
+      const topIdx = point.scores.indexOf(Math.max(...point.scores));
+      if (prevTopIdx !== null && topIdx !== prevTopIdx && (prevTopIdx === currentTopIdx || topIdx === currentTopIdx)) {
+        points.push({
+          weight: point.weight,
+          from: mainAlts[prevTopIdx]?.name || '',
+          to: mainAlts[topIdx]?.name || '',
+        });
+      }
+      prevTopIdx = topIdx;
+    }
+    return points;
+  }, [analysisData, selectedCriterion]);
+
   if (projLoading || loading) return <ProjectLayout><LoadingSpinner /></ProjectLayout>;
 
   return (
@@ -107,6 +136,37 @@ export default function SensitivityPage() {
 
       {analysisData ? (
         <>
+          {/* 현재 가중치 요약 테이블 */}
+          <div className={common.card} style={{ marginBottom: 'var(--spacing-lg)' }}>
+            <h3 className={common.cardTitle}>현재 기준 가중치 요약</h3>
+            <table className={common.dataTable}>
+              <thead>
+                <tr>
+                  <th>순위</th>
+                  <th>기준</th>
+                  <th style={{ textAlign: 'right' }}>가중치(%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {analysisData.rootCriteria
+                  .map((c, i) => ({ name: c.name, weight: analysisData.basePriorities[i], idx: i }))
+                  .sort((a, b) => b.weight - a.weight)
+                  .map((item, rank) => (
+                    <tr
+                      key={item.idx}
+                      className={item.idx === selectedCriterion ? styles.selectedRow : ''}
+                    >
+                      <td style={{ textAlign: 'center' }}>{rank + 1}</td>
+                      <td>{item.name}</td>
+                      <td style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                        {(item.weight * 100).toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+
           <WeightSlider
             criteria={analysisData.rootCriteria}
             selected={selectedCriterion}
@@ -117,6 +177,33 @@ export default function SensitivityPage() {
             alternatives={analysisData.mainAlts}
             criterionName={analysisData.rootCriteria[selectedCriterion]?.name}
           />
+
+          {/* 순위 전환점 카드 */}
+          {switchingPoints.length > 0 && (
+            <div className={styles.switchSection}>
+              <h3 className={common.cardTitle}>순위 전환점 분석</h3>
+              <div className={styles.switchCards}>
+                {switchingPoints.map((sp, i) => (
+                  <div key={i} className={styles.switchCard}>
+                    <div className={styles.switchWeight}>
+                      {analysisData.rootCriteria[selectedCriterion]?.name} 가중치{' '}
+                      <strong>{(sp.weight * 100).toFixed(0)}%</strong>
+                    </div>
+                    <div className={styles.switchChange}>
+                      1위: <span className={styles.switchFrom}>{sp.from}</span>
+                      {' → '}
+                      <span className={styles.switchTo}>{sp.to}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {switchingPoints.length === 0 && (
+            <div className={styles.noSwitch}>
+              선택 기준의 가중치를 0~100%로 변경해도 1위 대안이 바뀌지 않습니다.
+            </div>
+          )}
         </>
       ) : (
         <div className={styles.emptyCard}>

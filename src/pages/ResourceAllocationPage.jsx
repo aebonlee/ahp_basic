@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useProject } from '../hooks/useProjects';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { useCriteria } from '../hooks/useCriteria';
@@ -58,6 +59,14 @@ export default function ResourceAllocationPage() {
   const { alternatives } = useAlternatives(id);
   const { comparisons, loadProjectData, loading } = useEvaluation();
   const [totalResource, setTotalResource] = useState(100);
+  const [unit, setUnit] = useState('원');
+
+  const UNIT_OPTIONS = [
+    { value: '원', label: '금액(원)' },
+    { value: '명', label: '인원(명)' },
+    { value: 'h', label: '시간(h)' },
+    { value: '%', label: '백분율(%)' },
+  ];
 
   useEffect(() => {
     loadProjectData(id);
@@ -94,6 +103,22 @@ export default function ResourceAllocationPage() {
 
   const totalScore = allocations.reduce((sum, a) => sum + a.score, 0);
 
+  const sortedAllocations = useMemo(() => {
+    return [...allocations]
+      .map(a => {
+        const pct = totalScore > 0 ? a.score / totalScore : 0;
+        return { ...a, pct, alloc: pct * totalResource };
+      })
+      .sort((a, b) => b.pct - a.pct);
+  }, [allocations, totalScore, totalResource]);
+
+  const CHART_COLORS = ['#6366f1', '#06b6d4', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6'];
+
+  const chartData = sortedAllocations.map(a => ({
+    name: a.name,
+    value: +(a.pct * 100).toFixed(2),
+  }));
+
   if (projLoading || loading) return <ProjectLayout><LoadingSpinner /></ProjectLayout>;
 
   return (
@@ -111,32 +136,85 @@ export default function ResourceAllocationPage() {
             onChange={(e) => setTotalResource(Number(e.target.value) || 0)}
             className={styles.resourceInput}
           />
+          <select
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            className={styles.unitSelect}
+          >
+            {UNIT_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
         </div>
 
-        <table className={common.dataTable}>
+        {/* 수평 바 차트 */}
+        {chartData.length > 0 && (
+          <div className={styles.chartWrap}>
+            <ResponsiveContainer width="100%" height={Math.max(chartData.length * 48, 120)}>
+              <BarChart data={chartData} layout="vertical" margin={{ left: 20, right: 30, top: 5, bottom: 5 }}>
+                <XAxis type="number" domain={[0, 100]} tickFormatter={v => `${v}%`} />
+                <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 13 }} />
+                <Tooltip formatter={(v) => `${v}%`} />
+                <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={28}>
+                  {chartData.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* 대안별 카드 */}
+        <div className={styles.allocCards}>
+          {sortedAllocations.map((a, idx) => (
+            <div key={a.name} className={styles.allocCard}>
+              <div className={styles.allocRank}>
+                <span className={styles.rankBadge} style={{ background: CHART_COLORS[idx % CHART_COLORS.length] }}>
+                  {idx + 1}
+                </span>
+                <span className={styles.allocName}>{a.name}</span>
+              </div>
+              <div className={styles.allocBarTrack}>
+                <div
+                  className={styles.allocBarFill}
+                  style={{
+                    width: `${a.pct * 100}%`,
+                    background: CHART_COLORS[idx % CHART_COLORS.length],
+                  }}
+                />
+              </div>
+              <div className={styles.allocValues}>
+                <span className={styles.allocPct}>{(a.pct * 100).toFixed(2)}%</span>
+                <span className={styles.allocAmount}>
+                  {a.alloc.toFixed(2)} {unit}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 기존 테이블 */}
+        <table className={common.dataTable} style={{ marginTop: 'var(--spacing-lg)' }}>
           <thead>
             <tr>
               <th>대안</th>
               <th style={{ textAlign: 'right' }}>중요도</th>
-              <th style={{ textAlign: 'right' }}>배분량</th>
+              <th style={{ textAlign: 'right' }}>배분량 ({unit})</th>
             </tr>
           </thead>
           <tbody>
-            {allocations.map(a => {
-              const pct = totalScore > 0 ? a.score / totalScore : 0;
-              const alloc = pct * totalResource;
-              return (
-                <tr key={a.name}>
-                  <td>{a.name}</td>
-                  <td className={styles.tdRight}>
-                    {(pct * 100).toFixed(2)}%
-                  </td>
-                  <td className={styles.tdRightBold}>
-                    {alloc.toFixed(2)}
-                  </td>
-                </tr>
-              );
-            })}
+            {sortedAllocations.map(a => (
+              <tr key={a.name}>
+                <td>{a.name}</td>
+                <td className={styles.tdRight}>
+                  {(a.pct * 100).toFixed(2)}%
+                </td>
+                <td className={styles.tdRightBold}>
+                  {a.alloc.toFixed(2)}
+                </td>
+              </tr>
+            ))}
           </tbody>
           <tfoot>
             <tr>
