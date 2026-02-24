@@ -26,17 +26,14 @@
   max-width: 100%;
 }
 
-/* Horizontal mode: allow text wrapping */
+/* Horizontal mode: allow text wrapping, no line clamp */
 .wrapLabel {
   white-space: normal;
   word-break: keep-all;
   overflow-wrap: break-word;
   line-height: 1.3;
   text-align: center;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Goal node */
