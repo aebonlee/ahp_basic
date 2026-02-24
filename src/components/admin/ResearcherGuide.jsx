@@ -111,6 +111,20 @@ export default function ResearcherGuide() {
 
   return (
     <div className={styles.guide}>
+      {/* ─── Section Tabs (1~5) ─── */}
+      <div className={styles.sectionTabs}>
+        {SECTIONS.map((s) => (
+          <button
+            key={s.id}
+            className={`${styles.sectionTab} ${view === s.id ? styles.sectionTabActive : ''}`}
+            onClick={() => setView(s.id)}
+            title={s.label}
+          >
+            {s.step}
+          </button>
+        ))}
+      </div>
+
       {view === 'overview' ? (
         <div className={styles.overviewGrid}>
           {SECTIONS.map((s) => (
@@ -135,7 +149,6 @@ export default function ResearcherGuide() {
           </button>
 
           <div className={styles.sectionHeader}>
-            <span className={styles.stepNum}>{currentSection.step}</span>
             <span className={styles.sectionTitle}>{currentSection.label}</span>
           </div>
 

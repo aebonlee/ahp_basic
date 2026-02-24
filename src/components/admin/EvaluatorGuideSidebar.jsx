@@ -131,6 +131,20 @@ export default function EvaluatorGuideSidebar() {
 
   return (
     <div className={styles.guide}>
+      {/* ─── Section Tabs (1~5) ─── */}
+      <div className={styles.sectionTabs}>
+        {SECTIONS.map((s) => (
+          <button
+            key={s.id}
+            className={`${styles.sectionTab} ${view === s.id ? styles.sectionTabActive : ''}`}
+            onClick={() => setView(s.id)}
+            title={s.label}
+          >
+            {s.step}
+          </button>
+        ))}
+      </div>
+
       {/* Process Flow */}
       <div className={styles.processFlow}>
         {['초대 수락', '로그인', '평가 수행', '설문', '완료'].map((step, i, arr) => (
@@ -165,7 +179,6 @@ export default function EvaluatorGuideSidebar() {
           </button>
 
           <div className={styles.sectionHeader}>
-            <span className={styles.stepNum}>{currentSection.step}</span>
             <span className={styles.sectionTitle}>{currentSection.label}</span>
           </div>
 
