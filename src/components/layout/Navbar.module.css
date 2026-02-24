@@ -9,42 +9,56 @@
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  gap: var(--spacing-md);
 }
 
+/* ─── Left: Logo ─── */
 .logo {
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   user-select: none;
+  flex-shrink: 0;
 }
 
 .logoText {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.02em;
 }
 
-.logoSub {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-primary-light);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0.8;
+/* ─── Center: Project Name ─── */
+.center {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
 }
 
+.projectName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+/* ─── Right: Actions ─── */
 .actions {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
 .themeBtn {
@@ -126,8 +140,8 @@
     padding: 0 var(--spacing-md);
   }
 
-  .logoSub {
-    display: none;
+  .projectName {
+    font-size: 0.82rem;
   }
 
   .userInfo {

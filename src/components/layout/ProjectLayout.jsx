@@ -29,7 +29,7 @@ export default function ProjectLayout({ children, projectName }) {
 
   return (
     <div className={styles.layout}>
-      <Navbar />
+      <Navbar projectName={projectName} />
       <div className={styles.body}>
         {/* ─── Left Sidebar ─── */}
         <div className={`${styles.sidebarWrap} ${leftOpen ? '' : styles.collapsed}`}>

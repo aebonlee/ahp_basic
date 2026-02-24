@@ -75,8 +75,11 @@
   font-weight: 600;
   color: var(--color-primary);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  word-break: keep-all;
 }
 
 /* 단계 메뉴 */
@@ -153,9 +156,11 @@
 }
 
 .menuLabel {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.35;
+  min-height: calc(0.92rem * 1.35 * 2);
+  display: flex;
+  align-items: center;
+  word-break: keep-all;
 }
 
 /* Mobile */

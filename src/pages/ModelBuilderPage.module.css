@@ -253,9 +253,9 @@
 }
 
 .canvasAreaRow > .guidePanel {
-  width: 260px;
+  width: 280px;
   flex-shrink: 0;
-  max-height: 600px;
+  max-height: none;
 }
 
 .canvasAreaCol > .guidePanel {
@@ -300,6 +300,8 @@
 
 .guideList li {
   margin-bottom: 3px;
+  min-height: calc(0.76rem * 1.6 * 2);
+  line-height: 1.6;
 }
 
 .guideList li:last-child {

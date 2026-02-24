@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { USER_MODE } from '../../lib/constants';
 import styles from './Navbar.module.css';
 
-export default function Navbar() {
+export default function Navbar({ projectName }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, mode, setMode, isAdmin, signOut } = useAuth();
@@ -31,11 +31,19 @@ export default function Navbar() {
   return (
     <header className={styles.navbar}>
       <div className={styles.inner}>
+        {/* Left: Logo */}
         <div className={styles.logo} onClick={() => navigate(isAdminPath ? '/admin' : isAdmin ? '/admin' : '/eval')}>
           <span className={styles.logoText}>AHP Basic</span>
-          <span className={styles.logoSub}>Decision Analysis</span>
         </div>
 
+        {/* Center: Project Name */}
+        {projectName && (
+          <div className={styles.center}>
+            <span className={styles.projectName}>{projectName}</span>
+          </div>
+        )}
+
+        {/* Right: Actions */}
         <div className={styles.actions}>
           <button
             className={styles.themeBtn}
@@ -47,14 +55,12 @@ export default function Navbar() {
 
           {user && (
             <>
-              {/* Admin preview indicator — only for admins in evaluator preview mode */}
               {isPreviewMode && !isAdminPath && (
                 <button className={styles.previewBadge} onClick={handleReturnToAdmin}>
                   미리보기 중 — 돌아가기
                 </button>
               )}
 
-              {/* Role badge — only for admins in admin mode */}
               {isAdmin && !isPreviewMode && (
                 <span className={styles.roleBadge}>연구자</span>
               )}
