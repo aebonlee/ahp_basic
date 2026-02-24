@@ -1,22 +1,39 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import KeywordItem from './KeywordItem';
 import styles from './KeywordZone.module.css';
 
 export default function KeywordZone({ zone, items, onAdd, onUpdate, onDelete, onDragStart, onDrop, isDragging }) {
   const [input, setInput] = useState('');
   const [showInput, setShowInput] = useState(false);
+  const isComposing = useRef(false);
 
   const handleAdd = () => {
     if (input.trim()) {
       onAdd(input.trim());
       setInput('');
     }
-    setShowInput(false);
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleAdd();
-    if (e.key === 'Escape') { setShowInput(false); setInput(''); }
+    if (e.key === 'Enter' && !isComposing.current) {
+      e.preventDefault();
+      handleAdd();
+      // 입력창 유지 → 연속 입력 가능
+    }
+    if (e.key === 'Escape') {
+      setShowInput(false);
+      setInput('');
+    }
+  };
+
+  const handleBlur = () => {
+    // 빈 텍스트일 때만 입력창 닫기
+    if (!input.trim()) {
+      setShowInput(false);
+    } else {
+      handleAdd();
+      setShowInput(false);
+    }
   };
 
   return (
@@ -51,8 +68,10 @@ export default function KeywordZone({ zone, items, onAdd, onUpdate, onDelete, on
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            onBlur={handleAdd}
-            placeholder="키워드 입력 후 Enter"
+            onCompositionStart={() => { isComposing.current = true; }}
+            onCompositionEnd={() => { isComposing.current = false; }}
+            onBlur={handleBlur}
+            placeholder="키워드 입력 후 Enter (연속 입력 가능)"
             autoFocus
           />
         </div>

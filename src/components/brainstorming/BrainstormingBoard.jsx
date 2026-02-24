@@ -1,18 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import KeywordZone from './KeywordZone';
-import Button from '../common/Button';
 import styles from './BrainstormingBoard.module.css';
 
 const ZONES = [
-  { key: 'alternatives', label: '대안', color: '#4a9eff' },
-  { key: 'pros', label: '장점', color: '#4caf50' },
-  { key: 'cons', label: '단점', color: '#f44336' },
-  { key: 'criteria', label: '판단 기준', color: '#ff9800' },
+  { key: 'alternative',    label: '대안',      color: '#4a9eff' },
+  { key: 'advantage',      label: '장점',      color: '#4caf50' },
+  { key: 'disadvantage',   label: '단점',      color: '#f44336' },
+  { key: 'criterion',      label: '판단 기준', color: '#ff9800' },
 ];
 
+const ZONE_KEYS = ZONES.map(z => z.key);
+
 export default function BrainstormingBoard({ projectId }) {
-  const [items, setItems] = useState({ alternatives: [], pros: [], cons: [], criteria: [] });
+  const [items, setItems] = useState({ alternative: [], advantage: [], disadvantage: [], criterion: [] });
   const [dragItem, setDragItem] = useState(null);
 
   useEffect(() => {
@@ -20,13 +21,13 @@ export default function BrainstormingBoard({ projectId }) {
   }, [projectId]);
 
   const loadItems = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('brainstorming_items')
       .select('*')
       .eq('project_id', projectId)
       .order('sort_order');
     if (data) {
-      const grouped = { alternatives: [], pros: [], cons: [], criteria: [] };
+      const grouped = { alternative: [], advantage: [], disadvantage: [], criterion: [] };
       for (const item of data) {
         if (grouped[item.zone]) grouped[item.zone].push(item);
       }
@@ -37,14 +38,14 @@ export default function BrainstormingBoard({ projectId }) {
   const addItem = async (zone, text) => {
     if (!text.trim()) return;
     const maxOrder = items[zone].reduce((max, i) => Math.max(max, i.sort_order || 0), 0);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('brainstorming_items')
       .insert({
         project_id: projectId,
         zone,
         text: text.trim(),
         sort_order: maxOrder + 1,
-        parent_item_id: null,
+        parent_id: null,
       })
       .select()
       .single();
@@ -57,7 +58,7 @@ export default function BrainstormingBoard({ projectId }) {
     await supabase.from('brainstorming_items').update({ text }).eq('id', id);
     setItems(prev => {
       const next = { ...prev };
-      for (const zone of Object.keys(next)) {
+      for (const zone of ZONE_KEYS) {
         next[zone] = next[zone].map(i => i.id === id ? { ...i, text } : i);
       }
       return next;
@@ -68,7 +69,7 @@ export default function BrainstormingBoard({ projectId }) {
     await supabase.from('brainstorming_items').delete().eq('id', id);
     setItems(prev => {
       const next = { ...prev };
-      for (const zone of Object.keys(next)) {
+      for (const zone of ZONE_KEYS) {
         next[zone] = next[zone].filter(i => i.id !== id);
       }
       return next;
@@ -81,22 +82,21 @@ export default function BrainstormingBoard({ projectId }) {
 
   const handleDrop = async (targetZone, targetParentId) => {
     if (!dragItem) return;
-    const { sourceZone, id, text } = dragItem;
+    const { sourceZone, id } = dragItem;
 
     if (sourceZone === targetZone && !targetParentId) {
       setDragItem(null);
       return;
     }
 
-    // Move item: delete from source, add to target
     await supabase.from('brainstorming_items')
-      .update({ zone: targetZone, parent_item_id: targetParentId || null })
+      .update({ zone: targetZone, parent_id: targetParentId || null })
       .eq('id', id);
 
     setItems(prev => {
       const next = { ...prev };
       next[sourceZone] = next[sourceZone].filter(i => i.id !== id);
-      const movedItem = { ...dragItem, zone: targetZone, parent_item_id: targetParentId || null };
+      const movedItem = { ...dragItem, zone: targetZone, parent_id: targetParentId || null };
       next[targetZone] = [...next[targetZone], movedItem];
       return next;
     });
