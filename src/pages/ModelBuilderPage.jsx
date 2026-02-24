@@ -4,6 +4,7 @@ import { useProject } from '../hooks/useProjects';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { useConfirm } from '../hooks/useConfirm';
+import { useBrainstormingImport } from '../hooks/useBrainstormingImport';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import CriteriaForm from '../components/model/CriteriaForm';
 import AlternativeForm from '../components/model/AlternativeForm';
@@ -31,6 +32,7 @@ export default function ModelBuilderPage() {
   const [orientation, setOrientation] = useState('vertical');
   const [paperMode, setPaperMode] = useState(false);
   const { confirm, confirmDialogProps } = useConfirm();
+  const { importing, result: importResult, importToModel, clearResult: clearImportResult } = useBrainstormingImport(id);
 
   if (projectLoading || criteriaLoading || altLoading) {
     return <ProjectLayout><LoadingSpinner message="모델 데이터 로딩 중..." /></ProjectLayout>;
@@ -87,6 +89,14 @@ export default function ModelBuilderPage() {
     await deleteAlternative(altId);
   };
 
+  const handleBrainstormingImport = async () => {
+    try {
+      await importToModel(criteria, alternatives, addCriterion, addAlternative);
+    } catch (err) {
+      console.error('Brainstorming import failed:', err);
+    }
+  };
+
   const handleAltFormSubmit = async (data) => {
     if (altFormMode === 'edit') {
       await updateAlternative(selectedAlternative.id, data);
@@ -113,6 +123,13 @@ export default function ModelBuilderPage() {
       <div className={styles.canvasToolbar}>
         <Button size="sm" onClick={() => handleAddCriterion(null)}>+ 기준 추가</Button>
         <Button size="sm" variant="secondary" onClick={() => handleAddAlternative(null)}>+ 대안 추가</Button>
+        <button
+          className={styles.brainstormImportBtn}
+          onClick={handleBrainstormingImport}
+          disabled={importing}
+        >
+          {importing ? '가져오는 중...' : '브레인스토밍에서 가져오기'}
+        </button>
         <div className={styles.toolbarRight}>
         <button
           className={`${styles.paperBtn} ${paperMode ? styles.paperBtnActive : ''}`}
@@ -155,6 +172,20 @@ export default function ModelBuilderPage() {
         </div>
         </div>
       </div>
+
+      {importResult && !importResult.error && (
+        <div className={styles.importResultBar}>
+          기준 {importResult.importedCriteria}개, 대안 {importResult.importedAlternatives}개 반영 완료
+          {importResult.skipped > 0 && ` (중복 ${importResult.skipped}개 스킵)`}
+          <button className={styles.dismissBtn} onClick={clearImportResult}>✕</button>
+        </div>
+      )}
+      {importResult?.error && (
+        <div className={styles.importErrorBar}>
+          가져오기 오류: {importResult.error}
+          <button className={styles.dismissBtn} onClick={clearImportResult}>✕</button>
+        </div>
+      )}
 
       <div className={styles.canvasContainer}>
         <HierarchyCanvas

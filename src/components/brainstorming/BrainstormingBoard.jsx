@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useCriteria } from '../../hooks/useCriteria';
+import { useAlternatives } from '../../hooks/useAlternatives';
+import { useBrainstormingImport } from '../../hooks/useBrainstormingImport';
 import KeywordZone from './KeywordZone';
 import styles from './BrainstormingBoard.module.css';
 
@@ -15,6 +18,9 @@ const ZONE_KEYS = ZONES.map(z => z.key);
 export default function BrainstormingBoard({ projectId }) {
   const [items, setItems] = useState({ alternative: [], advantage: [], disadvantage: [], criterion: [] });
   const [dragItem, setDragItem] = useState(null);
+  const { criteria, addCriterion } = useCriteria(projectId);
+  const { alternatives, addAlternative } = useAlternatives(projectId);
+  const { importing, result, importToModel, clearResult } = useBrainstormingImport(projectId);
 
   useEffect(() => {
     loadItems();
@@ -110,6 +116,16 @@ export default function BrainstormingBoard({ projectId }) {
     setDragItem(null);
   };
 
+  const handleImportToModel = async () => {
+    try {
+      await importToModel(criteria, alternatives, addCriterion, addAlternative);
+    } catch (err) {
+      console.error('Import failed:', err);
+    }
+  };
+
+  const hasImportableItems = items.criterion.length > 0 || items.alternative.length > 0;
+
   return (
     <div className={styles.board}>
       <div className={styles.zones}>
@@ -126,6 +142,32 @@ export default function BrainstormingBoard({ projectId }) {
             isDragging={!!dragItem}
           />
         ))}
+      </div>
+
+      <div className={styles.actionBar}>
+        <button
+          className={styles.importBtn}
+          onClick={handleImportToModel}
+          disabled={importing || !hasImportableItems}
+        >
+          {importing ? '반영 중...' : '모델에 반영하기'}
+        </button>
+        {!hasImportableItems && (
+          <span className={styles.importHint}>대안 또는 판단 기준을 먼저 추가하세요</span>
+        )}
+        {result && !result.error && (
+          <span className={styles.importResult}>
+            기준 {result.importedCriteria}개, 대안 {result.importedAlternatives}개 반영 완료
+            {result.skipped > 0 && ` (중복 ${result.skipped}개 스킵)`}
+            <button className={styles.dismissBtn} onClick={clearResult}>✕</button>
+          </span>
+        )}
+        {result?.error && (
+          <span className={styles.importError}>
+            오류: {result.error}
+            <button className={styles.dismissBtn} onClick={clearResult}>✕</button>
+          </span>
+        )}
       </div>
 
       <div
