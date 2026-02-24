@@ -31,7 +31,7 @@
 }
 
 .sidebarWrap.right {
-  width: 320px;
+  width: 340px;
 }
 
 .sidebarWrap.right.collapsed {
@@ -107,30 +107,38 @@
   transition: all var(--transition-fast);
   position: relative;
   white-space: nowrap;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .tab::after {
   content: '';
   position: absolute;
-  left: 8px;
-  right: 8px;
+  left: 0;
+  right: 0;
   bottom: -2px;
-  height: 2px;
+  height: 3px;
   background: transparent;
   border-radius: 2px 2px 0 0;
-  transition: background var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .tab:hover {
-  color: var(--color-text);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
 }
 
 .tabActive {
-  color: var(--color-primary);
+  color: #fff;
+  background: var(--color-primary);
+}
+
+.tabActive:hover {
+  color: #fff;
+  background: var(--color-primary-hover);
 }
 
 .tabActive::after {
-  background: var(--color-primary);
+  background: var(--color-primary-dark);
 }
 
 .tabContent {
@@ -191,7 +199,7 @@
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
   .sidebarWrap.right {
-    width: 280px;
+    width: 300px;
   }
 }
 
