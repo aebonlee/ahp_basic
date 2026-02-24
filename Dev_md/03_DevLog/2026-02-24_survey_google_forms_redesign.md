@@ -1,7 +1,7 @@
 # 2026-02-24 — 설문 설계 구글 폼 스타일 개편 + 4단계 탭 UI
 
 > **날짜**: 2026-02-24
-> **커밋**: 2건 (`206f848`, `a44b4a1`)
+> **커밋**: 3건 (`206f848`, `a44b4a1`, `0a3628c`)
 > **변경 파일**: 6개 (코드) + 1개 (개발일지)
 
 ---
@@ -12,6 +12,7 @@
 |:----:|------|
 | `206f848` | 설문 설계 구글 폼 스타일 개편 + DB 마이그레이션 RLS 수정 |
 | `a44b4a1` | 설문 설계 4단계 탭 UI 개편 + category 컬럼 추가 |
+| `0a3628c` | STEP 4 연구자 설문항목 구글 폼 스타일 전면 개편 |
 
 ---
 
@@ -77,46 +78,70 @@
 ### DB 스키마 변경
 
 ```sql
--- survey_questions 테이블에 category 컬럼 추가
 ALTER TABLE survey_questions
   ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'demographic';
-
--- CHECK 제약조건
 ALTER TABLE survey_questions
   ADD CONSTRAINT survey_questions_category_check
   CHECK (category IN ('demographic', 'custom'));
 ```
 
-### 기본 템플릿 상세
+---
 
-**연구소개 양식**: 연구 목적 / 연구 방법 / 소요 시간 / 기대 효과 구조
+## 세션 3 — STEP 4 구글 폼 전용 UI (`0a3628c`)
 
-**개인정보 동의서 양식**: 수집 항목 / 수집 목적 / 보유 기간 / 동의 거부 시 불이익 구조
+### 핵심 변경: STEP 4(연구자 설문항목)만 구글 폼 스타일로 분리
 
-**인구통계 질문 (11개)**:
+STEP 3(인구통계)은 기존 compact 카드 유지, STEP 4만 전용 Google Forms UI 적용.
 
-| # | 질문 | 유형 |
-|:-:|------|------|
-| 1 | 성별 | radio |
-| 2 | 연령대 | dropdown |
-| 3 | 최종 학력 | dropdown |
-| 4 | 직업 | short_text |
-| 5 | 전문 분야 | short_text |
-| 6 | 관련 경력 | dropdown |
-| 7 | 소속 기관 유형 | radio |
-| 8 | 전문성 자가 평가 | likert |
-| 9 | AHP 평가 경험 | radio |
-| 10 | 소속 기관명 | short_text |
-| 11 | 연락처 | short_text |
+```
+┌─────────────────────────────────────────────────────────┐
+│  STEP 4  연구자 설문항목                    3개 질문     │
+└─────────────────────────────────────────────────────────┘
 
-**연구자 설문 예시 (3개)**:
-1. 연구 주제 사전 인지 여부 (radio)
-2. 관련 업무/연구 경험 (long_text)
-3. 추가 고려사항 자유 기술 (long_text)
+┌──────────────────────────────────────┐  ┌────┐
+│ ▌ [질문 텍스트 입력]     [⊙ 객관식 ▾]│  │ Tt │  ← 우측 플로팅 툴바
+│   [질문 설명 (선택)]                  │  │ ≡  │     유형별 아이콘 버튼
+│                                      │  │────│
+│   ⊙ 옵션 1               [✕]        │  │ ⊙  │
+│   ⊙ 옵션 2               [✕]        │  │ ☑  │
+│   ⊙ 옵션 추가                        │  │ ▾  │
+│   ─────────────────────────────────  │  │────│
+│   ⧉  🗑  ▲  ▼  │  T  │  필수 [✓]   │  │ #  │
+└──────────────────────────────────────┘  │ ⊕  │
+                                          └────┘
+```
 
-### useSurvey Hook 변경
+### GFormCard vs QuestionCard 비교
 
-- `addQuestion`에 `category` 파라미터 전달 지원
+| 항목 | QuestionCard (STEP 3) | GFormCard (STEP 4) |
+|------|:---------------------:|:------------------:|
+| 카드 펼침 | 클릭 시만 | 항상 펼침 |
+| 유형 셀렉터 | 활성 시만 표시 | 항상 표시 + 아이콘 |
+| 옵션 편집 | 활성 시만 | 항상 표시 (삭제 버튼만 활성 시) |
+| 하단 바 | 활성 시만 | 항상 표시 |
+| 질문 설명 | 없음 | T 버튼으로 토글 |
+| 좌측 바 | 4px | 6px |
+| 활성 테두리 | box-shadow만 | border-color + box-shadow |
+
+### 우측 플로팅 툴바
+
+| 아이콘 | 유형 |
+|:------:|------|
+| Tt | 단답형 |
+| ≡ | 장문형 |
+| ⊙ | 객관식 (단일) |
+| ☑ | 체크박스 (복수) |
+| ▾ | 드롭다운 |
+| # | 숫자 |
+| ⊕ | 리커트 척도 |
+
+> sticky 포지션으로 스크롤 추종, 모바일에서는 상단 가로 배치로 전환
+
+### 기타 변경
+
+- `handleAddQuestion`에 `type` 파라미터 추가 — 유형 지정 즉시 추가 가능
+- QUESTION_TYPES 상수에 `icon` 필드 추가
+- 유형 변경 시 기본 옵션 자동 생성 (리커트 5단계 / 일반 2개)
 
 ---
 
@@ -124,33 +149,29 @@ ALTER TABLE survey_questions
 
 | 파일 | 설명 |
 |------|------|
-| `supabase/migrations/004_survey_tables.sql` | RLS 개별 분리 + category 컬럼 추가 |
+| `supabase/migrations/004_survey_tables.sql` | RLS 개별 분리 + category 컬럼 |
 | `src/hooks/useSurvey.js` | addQuestion category 지원 |
-| `src/pages/SurveyBuilderPage.jsx` | 4단계 탭 전면 재설계 + 기본 템플릿 4종 |
-| `src/pages/SurveyBuilderPage.module.css` | 탭 UI + 구글 폼 스타일 CSS |
+| `src/pages/SurveyBuilderPage.jsx` | 4단계 탭 + STEP 4 구글 폼 전용 UI |
+| `src/pages/SurveyBuilderPage.module.css` | 탭 + 구글 폼 CSS (gf* 클래스) |
 | `src/pages/EvalPreSurveyPage.jsx` | 구글 폼 응답 스타일 개선 |
 | `src/pages/EvalPreSurveyPage.module.css` | 좌측 바 + 리커트 가로 바 |
 
 ---
 
-## Supabase 수동 실행 필요
+## Supabase 수동 실행 (완료)
 
 ```sql
--- 기존 테이블이 없다면 004_survey_tables.sql 전체 실행
--- 기존 테이블이 있다면 아래만 실행:
-ALTER TABLE survey_questions
-  ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'demographic';
-ALTER TABLE survey_questions
-  ADD CONSTRAINT survey_questions_category_check
-  CHECK (category IN ('demographic', 'custom'));
+-- 004_survey_tables.sql 전체 실행 완료
+-- category 컬럼 + CHECK 제약조건 포함
 ```
 
 ---
 
 ## 검증
 
-- [x] `npx vite build` — 빌드 성공 (1,202KB)
-- [ ] Supabase SQL Editor에서 category 컬럼 추가 실행
+- [x] `npx vite build` — 빌드 성공 (1,209KB)
+- [x] Supabase SQL Editor에서 마이그레이션 수동 실행 완료
 - [ ] 설문 설계 4단계 탭 전환 확인
-- [ ] 각 단계 기본 템플릿 로드 확인
-- [ ] 인구통계/연구자 질문 독립 관리 확인
+- [ ] STEP 4 구글 폼 스타일 질문 생성/편집 확인
+- [ ] 우측 툴바 유형별 질문 추가 확인
+- [ ] 모바일 반응형 확인
