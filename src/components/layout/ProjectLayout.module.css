@@ -31,7 +31,7 @@
 }
 
 .sidebarWrap.right {
-  width: 340px;
+  width: 360px;
 }
 
 .sidebarWrap.right.collapsed {
@@ -199,7 +199,7 @@
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
   .sidebarWrap.right {
-    width: 300px;
+    width: 320px;
   }
 }
 
