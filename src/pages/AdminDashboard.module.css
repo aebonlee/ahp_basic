@@ -14,7 +14,7 @@
 
 .dashboard {
   display: grid;
-  grid-template-columns: 350px 1fr 360px;
+  grid-template-columns: 350px 1fr;
   gap: var(--spacing-lg);
   min-height: 500px;
 }
@@ -31,16 +31,6 @@
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--color-border-light);
-}
-
-.guidePanel {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border-light);
-  max-height: calc(100vh - 140px);
-  overflow-y: auto;
 }
 
 /* Welcome (no project selected) */
@@ -206,16 +196,6 @@
   cursor: default;
 }
 
-@media (max-width: 1200px) {
-  .dashboard {
-    grid-template-columns: 350px 1fr;
-  }
-
-  .guidePanel {
-    display: none;
-  }
-}
-
 @media (max-width: 768px) {
   .dashboard {
     grid-template-columns: 1fr;
@@ -225,9 +205,5 @@
     flex-direction: column;
     gap: var(--spacing-sm);
     align-items: flex-start;
-  }
-
-  .guidePanel {
-    display: none;
   }
 }

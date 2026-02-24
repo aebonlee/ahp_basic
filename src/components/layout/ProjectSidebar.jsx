@@ -12,7 +12,7 @@ const STEPS = [
   { key: 'resource',    path: '/resource',    label: '자원 배분',     step: 8 },
 ];
 
-export default function ProjectSidebar({ projectName }) {
+export default function ProjectSidebar({ projectName, collapsed }) {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -21,18 +21,19 @@ export default function ProjectSidebar({ projectName }) {
   const basePath = hasProject ? `/admin/project/${id}` : '';
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
       {/* 프로젝트 목록 */}
       <button
         className={`${styles.dashboardItem} ${currentPath === '/admin' ? styles.active : ''}`}
         onClick={() => navigate('/admin')}
+        title="프로젝트 목록"
       >
         <span className={styles.dashboardIcon}>☰</span>
-        <span className={styles.menuLabel}>프로젝트 목록</span>
+        {!collapsed && <span className={styles.menuLabel}>프로젝트 목록</span>}
       </button>
 
       {/* 프로젝트명 */}
-      {hasProject && (
+      {hasProject && !collapsed && (
         <div className={styles.projectName} title={projectName}>
           <span className={styles.name}>{projectName || '프로젝트'}</span>
         </div>
@@ -49,9 +50,10 @@ export default function ProjectSidebar({ projectName }) {
               className={`${styles.menuItem} ${isActive ? styles.active : ''} ${!hasProject ? styles.disabled : ''}`}
               onClick={() => hasProject && navigate(fullPath)}
               disabled={!hasProject}
+              title={collapsed ? s.label : undefined}
             >
               <span className={styles.stepNum}>{s.step}</span>
-              <span className={styles.menuLabel}>{s.label}</span>
+              {!collapsed && <span className={styles.menuLabel}>{s.label}</span>}
             </button>
           );
         })}

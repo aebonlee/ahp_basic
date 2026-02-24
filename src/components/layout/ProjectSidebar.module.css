@@ -7,6 +7,12 @@
   flex-direction: column;
   overflow-y: auto;
   height: 100%;
+  transition: width 250ms ease, min-width 250ms ease;
+}
+
+.sidebar.collapsed {
+  width: 48px;
+  min-width: 48px;
 }
 
 /* 프로젝트 목록 버튼 */
@@ -27,12 +33,17 @@
   position: relative;
 }
 
+.collapsed .dashboardItem {
+  justify-content: center;
+  padding: 12px 0;
+}
+
 .dashboardItem:hover {
   background: var(--color-bg);
 }
 
 .dashboardItem.active {
-  background: #eff6ff;
+  background: var(--color-primary-bg);
   color: var(--color-primary);
 }
 
@@ -90,13 +101,18 @@
   position: relative;
 }
 
+.collapsed .menuItem {
+  justify-content: center;
+  padding: 10px 0;
+}
+
 .menuItem:hover:not(:disabled) {
   background: var(--color-bg);
   color: var(--color-text);
 }
 
 .active {
-  background: #eff6ff;
+  background: var(--color-primary-bg);
   color: var(--color-primary);
   font-weight: 600;
 }
@@ -152,9 +168,19 @@
     flex-direction: column;
   }
 
+  .sidebar.collapsed {
+    width: 100%;
+    min-width: 100%;
+  }
+
   .dashboardItem {
     padding: var(--spacing-sm) var(--spacing-md);
     border-bottom: none;
+  }
+
+  .collapsed .dashboardItem {
+    justify-content: flex-start;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .projectName {
@@ -173,6 +199,11 @@
     padding: var(--spacing-sm) var(--spacing-md);
     white-space: nowrap;
     font-size: 0.78rem;
+  }
+
+  .collapsed .menuItem {
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .active::before {
