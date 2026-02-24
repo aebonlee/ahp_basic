@@ -7,7 +7,7 @@ import styles from './Navbar.module.css';
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, mode, setMode, signOut } = useAuth();
+  const { user, mode, setMode, isAdmin, signOut } = useAuth();
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('ahp_theme') === 'dark');
 
   useEffect(() => {
@@ -15,12 +15,12 @@ export default function Navbar() {
     localStorage.setItem('ahp_theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdminPath = location.pathname.startsWith('/admin');
+  const isPreviewMode = isAdmin && mode === USER_MODE.EVALUATOR;
 
-  const handleModeSwitch = () => {
-    const newMode = mode === USER_MODE.ADMIN ? USER_MODE.EVALUATOR : USER_MODE.ADMIN;
-    setMode(newMode);
-    navigate(newMode === USER_MODE.ADMIN ? '/admin' : '/eval');
+  const handleReturnToAdmin = () => {
+    setMode(USER_MODE.ADMIN);
+    navigate('/admin');
   };
 
   const handleSignOut = async () => {
@@ -31,7 +31,7 @@ export default function Navbar() {
   return (
     <header className={styles.navbar}>
       <div className={styles.inner}>
-        <div className={styles.logo} onClick={() => navigate(isAdmin ? '/admin' : '/eval')}>
+        <div className={styles.logo} onClick={() => navigate(isAdminPath ? '/admin' : isAdmin ? '/admin' : '/eval')}>
           <span className={styles.logoText}>AHP Basic</span>
           <span className={styles.logoSub}>Decision Analysis</span>
         </div>
@@ -44,15 +44,21 @@ export default function Navbar() {
           >
             {darkMode ? '\u2600' : '\u263E'}
           </button>
+
           {user && (
             <>
-              <button
-                className={styles.modeBtn}
-                onClick={handleModeSwitch}
-                title={`${mode === USER_MODE.ADMIN ? '평가자' : '관리자'} 모드로 전환`}
-              >
-                {mode === USER_MODE.ADMIN ? '관리자' : '평가자'} MODE
-              </button>
+              {/* Admin preview indicator — only for admins in evaluator preview mode */}
+              {isPreviewMode && !isAdminPath && (
+                <button className={styles.previewBadge} onClick={handleReturnToAdmin}>
+                  미리보기 중 — 돌아가기
+                </button>
+              )}
+
+              {/* Role badge — only for admins in admin mode */}
+              {isAdmin && !isPreviewMode && (
+                <span className={styles.roleBadge}>연구자</span>
+              )}
+
               <span className={styles.userInfo}>{user.email}</span>
               <button className={styles.logoutBtn} onClick={handleSignOut}>
                 로그아웃

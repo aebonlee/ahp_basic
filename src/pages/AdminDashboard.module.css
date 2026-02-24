@@ -12,6 +12,13 @@
   color: var(--color-text);
 }
 
+.headerDesc {
+  font-size: 0.92rem;
+  color: var(--color-text-muted);
+  margin-top: calc(-1 * var(--spacing-sm));
+  margin-bottom: var(--spacing-md);
+}
+
 .dashboard {
   display: grid;
   grid-template-columns: 350px 1fr;

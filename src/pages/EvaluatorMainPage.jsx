@@ -2,9 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
-import { PROJECT_STATUS, PROJECT_STATUS_LABELS, EVAL_METHOD_LABELS } from '../lib/constants';
+import { PROJECT_STATUS, PROJECT_STATUS_LABELS, EVAL_METHOD_LABELS, USER_MODE } from '../lib/constants';
 import PageLayout from '../components/layout/PageLayout';
-import ModeSwitch from '../components/admin/ModeSwitch';
 import EvaluatorGuide from '../components/evaluation/EvaluatorGuide';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
@@ -19,9 +18,11 @@ const STATUS_ICONS = {
 
 export default function EvaluatorMainPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin, mode, setMode } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const isAdminPreview = isAdmin && mode === USER_MODE.EVALUATOR;
 
   useEffect(() => {
     loadAssignedProjects();
@@ -80,11 +81,32 @@ export default function EvaluatorMainPage() {
     setLoading(false);
   };
 
+  const handleReturnToAdmin = useCallback(() => {
+    setMode(USER_MODE.ADMIN);
+    navigate('/admin');
+  }, [setMode, navigate]);
+
   const activeProjects = projects.filter(p => !p.completed);
   const completedProjects = projects.filter(p => p.completed);
 
   return (
     <PageLayout>
+      {/* Admin Preview Bar — only for admins testing evaluator view */}
+      {isAdminPreview && (
+        <div className={styles.previewBar}>
+          <div className={styles.previewBarContent}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+              <path d="M1 8s3-5.5 7-5.5S15 8 15 8s-3 5.5-7 5.5S1 8 1 8z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+              <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+            <span>평가자 화면 미리보기 — 평가자에게 보이는 화면입니다</span>
+          </div>
+          <button className={styles.previewReturnBtn} onClick={handleReturnToAdmin}>
+            연구자 모드로 돌아가기
+          </button>
+        </div>
+      )}
+
       {/* Hero Banner */}
       <div className={styles.banner}>
         <div className={styles.bannerContent}>
@@ -93,7 +115,6 @@ export default function EvaluatorMainPage() {
         </div>
         <div className={styles.bannerActions}>
           <EvaluatorGuide />
-          <ModeSwitch />
         </div>
       </div>
 
@@ -111,6 +132,11 @@ export default function EvaluatorMainPage() {
           </div>
           <h3 className={styles.emptyTitle}>배정된 평가가 없습니다</h3>
           <p className={styles.emptyDesc}>프로젝트 관리자가 평가자로 배정하면 여기에 표시됩니다.</p>
+          {isAdminPreview && (
+            <p className={styles.emptyHint}>
+              연구자 모드에서 평가자를 등록하고 초대 링크를 공유하세요.
+            </p>
+          )}
         </div>
       ) : (
         <div className={styles.sections}>

@@ -51,6 +51,10 @@ export default function AdminDashboard() {
         <ModeSwitch />
       </div>
 
+      <p className={styles.headerDesc}>
+        프로젝트를 생성하고, 평가자를 배정하고, 결과를 분석하세요.
+      </p>
+
       <div className={styles.dashboard}>
         <div className={styles.leftPanel}>
           <ProjectPanel
