@@ -86,6 +86,11 @@
   --shadow-violet: 0 4px 14px rgba(15, 43, 91, 0.15);
   --shadow-violet-lg: 0 8px 24px rgba(15, 43, 91, 0.20);
 
+  /* ─── Line height ─── */
+  --line-height-tight: 1.35;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.65;
+
   /* ─── Font ─── */
   --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;

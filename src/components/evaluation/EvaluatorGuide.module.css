@@ -149,14 +149,14 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-text);
-  line-height: 1.4;
+  line-height: var(--line-height-tight);
 }
 
 .overviewDesc {
   display: block;
   font-size: 0.82rem;
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
   margin-top: 2px;
 }
 
@@ -234,7 +234,7 @@
 .detailCardBody {
   font-size: 0.88rem;
   color: var(--color-text-light);
-  line-height: 1.7;
+  line-height: var(--line-height-relaxed);
 }
 
 .detailCardBody ul {
@@ -266,7 +266,7 @@
 
 .exampleContent {
   font-size: 0.85rem;
-  line-height: 1.7;
+  line-height: var(--line-height-relaxed);
   color: var(--color-text-light);
 }
 
@@ -336,7 +336,7 @@
   border-radius: var(--radius-md);
   padding: 12px 14px;
   font-size: 0.85rem;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
   color: #92400e;
   margin-top: var(--spacing-xs);
 }
@@ -359,7 +359,7 @@
   padding: 6px 0;
   font-size: 0.85rem;
   color: var(--color-text-light);
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
 }
 
 .checklist li::before {

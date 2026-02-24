@@ -31,7 +31,7 @@
 .heroDesc {
   font-size: 1.05rem;
   color: #64748b;
-  line-height: 1.8;
+  line-height: var(--line-height-relaxed);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -92,7 +92,7 @@
 .stepDesc {
   font-size: 0.95rem;
   color: #475569;
-  line-height: 1.8;
+  line-height: var(--line-height-relaxed);
   margin-bottom: 20px;
 }
 

@@ -97,7 +97,7 @@
 .projectDesc {
   font-size: 1.05rem;
   color: var(--color-text-light);
-  line-height: 1.7;
+  line-height: var(--line-height-relaxed);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -150,14 +150,14 @@
   display: block;
   font-size: 1.1rem;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
   color: var(--color-text);
 }
 
 .stepDesc {
   display: block;
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
   color: var(--color-text-muted);
   margin-top: 2px;
 }

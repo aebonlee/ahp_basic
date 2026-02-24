@@ -83,7 +83,7 @@
 .cardText {
   font-size: 0.9rem;
   color: var(--color-text-light);
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .left { color: var(--color-pairwise-left); font-weight: 600; }

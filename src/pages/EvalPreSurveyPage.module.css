@@ -78,7 +78,7 @@
   border-radius: var(--radius-md);
   padding: var(--spacing-md) var(--spacing-lg);
   font-size: 0.9rem;
-  line-height: 1.7;
+  line-height: var(--line-height-relaxed);
   color: var(--color-text);
   white-space: pre-wrap;
   margin-bottom: var(--spacing-lg);
@@ -93,7 +93,7 @@
   border-radius: var(--radius-md);
   padding: var(--spacing-md) var(--spacing-lg);
   font-size: 0.88rem;
-  line-height: 1.7;
+  line-height: var(--line-height-relaxed);
   color: var(--color-text);
   white-space: pre-wrap;
   margin-bottom: var(--spacing-md);
@@ -144,7 +144,7 @@
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
 }
 
 .required {
@@ -297,7 +297,7 @@
 .likertOption span {
   font-size: 0.75rem;
   color: var(--color-text-light);
-  line-height: 1.3;
+  line-height: var(--line-height-tight);
   word-break: keep-all;
 }
 

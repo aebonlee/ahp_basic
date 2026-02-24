@@ -301,14 +301,14 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text);
-  line-height: 1.3;
+  line-height: var(--line-height-tight);
   letter-spacing: -0.01em;
 }
 
 .cardDesc {
   font-size: 0.9rem;
   color: var(--color-text-light);
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

@@ -129,7 +129,7 @@
 .cardDesc {
   font-size: 0.85rem;
   color: var(--color-text-muted);
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
   margin-bottom: var(--spacing-md);
 }
 
@@ -193,7 +193,7 @@
   font-size: 0.9rem;
   font-family: inherit;
   resize: vertical;
-  line-height: 1.7;
+  line-height: var(--line-height-relaxed);
   background: var(--color-bg);
   transition: border-color 0.2s;
 }
