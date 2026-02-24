@@ -1,7 +1,7 @@
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../../lib/constants';
 import styles from './ProjectCard.module.css';
 
-export default function ProjectCard({ project, selected, onSelect, onEdit, onDelete, onManage }) {
+export default function ProjectCard({ project, selected, onSelect, onEdit, onDelete, onManage, onClone }) {
   return (
     <div
       className={`${styles.card} ${selected ? styles.selected : ''}`}
@@ -25,6 +25,9 @@ export default function ProjectCard({ project, selected, onSelect, onEdit, onDel
         </button>
         <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); onEdit(); }}>
           수정
+        </button>
+        <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); onClone(); }}>
+          복제
         </button>
         <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={(e) => { e.stopPropagation(); onDelete(); }}>
           삭제

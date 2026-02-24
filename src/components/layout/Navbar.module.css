@@ -47,6 +47,26 @@
   gap: var(--spacing-sm);
 }
 
+.themeBtn {
+  background: none;
+  border: 1px solid var(--color-dark-border);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.themeBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .modeBtn {
   background: var(--color-accent);
   color: var(--color-dark);

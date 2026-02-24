@@ -13,7 +13,7 @@ import styles from './ProjectPanel.module.css';
 
 export default function ProjectPanel({ projects, loading, selectedProjectId, onSelect }) {
   const navigate = useNavigate();
-  const { deleteProject } = useProjects();
+  const { deleteProject, cloneProject } = useProjects();
   const toast = useToast();
   const { confirm, confirmDialogProps } = useConfirm();
   const [showForm, setShowForm] = useState(false);
@@ -41,6 +41,16 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
 
   const handleManage = (id) => {
     navigate(`/admin/project/${id}`);
+  };
+
+  const handleClone = async (id) => {
+    try {
+      const newProj = await cloneProject(id);
+      toast.success(`"${newProj.name}" 복제 완료`);
+      onSelect(newProj.id);
+    } catch (err) {
+      toast.error('복제 실패: ' + err.message);
+    }
   };
 
   return (
@@ -94,6 +104,7 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
               onSelect={() => onSelect(project.id)}
               onEdit={() => handleEdit(project)}
               onDelete={() => handleDelete(project.id)}
+              onClone={() => handleClone(project.id)}
               onManage={() => handleManage(project.id)}
             />
           ))
