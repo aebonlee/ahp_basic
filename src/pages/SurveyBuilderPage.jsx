@@ -15,13 +15,13 @@ const STEPS = [
 ];
 
 const QUESTION_TYPES = [
-  { value: 'short_text', label: '단답형' },
-  { value: 'long_text', label: '장문형' },
-  { value: 'radio', label: '객관식 (단일)' },
-  { value: 'checkbox', label: '체크박스 (복수)' },
-  { value: 'dropdown', label: '드롭다운' },
-  { value: 'number', label: '숫자' },
-  { value: 'likert', label: '리커트 척도' },
+  { value: 'short_text', label: '단답형',         icon: 'Tt' },
+  { value: 'long_text',  label: '장문형',         icon: '≡' },
+  { value: 'radio',      label: '객관식 (단일)',  icon: '⊙' },
+  { value: 'checkbox',   label: '체크박스 (복수)', icon: '☑' },
+  { value: 'dropdown',   label: '드롭다운',       icon: '▾' },
+  { value: 'number',     label: '숫자',           icon: '#' },
+  { value: 'likert',     label: '리커트 척도',    icon: '⊕' },
 ];
 
 const NEEDS_OPTIONS = ['radio', 'checkbox', 'dropdown', 'likert'];
@@ -81,12 +81,11 @@ export default function SurveyBuilderPage() {
   const { questions, loading: qLoading, addQuestion, updateQuestion, deleteQuestion, reorderQuestions } = useSurveyQuestions(id);
   const { config, loading: cLoading, saveConfig } = useSurveyConfig(id);
 
-  const [step, setStep] = useState(0); // 0~3
+  const [step, setStep] = useState(0);
   const [savingField, setSavingField] = useState(null);
   const [activeId, setActiveId] = useState(null);
   const [templateLoading, setTemplateLoading] = useState(false);
 
-  // 카테고리별 질문 분리
   const demographicQs = useMemo(() => questions.filter(q => (q.category || 'demographic') === 'demographic'), [questions]);
   const customQs = useMemo(() => questions.filter(q => q.category === 'custom'), [questions]);
 
@@ -101,9 +100,12 @@ export default function SurveyBuilderPage() {
     try { await updateQuestion(qId, updates); } catch (e) { console.error(e); }
   }, [updateQuestion]);
 
-  const handleAddQuestion = useCallback(async (category) => {
+  const handleAddQuestion = useCallback(async (category, type = 'short_text') => {
     try {
-      const newQ = await addQuestion({ question_text: '', question_type: 'short_text', options: [], required: true, category });
+      const defaultOpts = type === 'likert'
+        ? ['매우 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+        : NEEDS_OPTIONS.includes(type) ? ['옵션 1', '옵션 2'] : [];
+      const newQ = await addQuestion({ question_text: '', question_type: type, options: defaultOpts, required: true, category });
       if (newQ?.id) setActiveId(newQ.id);
     } catch (e) { console.error(e); }
   }, [addQuestion]);
@@ -121,7 +123,6 @@ export default function SurveyBuilderPage() {
   }, [addQuestion]);
 
   const handleMove = useCallback(async (index, direction, list) => {
-    // list 내에서의 이동 → 전체 questions 기준으로 reorder
     const target = index + direction;
     if (target < 0 || target >= list.length) return;
     const allIds = questions.map(q => q.id);
@@ -159,13 +160,11 @@ export default function SurveyBuilderPage() {
     return <ProjectLayout><LoadingSpinner message="설문 설정 로딩 중..." /></ProjectLayout>;
   }
 
-  const currentStep = STEPS[step];
-
   return (
     <ProjectLayout>
       <h1 className={common.pageTitle}>설문 설계</h1>
 
-      {/* ── 스텝 탭 네비게이션 ── */}
+      {/* ── 스텝 탭 ── */}
       <div className={styles.stepTabs}>
         {STEPS.map((s, i) => (
           <button
@@ -181,59 +180,27 @@ export default function SurveyBuilderPage() {
 
       {/* ── 스텝 콘텐츠 ── */}
       <div className={styles.stepContent}>
-
-        {/* STEP 1: 연구 소개 */}
         {step === 0 && (
-          <StepIntro
-            config={config}
-            savingField={savingField}
-            onBlur={handleConfigBlur}
-            onLoadTemplate={handleLoadIntroTemplate}
-          />
+          <StepIntro config={config} savingField={savingField} onBlur={handleConfigBlur} onLoadTemplate={handleLoadIntroTemplate} />
         )}
-
-        {/* STEP 2: 개인정보 동의 안내 */}
         {step === 1 && (
-          <StepConsent
-            config={config}
-            savingField={savingField}
-            onBlur={handleConfigBlur}
-            onLoadTemplate={handleLoadConsentTemplate}
-          />
+          <StepConsent config={config} savingField={savingField} onBlur={handleConfigBlur} onLoadTemplate={handleLoadConsentTemplate} />
         )}
-
-        {/* STEP 3: 인구통계학적 설문 */}
         {step === 2 && (
           <StepQuestions
-            title="인구통계학적 설문"
-            desc="평가자의 배경 정보를 수집하는 기본 질문입니다. 기본 템플릿을 로드하거나 직접 추가할 수 있습니다."
-            category="demographic"
-            questions={demographicQs}
-            allQuestions={questions}
-            templateData={DEMOGRAPHIC_TEMPLATE}
-            templateLabel="인구통계 기본 템플릿 로드 (11개)"
-            templateLoading={templateLoading}
-            activeId={activeId}
-            setActiveId={setActiveId}
-            onUpdate={handleQuestionUpdate}
-            onDelete={deleteQuestion}
-            onDuplicate={handleDuplicate}
-            onMove={handleMove}
-            onAdd={handleAddQuestion}
-            onLoadTemplate={handleLoadTemplate}
+            title="인구통계학적 설문" desc="평가자의 배경 정보를 수집하는 기본 질문입니다. 기본 템플릿을 로드하거나 직접 추가할 수 있습니다."
+            category="demographic" questions={demographicQs} allQuestions={questions}
+            templateData={DEMOGRAPHIC_TEMPLATE} templateLabel="인구통계 기본 템플릿 로드 (11개)"
+            templateLoading={templateLoading} activeId={activeId} setActiveId={setActiveId}
+            onUpdate={handleQuestionUpdate} onDelete={deleteQuestion} onDuplicate={handleDuplicate}
+            onMove={handleMove} onAdd={handleAddQuestion} onLoadTemplate={handleLoadTemplate}
           />
         )}
-
-        {/* STEP 4: 연구자 설문항목 */}
         {step === 3 && (
-          <StepQuestions
-            title="연구자 설문항목"
-            desc="연구 주제에 맞는 추가 질문을 자유롭게 설계하세요. 기본 예시 템플릿도 제공됩니다."
-            category="custom"
+          <StepCustomGoogleForm
             questions={customQs}
             allQuestions={questions}
             templateData={CUSTOM_TEMPLATE}
-            templateLabel="연구자 설문 예시 템플릿 로드 (3개)"
             templateLoading={templateLoading}
             activeId={activeId}
             setActiveId={setActiveId}
@@ -249,21 +216,9 @@ export default function SurveyBuilderPage() {
 
       {/* ── 하단 네비게이션 ── */}
       <div className={styles.stepNav}>
-        <button
-          className={styles.navBtn}
-          onClick={() => setStep(s => s - 1)}
-          disabled={step === 0}
-        >
-          ← 이전
-        </button>
+        <button className={styles.navBtn} onClick={() => setStep(s => s - 1)} disabled={step === 0}>← 이전</button>
         <span className={styles.navIndicator}>{step + 1} / {STEPS.length}</span>
-        <button
-          className={`${styles.navBtn} ${styles.navBtnPrimary}`}
-          onClick={() => setStep(s => s + 1)}
-          disabled={step === STEPS.length - 1}
-        >
-          다음 →
-        </button>
+        <button className={`${styles.navBtn} ${styles.navBtnPrimary}`} onClick={() => setStep(s => s + 1)} disabled={step === STEPS.length - 1}>다음 →</button>
       </div>
     </ProjectLayout>
   );
@@ -282,20 +237,13 @@ function StepIntro({ config, savingField, onBlur, onLoadTemplate }) {
         </div>
         {savingField === 'research_description' && <span className={styles.savedMsg}>저장됨</span>}
       </div>
-      <p className={styles.cardDesc}>
-        평가자에게 보여줄 연구의 배경, 목적, 기대 효과 등을 작성합니다.
-        평가자는 이 내용을 먼저 읽은 후 설문을 시작합니다.
-      </p>
-
+      <p className={styles.cardDesc}>평가자에게 보여줄 연구의 배경, 목적, 기대 효과 등을 작성합니다. 평가자는 이 내용을 먼저 읽은 후 설문을 시작합니다.</p>
       {!config.research_description && (
         <div className={styles.templateBanner}>
           <span>기본 양식을 불러와서 시작해 보세요</span>
-          <button className={styles.templateBannerBtn} onClick={onLoadTemplate}>
-            기본 양식 불러오기
-          </button>
+          <button className={styles.templateBannerBtn} onClick={onLoadTemplate}>기본 양식 불러오기</button>
         </div>
       )}
-
       <textarea
         className={styles.textarea}
         key={config.research_description}
@@ -321,20 +269,13 @@ function StepConsent({ config, savingField, onBlur, onLoadTemplate }) {
         </div>
         {savingField === 'consent_text' && <span className={styles.savedMsg}>저장됨</span>}
       </div>
-      <p className={styles.cardDesc}>
-        평가자가 동의해야 설문 및 평가를 진행할 수 있습니다.
-        개인정보 수집·이용 동의서 내용을 작성하세요.
-      </p>
-
+      <p className={styles.cardDesc}>평가자가 동의해야 설문 및 평가를 진행할 수 있습니다. 개인정보 수집·이용 동의서 내용을 작성하세요.</p>
       {!config.consent_text && (
         <div className={styles.templateBanner}>
           <span>기본 동의서 양식을 불러와서 시작해 보세요</span>
-          <button className={styles.templateBannerBtn} onClick={onLoadTemplate}>
-            기본 양식 불러오기
-          </button>
+          <button className={styles.templateBannerBtn} onClick={onLoadTemplate}>기본 양식 불러오기</button>
         </div>
       )}
-
       <textarea
         className={styles.textarea}
         key={config.consent_text}
@@ -348,19 +289,17 @@ function StepConsent({ config, savingField, onBlur, onLoadTemplate }) {
 }
 
 /* ============================================
-   STEP 3 & 4: 질문 빌더 (공용)
+   STEP 3: 인구통계 (기존 compact 스타일)
    ============================================ */
 function StepQuestions({
-  title, desc, category, questions: filteredQs, allQuestions,
+  title, desc, category, questions: filteredQs,
   templateData, templateLabel, templateLoading,
   activeId, setActiveId,
   onUpdate, onDelete, onDuplicate, onMove, onAdd, onLoadTemplate,
 }) {
   const stepNum = category === 'demographic' ? 3 : 4;
-
   return (
     <>
-      {/* 안내 카드 */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <div className={styles.cardHeaderLeft}>
@@ -371,46 +310,25 @@ function StepQuestions({
         </div>
         <p className={styles.cardDesc}>{desc}</p>
       </div>
-
-      {/* 템플릿 로드 영역 (질문 없을 때) */}
       {filteredQs.length === 0 && (
         <div className={styles.templateArea}>
           <div className={styles.templateIcon}>{category === 'demographic' ? '👤' : '📝'}</div>
           <div className={styles.templateTitle}>아직 질문이 없습니다</div>
-          <div className={styles.templateDesc}>
-            기본 템플릿을 로드하거나, 하단의 "질문 추가" 버튼으로 직접 추가하세요.
-          </div>
-          <button
-            className={styles.templateBtn}
-            onClick={() => onLoadTemplate(templateData, category)}
-            disabled={templateLoading}
-          >
+          <div className={styles.templateDesc}>기본 템플릿을 로드하거나, 하단의 "질문 추가" 버튼으로 직접 추가하세요.</div>
+          <button className={styles.templateBtn} onClick={() => onLoadTemplate(templateData, category)} disabled={templateLoading}>
             {templateLoading ? '로딩 중...' : templateLabel}
           </button>
         </div>
       )}
-
-      {/* 질문 카드 목록 */}
       {filteredQs.map((q, idx) => (
-        <QuestionCard
-          key={q.id}
-          question={q}
-          index={idx}
-          total={filteredQs.length}
-          isActive={activeId === q.id}
-          onActivate={() => setActiveId(q.id)}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-          onDuplicate={onDuplicate}
-          onMove={(i, d) => onMove(i, d, filteredQs)}
-        />
+        <QuestionCard key={q.id} question={q} index={idx} total={filteredQs.length}
+          isActive={activeId === q.id} onActivate={() => setActiveId(q.id)}
+          onUpdate={onUpdate} onDelete={onDelete} onDuplicate={onDuplicate}
+          onMove={(i, d) => onMove(i, d, filteredQs)} />
       ))}
-
-      {/* 질문 추가 버튼 */}
       <div className={styles.addBtnArea}>
         <button className={styles.addBtn} onClick={() => onAdd(category)}>
-          <span className={styles.addBtnIcon}>+</span>
-          질문 추가
+          <span className={styles.addBtnIcon}>+</span> 질문 추가
         </button>
       </div>
     </>
@@ -418,17 +336,109 @@ function StepQuestions({
 }
 
 /* ============================================
-   질문 카드 컴포넌트
+   STEP 4: 연구자 설문항목 — Google Forms 스타일
    ============================================ */
-function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, onDelete, onDuplicate, onMove }) {
+function StepCustomGoogleForm({
+  questions: filteredQs, allQuestions,
+  templateData, templateLoading,
+  activeId, setActiveId,
+  onUpdate, onDelete, onDuplicate, onMove, onAdd, onLoadTemplate,
+}) {
+  return (
+    <>
+      {/* 안내 헤더 카드 */}
+      <div className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div className={styles.cardHeaderLeft}>
+            <span className={styles.cardBadge}>STEP 4</span>
+            <h2 className={styles.cardTitle}>연구자 설문항목</h2>
+          </div>
+          <span className={styles.questionCount}>{filteredQs.length}개 질문</span>
+        </div>
+        <p className={styles.cardDesc}>
+          연구 주제에 맞는 추가 질문을 자유롭게 설계하세요. 구글 폼처럼 각 질문의 유형을 선택하고, 선택지를 편집할 수 있습니다.
+        </p>
+      </div>
+
+      {/* 질문 없을 때 */}
+      {filteredQs.length === 0 && (
+        <div className={styles.templateArea}>
+          <div className={styles.templateIcon}>📝</div>
+          <div className={styles.templateTitle}>아직 질문이 없습니다</div>
+          <div className={styles.templateDesc}>예시 템플릿을 로드하거나, 아래 툴바에서 원하는 유형의 질문을 추가하세요.</div>
+          <button className={styles.templateBtn} onClick={() => onLoadTemplate(templateData, 'custom')} disabled={templateLoading}>
+            {templateLoading ? '로딩 중...' : '연구자 설문 예시 템플릿 로드 (3개)'}
+          </button>
+        </div>
+      )}
+
+      {/* 질문 카드 + 우측 사이드 툴바 레이아웃 */}
+      <div className={styles.gfLayout}>
+        <div className={styles.gfCards}>
+          {filteredQs.map((q, idx) => (
+            <GFormCard key={q.id} question={q} index={idx} total={filteredQs.length}
+              isActive={activeId === q.id} onActivate={() => setActiveId(q.id)}
+              onUpdate={onUpdate} onDelete={onDelete} onDuplicate={onDuplicate}
+              onMove={(i, d) => onMove(i, d, filteredQs)} />
+          ))}
+        </div>
+
+        {/* 우측 플로팅 툴바 */}
+        <div className={styles.gfToolbar}>
+          <div className={styles.gfToolbarInner}>
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'short_text')} title="단답형 추가">
+              <span className={styles.gfToolIcon}>Tt</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'long_text')} title="장문형 추가">
+              <span className={styles.gfToolIcon}>≡</span>
+            </button>
+            <div className={styles.gfToolDivider} />
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'radio')} title="객관식 추가">
+              <span className={styles.gfToolIcon}>⊙</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'checkbox')} title="체크박스 추가">
+              <span className={styles.gfToolIcon}>☑</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'dropdown')} title="드롭다운 추가">
+              <span className={styles.gfToolIcon}>▾</span>
+            </button>
+            <div className={styles.gfToolDivider} />
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'number')} title="숫자 추가">
+              <span className={styles.gfToolIcon}>#</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd('custom', 'likert')} title="리커트 추가">
+              <span className={styles.gfToolIcon}>⊕</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 하단 전체 추가 버튼 */}
+      <div className={styles.addBtnArea}>
+        <button className={styles.addBtn} onClick={() => onAdd('custom')}>
+          <span className={styles.addBtnIcon}>+</span> 질문 추가
+        </button>
+      </div>
+    </>
+  );
+}
+
+/* ============================================
+   Google Forms 스타일 질문 카드 (항상 펼침)
+   ============================================ */
+function GFormCard({ question, index, total, isActive, onActivate, onUpdate, onDelete, onDuplicate, onMove }) {
   const [text, setText] = useState(question.question_text);
+  const [desc, setDesc] = useState(question.description || '');
+  const [showDesc, setShowDesc] = useState(!!(question.description));
   const [options, setOptions] = useState(question.options || []);
   const needsOptions = NEEDS_OPTIONS.includes(question.question_type);
 
   const handleTextBlur = () => {
     if (text !== question.question_text) onUpdate(question.id, { question_text: text });
   };
-
+  const handleDescBlur = () => {
+    onUpdate(question.id, { description: desc });
+  };
   const handleTypeChange = (e) => {
     const newType = e.target.value;
     const updates = { question_type: newType };
@@ -441,9 +451,145 @@ function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, 
     }
     onUpdate(question.id, updates);
   };
-
   const handleRequiredChange = (e) => onUpdate(question.id, { required: e.target.checked });
+  const handleOptionChange = (optIdx, value) => {
+    const next = [...options]; next[optIdx] = value; setOptions(next);
+  };
+  const handleOptionBlur = () => onUpdate(question.id, { options });
+  const handleAddOption = () => {
+    const next = [...options, `옵션 ${options.length + 1}`]; setOptions(next);
+    onUpdate(question.id, { options: next });
+  };
+  const handleRemoveOption = (optIdx) => {
+    const next = options.filter((_, i) => i !== optIdx); setOptions(next);
+    onUpdate(question.id, { options: next });
+  };
 
+  const typeIcon = QUESTION_TYPES.find(t => t.value === question.question_type)?.icon || '';
+
+  return (
+    <div className={`${styles.gfCard} ${isActive ? styles.gfCardActive : ''}`} onClick={onActivate}>
+      <div className={styles.gfLeftBar} />
+      <div className={styles.gfCardBody}>
+        {/* 상단: 질문 텍스트 + 유형 셀렉터 */}
+        <div className={styles.gfTop}>
+          <input
+            className={styles.gfQuestionInput}
+            value={text}
+            onChange={e => setText(e.target.value)}
+            onBlur={handleTextBlur}
+            placeholder="질문"
+          />
+          <div className={styles.gfTypeSelect} onClick={e => e.stopPropagation()}>
+            <span className={styles.gfTypeIcon}>{typeIcon}</span>
+            <select value={question.question_type} onChange={handleTypeChange}>
+              {QUESTION_TYPES.map(t => (
+                <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* 설명 필드 */}
+        {showDesc && (
+          <input
+            className={styles.gfDescInput}
+            value={desc}
+            onChange={e => setDesc(e.target.value)}
+            onBlur={handleDescBlur}
+            placeholder="질문 설명 (선택사항)"
+            onClick={e => e.stopPropagation()}
+          />
+        )}
+
+        {/* 옵션/미리보기 영역 — 항상 표시 */}
+        <div className={styles.gfPreviewBody}>
+          {needsOptions ? (
+            <div className={styles.optionsEditor}>
+              {options.map((opt, optIdx) => (
+                <div key={optIdx} className={styles.optionRow}>
+                  {question.question_type === 'radio' && <div className={styles.optionDot} />}
+                  {question.question_type === 'checkbox' && <div className={styles.optionSquare} />}
+                  {(question.question_type === 'dropdown' || question.question_type === 'likert') && (
+                    <span className={styles.optionNumber}>{optIdx + 1}.</span>
+                  )}
+                  <input
+                    className={styles.optionInput}
+                    value={opt}
+                    onChange={e => handleOptionChange(optIdx, e.target.value)}
+                    onBlur={handleOptionBlur}
+                    onClick={e => e.stopPropagation()}
+                  />
+                  {isActive && (
+                    <button className={styles.removeOptionBtn} onClick={e => { e.stopPropagation(); handleRemoveOption(optIdx); }} title="삭제">✕</button>
+                  )}
+                </div>
+              ))}
+              {isActive && (
+                <div className={styles.addOptionRow}>
+                  {question.question_type === 'radio' && <div className={styles.optionDot} />}
+                  {question.question_type === 'checkbox' && <div className={styles.optionSquare} />}
+                  {(question.question_type === 'dropdown' || question.question_type === 'likert') && (
+                    <span className={styles.optionNumber}>{options.length + 1}.</span>
+                  )}
+                  <button className={styles.addOptionText} onClick={e => { e.stopPropagation(); handleAddOption(); }}>
+                    옵션 추가
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <QuestionPreview type={question.question_type} />
+          )}
+        </div>
+
+        {/* 하단 바 — 항상 표시 */}
+        <div className={styles.gfBottomBar} onClick={e => e.stopPropagation()}>
+          <button className={styles.bottomBarBtn} onClick={() => onDuplicate(question)} title="복제">⧉</button>
+          <button className={styles.bottomBarBtnDanger} onClick={() => onDelete(question.id)} title="삭제">🗑</button>
+          <button className={styles.bottomBarBtn} onClick={() => onMove(index, -1)} disabled={index === 0} title="위로">▲</button>
+          <button className={styles.bottomBarBtn} onClick={() => onMove(index, 1)} disabled={index === total - 1} title="아래로">▼</button>
+          <div className={styles.divider} />
+          <button
+            className={`${styles.bottomBarBtn} ${showDesc ? styles.bottomBarBtnOn : ''}`}
+            onClick={() => setShowDesc(v => !v)}
+            title="설명 추가"
+          >T</button>
+          <div className={styles.divider} />
+          <label className={styles.requiredToggle}>
+            필수
+            <input type="checkbox" checked={question.required} onChange={handleRequiredChange} />
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================
+   질문 카드 (STEP 3 compact 용)
+   ============================================ */
+function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, onDelete, onDuplicate, onMove }) {
+  const [text, setText] = useState(question.question_text);
+  const [options, setOptions] = useState(question.options || []);
+  const needsOptions = NEEDS_OPTIONS.includes(question.question_type);
+
+  const handleTextBlur = () => {
+    if (text !== question.question_text) onUpdate(question.id, { question_text: text });
+  };
+  const handleTypeChange = (e) => {
+    const newType = e.target.value;
+    const updates = { question_type: newType };
+    if (NEEDS_OPTIONS.includes(newType) && options.length === 0) {
+      const defaultOpts = newType === 'likert'
+        ? ['매우 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+        : ['옵션 1', '옵션 2'];
+      updates.options = defaultOpts;
+      setOptions(defaultOpts);
+    }
+    onUpdate(question.id, updates);
+  };
+  const handleRequiredChange = (e) => onUpdate(question.id, { required: e.target.checked });
   const handleOptionChange = (optIdx, value) => {
     const next = [...options]; next[optIdx] = value; setOptions(next);
   };
@@ -461,73 +607,35 @@ function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, 
     <div className={`${styles.questionCard} ${isActive ? styles.active : ''}`} onClick={onActivate}>
       <div className={styles.leftBar} />
       <div className={styles.cardContent}>
-        {/* 상단: 질문 텍스트 + 유형 */}
         <div className={styles.questionTop}>
-          <input
-            className={styles.questionInput}
-            value={text}
-            onChange={e => setText(e.target.value)}
-            onBlur={handleTextBlur}
-            placeholder={`질문 ${index + 1}`}
-          />
+          <input className={styles.questionInput} value={text} onChange={e => setText(e.target.value)} onBlur={handleTextBlur} placeholder={`질문 ${index + 1}`} />
           {isActive && (
-            <select
-              className={styles.typeSelect}
-              value={question.question_type}
-              onChange={handleTypeChange}
-              onClick={e => e.stopPropagation()}
-            >
-              {QUESTION_TYPES.map(t => (
-                <option key={t.value} value={t.value}>{t.label}</option>
-              ))}
+            <select className={styles.typeSelect} value={question.question_type} onChange={handleTypeChange} onClick={e => e.stopPropagation()}>
+              {QUESTION_TYPES.map(t => (<option key={t.value} value={t.value}>{t.label}</option>))}
             </select>
           )}
         </div>
-
-        {/* 미리보기 or 옵션 편집기 */}
         {isActive && needsOptions ? (
           <div className={styles.optionsEditor}>
             {options.map((opt, optIdx) => (
               <div key={optIdx} className={styles.optionRow}>
                 {question.question_type === 'radio' && <div className={styles.optionDot} />}
                 {question.question_type === 'checkbox' && <div className={styles.optionSquare} />}
-                {(question.question_type === 'dropdown' || question.question_type === 'likert') && (
-                  <span className={styles.optionNumber}>{optIdx + 1}.</span>
-                )}
-                <input
-                  className={styles.optionInput}
-                  value={opt}
-                  onChange={e => handleOptionChange(optIdx, e.target.value)}
-                  onBlur={handleOptionBlur}
-                  onClick={e => e.stopPropagation()}
-                />
-                <button
-                  className={styles.removeOptionBtn}
-                  onClick={e => { e.stopPropagation(); handleRemoveOption(optIdx); }}
-                  title="삭제"
-                >
-                  ✕
-                </button>
+                {(question.question_type === 'dropdown' || question.question_type === 'likert') && <span className={styles.optionNumber}>{optIdx + 1}.</span>}
+                <input className={styles.optionInput} value={opt} onChange={e => handleOptionChange(optIdx, e.target.value)} onBlur={handleOptionBlur} onClick={e => e.stopPropagation()} />
+                <button className={styles.removeOptionBtn} onClick={e => { e.stopPropagation(); handleRemoveOption(optIdx); }} title="삭제">✕</button>
               </div>
             ))}
             <div className={styles.addOptionRow}>
               {question.question_type === 'radio' && <div className={styles.optionDot} />}
               {question.question_type === 'checkbox' && <div className={styles.optionSquare} />}
-              {(question.question_type === 'dropdown' || question.question_type === 'likert') && (
-                <span className={styles.optionNumber}>{options.length + 1}.</span>
-              )}
-              <button className={styles.addOptionText} onClick={e => { e.stopPropagation(); handleAddOption(); }}>
-                옵션 추가
-              </button>
+              {(question.question_type === 'dropdown' || question.question_type === 'likert') && <span className={styles.optionNumber}>{options.length + 1}.</span>}
+              <button className={styles.addOptionText} onClick={e => { e.stopPropagation(); handleAddOption(); }}>옵션 추가</button>
             </div>
           </div>
         ) : (
-          <div className={styles.previewArea}>
-            <QuestionPreview type={question.question_type} options={options} />
-          </div>
+          <div className={styles.previewArea}><QuestionPreview type={question.question_type} options={options} /></div>
         )}
-
-        {/* 하단 바 */}
         {isActive && (
           <div className={styles.bottomBar} onClick={e => e.stopPropagation()}>
             <button className={styles.bottomBarBtn} onClick={() => onDuplicate(question)} title="복제">⧉</button>
@@ -535,10 +643,7 @@ function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, 
             <button className={styles.bottomBarBtn} onClick={() => onMove(index, -1)} disabled={index === 0} title="위로">▲</button>
             <button className={styles.bottomBarBtn} onClick={() => onMove(index, 1)} disabled={index === total - 1} title="아래로">▼</button>
             <div className={styles.divider} />
-            <label className={styles.requiredToggle}>
-              필수
-              <input type="checkbox" checked={question.required} onChange={handleRequiredChange} />
-            </label>
+            <label className={styles.requiredToggle}>필수 <input type="checkbox" checked={question.required} onChange={handleRequiredChange} /></label>
           </div>
         )}
       </div>
@@ -551,42 +656,16 @@ function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, 
    ============================================ */
 function QuestionPreview({ type, options = [] }) {
   switch (type) {
-    case 'short_text':
-      return <div className={styles.previewPlaceholderShort}>단답형 텍스트</div>;
-    case 'long_text':
-      return <div className={styles.previewPlaceholderLong}>장문형 텍스트</div>;
-    case 'number':
-      return <div className={styles.previewPlaceholderShort}>숫자 입력</div>;
+    case 'short_text':  return <div className={styles.previewPlaceholderShort}>단답형 텍스트</div>;
+    case 'long_text':   return <div className={styles.previewPlaceholderLong}>장문형 텍스트</div>;
+    case 'number':      return <div className={styles.previewPlaceholderShort}>숫자 입력</div>;
     case 'radio':
-      return (
-        <div className={styles.previewRadio}>
-          {options.map((opt, i) => (
-            <div key={i} className={styles.previewRadioItem}><div className={styles.previewDot} /><span>{opt}</span></div>
-          ))}
-        </div>
-      );
+      return (<div className={styles.previewRadio}>{options.map((opt, i) => (<div key={i} className={styles.previewRadioItem}><div className={styles.previewDot} /><span>{opt}</span></div>))}</div>);
     case 'checkbox':
-      return (
-        <div className={styles.previewCheckbox}>
-          {options.map((opt, i) => (
-            <div key={i} className={styles.previewCheckboxItem}><div className={styles.previewSquare} /><span>{opt}</span></div>
-          ))}
-        </div>
-      );
-    case 'dropdown':
-      return <div className={styles.previewDropdown}>선택하세요 ▾</div>;
+      return (<div className={styles.previewCheckbox}>{options.map((opt, i) => (<div key={i} className={styles.previewCheckboxItem}><div className={styles.previewSquare} /><span>{opt}</span></div>))}</div>);
+    case 'dropdown':    return <div className={styles.previewDropdown}>선택하세요 ▾</div>;
     case 'likert':
-      return (
-        <div className={styles.previewLikert}>
-          {options.map((opt, i) => (
-            <div key={i} className={styles.previewLikertItem}>
-              <div className={styles.previewLikertDot} />
-              <span className={styles.previewLikertLabel}>{opt}</span>
-            </div>
-          ))}
-        </div>
-      );
-    default:
-      return <div className={styles.previewPlaceholder}>텍스트 입력</div>;
+      return (<div className={styles.previewLikert}>{options.map((opt, i) => (<div key={i} className={styles.previewLikertItem}><div className={styles.previewLikertDot} /><span className={styles.previewLikertLabel}>{opt}</span></div>))}</div>);
+    default:            return <div className={styles.previewPlaceholder}>텍스트 입력</div>;
   }
 }
