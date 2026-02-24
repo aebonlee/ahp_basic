@@ -2,8 +2,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #050d1a;
-  color: #f1f5f9;
+  background: #ffffff;
+  color: #1e293b;
   overflow-x: hidden;
 }
 
@@ -15,9 +15,9 @@
   right: 0;
   z-index: 100;
   padding: 0 var(--spacing-xl);
-  background: rgba(5, 13, 26, 0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(30, 64, 175, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .navInner {
@@ -38,7 +38,7 @@
 }
 
 .logoMark {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  background: #0f2b5b;
   color: #fff;
   font-size: 0.75rem;
   font-weight: 800;
@@ -50,7 +50,7 @@
 .logoText {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #fff;
+  color: #0f2b5b;
   letter-spacing: -0.02em;
 }
 
@@ -60,7 +60,7 @@
 }
 
 .navLinks a {
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
   font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
@@ -69,7 +69,7 @@
 }
 
 .navLinks a:hover {
-  color: #fff;
+  color: #0f2b5b;
 }
 
 .navActions {
@@ -81,7 +81,7 @@
   padding: 8px 20px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  background: #0f2b5b;
   color: #fff;
   font-size: 0.82rem;
   font-weight: 600;
@@ -90,17 +90,17 @@
 }
 
 .navBtn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+  background: #1a3f7a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(15, 43, 91, 0.2);
 }
 
 .navBtnGhost {
   padding: 8px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.7);
+  color: #475569;
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
@@ -108,8 +108,8 @@
 }
 
 .navBtnGhost:hover {
-  border-color: rgba(255, 255, 255, 0.35);
-  color: #fff;
+  border-color: #0f2b5b;
+  color: #0f2b5b;
 }
 
 /* ─── Hero ─── */
@@ -120,18 +120,18 @@
   align-items: center;
   justify-content: center;
   padding: 120px var(--spacing-xl) 80px;
-  background: linear-gradient(170deg, #050d1a 0%, #0a1f3d 40%, #0f2a52 60%, #091428 100%);
+  background: #ffffff;
   overflow: hidden;
 }
 
 .heroGlow {
   position: absolute;
-  top: 15%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(30, 64, 175, 0.2) 0%, rgba(59, 130, 246, 0.08) 40%, transparent 70%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(15, 43, 91, 0.04) 0%, rgba(37, 99, 235, 0.02) 40%, transparent 70%);
   pointer-events: none;
 }
 
@@ -141,17 +141,17 @@
   background:
     repeating-linear-gradient(
       90deg,
-      rgba(59, 130, 246, 0.04) 0px,
-      rgba(59, 130, 246, 0.04) 1px,
+      rgba(15, 43, 91, 0.025) 0px,
+      rgba(15, 43, 91, 0.025) 1px,
       transparent 1px,
-      transparent 100px
+      transparent 120px
     ),
     repeating-linear-gradient(
       0deg,
-      rgba(59, 130, 246, 0.04) 0px,
-      rgba(59, 130, 246, 0.04) 1px,
+      rgba(15, 43, 91, 0.025) 0px,
+      rgba(15, 43, 91, 0.025) 1px,
       transparent 1px,
-      transparent 100px
+      transparent 120px
     );
   pointer-events: none;
 }
@@ -166,15 +166,15 @@
 .heroBadge {
   display: inline-block;
   padding: 6px 18px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  border: 1px solid #cbd5e1;
   border-radius: 50px;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #60a5fa;
+  color: #0f2b5b;
   margin-bottom: 32px;
-  background: rgba(59, 130, 246, 0.06);
+  background: #f8fafc;
 }
 
 .heroTitle {
@@ -182,12 +182,13 @@
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.04em;
-  color: #fff;
+  color: #0f172a;
   margin-bottom: 28px;
 }
 
 .heroAccent {
-  background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #60a5fa 100%);
+  color: #0f2b5b;
+  background: linear-gradient(135deg, #0f2b5b 0%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -196,7 +197,7 @@
 .heroDesc {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
   margin-bottom: 44px;
 }
 
@@ -215,27 +216,27 @@
   padding: 14px 32px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  background: #0f2b5b;
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(30, 64, 175, 0.3);
+  box-shadow: 0 2px 12px rgba(15, 43, 91, 0.15);
 }
 
 .ctaPrimary:hover {
-  background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+  background: #1a3f7a;
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 6px 24px rgba(15, 43, 91, 0.25);
 }
 
 .ctaSecondary {
   padding: 14px 32px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.7);
+  background: #fff;
+  color: #475569;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -243,9 +244,9 @@
 }
 
 .ctaSecondary:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  border-color: #0f2b5b;
+  color: #0f2b5b;
+  background: #f8fafc;
 }
 
 /* Scroll indicator */
@@ -260,7 +261,7 @@
 .scrollMouse {
   width: 24px;
   height: 38px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid #cbd5e1;
   border-radius: 12px;
   position: relative;
 }
@@ -268,7 +269,7 @@
 .scrollDot {
   width: 3px;
   height: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: #94a3b8;
   border-radius: 3px;
   position: absolute;
   left: 50%;
@@ -284,9 +285,9 @@
 
 /* ─── Stats Bar ─── */
 .statsBar {
-  background: #0a1628;
-  border-top: 1px solid rgba(59, 130, 246, 0.1);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
   padding: 48px var(--spacing-xl);
 }
 
@@ -306,14 +307,14 @@
   display: block;
   font-size: 2rem;
   font-weight: 800;
-  color: #60a5fa;
+  color: #0f2b5b;
   letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
 
 .statLabel {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: #94a3b8;
   letter-spacing: 0.02em;
 }
 
@@ -330,13 +331,13 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #3b82f6;
+  color: #2563eb;
   margin-bottom: 12px;
 }
 
 .sectionTagLight {
   composes: sectionTag;
-  color: #60a5fa;
+  color: #93b4f5;
 }
 
 .sectionTitle {
@@ -362,7 +363,7 @@
 
 /* ─── Features ─── */
 .features {
-  background: #f8fafc;
+  background: #ffffff;
   padding: 100px 0;
 }
 
@@ -389,7 +390,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #1e40af, #3b82f6, #60a5fa);
+  background: linear-gradient(90deg, #0f2b5b, #2563eb);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -397,7 +398,7 @@
 
 .featureCard:hover {
   border-color: #bfdbfe;
-  box-shadow: 0 12px 40px rgba(30, 64, 175, 0.08);
+  box-shadow: 0 8px 32px rgba(15, 43, 91, 0.06);
   transform: translateY(-4px);
 }
 
@@ -409,8 +410,8 @@
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  color: #1e40af;
+  background: #f0f4fa;
+  color: #0f2b5b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -436,19 +437,19 @@
   right: 24px;
   font-size: 3rem;
   font-weight: 800;
-  color: rgba(30, 64, 175, 0.04);
+  color: rgba(15, 43, 91, 0.04);
   line-height: 1;
   pointer-events: none;
 }
 
 /* ─── Process ─── */
 .process {
-  background: linear-gradient(170deg, #0a1628 0%, #0f2447 50%, #0a1628 100%);
+  background: #0f2b5b;
   padding: 100px 0;
 }
 
 .process .sectionSub {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .stepGrid {
@@ -468,19 +469,15 @@
   display: block;
   font-size: 2.4rem;
   font-weight: 800;
-  color: #3b82f6;
   letter-spacing: -0.04em;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #60a5fa;
 }
 
 .stepLine {
   width: 40px;
   height: 2px;
-  background: linear-gradient(90deg, #1e40af, #3b82f6);
+  background: rgba(255, 255, 255, 0.15);
   margin: 0 auto 20px;
   border-radius: 1px;
 }
@@ -494,7 +491,7 @@
 
 .stepDesc {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
 }
 
@@ -505,7 +502,7 @@
   top: 10px;
   bottom: 10px;
   width: 1px;
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* ─── CTA Section ─── */
@@ -513,7 +510,7 @@
   position: relative;
   padding: 120px var(--spacing-xl);
   text-align: center;
-  background: linear-gradient(170deg, #050d1a, #0f2447);
+  background: #f8fafc;
   overflow: hidden;
 }
 
@@ -524,7 +521,7 @@
   transform: translate(-50%, -50%);
   width: 600px;
   height: 400px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(15, 43, 91, 0.03) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -536,21 +533,20 @@
 .ctaTitle {
   font-size: 2.4rem;
   font-weight: 800;
-  color: #fff;
+  color: #0f172a;
   letter-spacing: -0.03em;
   margin-bottom: 16px;
 }
 
 .ctaDesc {
   font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
   margin-bottom: 36px;
 }
 
 /* ─── Footer ─── */
 .footer {
-  background: #030812;
-  border-top: 1px solid rgba(59, 130, 246, 0.08);
+  background: #0f2b5b;
   padding: 36px var(--spacing-xl);
 }
 
@@ -571,19 +567,19 @@
 .footerLogo {
   font-size: 1rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .footerSub {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.35);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .footerCopy {
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* ─── Responsive ─── */
