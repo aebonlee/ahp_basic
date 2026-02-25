@@ -86,14 +86,14 @@
 .nav {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-sm) 0;
+  padding: var(--spacing-xs) 0;
 }
 
 .menuItem {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: 11px var(--spacing-md);
+  padding: 7px var(--spacing-md);
   border: none;
   background: none;
   text-align: left;
@@ -156,8 +156,8 @@
 }
 
 .menuLabel {
-  line-height: var(--line-height-tight);
-  min-height: calc(0.92rem * 1.35 * 2);
+  line-height: 1.3;
+  min-height: auto;
   display: flex;
   align-items: center;
   word-break: keep-all;
