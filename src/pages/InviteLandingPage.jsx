@@ -29,21 +29,21 @@ export default function InviteLandingPage() {
   const { responses, loading: responsesLoading } = useSurveyResponses(token);
 
   const checkInvite = useCallback(async () => {
-    // Token is the project ID
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', token)
-      .single();
-
-    if (error || !data) {
-      setStatus('invalid');
-      return;
-    }
-
-    setProject(data);
-
     if (user) {
+      // 로그인 사용자: 직접 테이블 조회 (RLS 통과)
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', token)
+        .single();
+
+      if (error || !data) {
+        setStatus('invalid');
+        return;
+      }
+
+      setProject(data);
+
       // user_id 또는 email로 평가자 매칭
       const { data: evalData } = await supabase
         .from('evaluators')
@@ -64,7 +64,16 @@ export default function InviteLandingPage() {
         setStatus('not_assigned');
       }
     } else {
-      // 비로그인 → 전화번호 뒷자리 인증
+      // 비로그인 사용자: RPC로 프로젝트 조회 (RLS 우회)
+      const { data, error } = await supabase
+        .rpc('get_project_for_invite', { p_project_id: token });
+
+      if (error || !data || data.length === 0) {
+        setStatus('invalid');
+        return;
+      }
+
+      setProject(data[0]);
       setStatus('need_verify');
     }
   }, [token, user]);
@@ -84,10 +93,7 @@ export default function InviteLandingPage() {
     setVerifyError('');
 
     const { data: matches, error } = await supabase
-      .from('evaluators')
-      .select('*')
-      .eq('project_id', token)
-      .like('phone_number', `%${phoneLast4}`);
+      .rpc('verify_evaluator_phone', { p_project_id: token, p_phone_last4: phoneLast4 });
 
     if (error) {
       setVerifyError('확인 중 오류가 발생했습니다.');
@@ -112,10 +118,23 @@ export default function InviteLandingPage() {
     setVerifying(false);
   };
 
-  const completeVerification = (ev) => {
-    sessionStorage.setItem(`evaluator_${token}`, ev.id);
-    setEvaluator(ev);
-    setStatus('ready');
+  const completeVerification = async (ev) => {
+    setVerifying(true);
+    try {
+      // 익명 로그인 → evaluator.user_id 연결 → 기존 RLS 정책 그대로 작동
+      const { error: anonError } = await supabase.auth.signInAnonymously();
+      if (anonError) throw anonError;
+
+      await supabase.rpc('link_evaluator_to_user', { p_evaluator_id: ev.id });
+
+      sessionStorage.setItem(`evaluator_${token}`, ev.id);
+      setEvaluator(ev);
+      setStatus('ready');
+    } catch (err) {
+      console.error('Anonymous sign-in failed:', err);
+      setVerifyError('인증 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+    setVerifying(false);
   };
 
   const handleStartEval = () => {
