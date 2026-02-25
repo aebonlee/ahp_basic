@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSurveyQuestions, useSurveyConfig } from '../hooks/useSurvey';
+import { useToast } from '../contexts/ToastContext';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import common from '../styles/common.module.css';
@@ -80,6 +81,7 @@ export default function SurveyBuilderPage() {
   const { id } = useParams();
   const { questions, loading: qLoading, addQuestion, updateQuestion, deleteQuestion, reorderQuestions } = useSurveyQuestions(id);
   const { config, loading: cLoading, saveConfig } = useSurveyConfig(id);
+  const toast = useToast();
 
   const [step, setStep] = useState(0);
   const [savingField, setSavingField] = useState(null);
@@ -92,12 +94,12 @@ export default function SurveyBuilderPage() {
   /* ── 핸들러 ── */
   const handleConfigBlur = useCallback(async (field, value) => {
     setSavingField(field);
-    try { await saveConfig({ [field]: value }); } catch (e) { console.error(e); }
+    try { await saveConfig({ [field]: value }); } catch (e) { toast.error('저장 실패: ' + e.message); }
     setTimeout(() => setSavingField(null), 1500);
   }, [saveConfig]);
 
   const handleQuestionUpdate = useCallback(async (qId, updates) => {
-    try { await updateQuestion(qId, updates); } catch (e) { console.error(e); }
+    try { await updateQuestion(qId, updates); } catch (e) { toast.error('저장 실패: ' + e.message); }
   }, [updateQuestion]);
 
   const handleAddQuestion = useCallback(async (category, type = 'short_text') => {
@@ -107,7 +109,7 @@ export default function SurveyBuilderPage() {
         : NEEDS_OPTIONS.includes(type) ? ['옵션 1', '옵션 2'] : [];
       const newQ = await addQuestion({ question_text: '', question_type: type, options: defaultOpts, required: true, category });
       if (newQ?.id) setActiveId(newQ.id);
-    } catch (e) { console.error(e); }
+    } catch (e) { toast.error('저장 실패: ' + e.message); }
   }, [addQuestion]);
 
   const handleDuplicate = useCallback(async (q) => {
@@ -119,7 +121,7 @@ export default function SurveyBuilderPage() {
         required: q.required,
         category: q.category || 'demographic',
       });
-    } catch (e) { console.error(e); }
+    } catch (e) { toast.error('저장 실패: ' + e.message); }
   }, [addQuestion]);
 
   const handleMove = useCallback(async (index, direction, list) => {
@@ -140,19 +142,19 @@ export default function SurveyBuilderPage() {
       for (const tmpl of template) {
         await addQuestion({ ...tmpl, category });
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { toast.error('저장 실패: ' + e.message); }
     setTemplateLoading(false);
   }, [addQuestion]);
 
   const handleLoadIntroTemplate = useCallback(async () => {
     setSavingField('research_description');
-    try { await saveConfig({ research_description: DEFAULT_INTRO }); } catch (e) { console.error(e); }
+    try { await saveConfig({ research_description: DEFAULT_INTRO }); } catch (e) { toast.error('저장 실패: ' + e.message); }
     setTimeout(() => setSavingField(null), 1500);
   }, [saveConfig]);
 
   const handleLoadConsentTemplate = useCallback(async () => {
     setSavingField('consent_text');
-    try { await saveConfig({ consent_text: DEFAULT_CONSENT }); } catch (e) { console.error(e); }
+    try { await saveConfig({ consent_text: DEFAULT_CONSENT }); } catch (e) { toast.error('저장 실패: ' + e.message); }
     setTimeout(() => setSavingField(null), 1500);
   }, [saveConfig]);
 

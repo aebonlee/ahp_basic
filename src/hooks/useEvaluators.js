@@ -10,11 +10,25 @@ export function useEvaluators(projectId) {
     if (!projectId) { setLoading(false); return; }
     setLoading(true);
     setError(null);
-    const { data, error: fetchError } = await supabase
-      .from('evaluators')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('created_at');
+
+    // anon 평가자: sessionStorage에 evaluator_id가 있으면 RPC로 조회 (PII 제외)
+    const storedEvalId = sessionStorage.getItem(`evaluator_${projectId}`);
+    const { data: session } = await supabase.auth.getSession();
+    const isAnon = !session?.session && storedEvalId;
+
+    let data, fetchError;
+    if (isAnon) {
+      ({ data, error: fetchError } = await supabase.rpc('anon_get_evaluators', {
+        p_evaluator_id: storedEvalId,
+      }));
+    } else {
+      ({ data, error: fetchError } = await supabase
+        .from('evaluators')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('created_at'));
+    }
+
     if (fetchError) {
       setError(fetchError.message);
     } else {

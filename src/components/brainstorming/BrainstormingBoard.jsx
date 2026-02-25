@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useCriteria } from '../../hooks/useCriteria';
 import { useAlternatives } from '../../hooks/useAlternatives';
 import { useBrainstormingImport } from '../../hooks/useBrainstormingImport';
+import { useToast } from '../../contexts/ToastContext';
 import KeywordZone from './KeywordZone';
 import styles from './BrainstormingBoard.module.css';
 
@@ -21,6 +22,7 @@ export default function BrainstormingBoard({ projectId }) {
   const { criteria, addCriterion } = useCriteria(projectId);
   const { alternatives, addAlternative } = useAlternatives(projectId);
   const { importing, result, importToModel, clearResult } = useBrainstormingImport(projectId);
+  const toast = useToast();
 
   useEffect(() => {
     loadItems();
@@ -61,7 +63,8 @@ export default function BrainstormingBoard({ projectId }) {
   };
 
   const updateItem = async (id, text) => {
-    await supabase.from('brainstorming_items').update({ text }).eq('id', id);
+    const { error } = await supabase.from('brainstorming_items').update({ text }).eq('id', id);
+    if (error) { toast.error('항목 수정 실패: ' + error.message); return; }
     setItems(prev => {
       const next = { ...prev };
       for (const zone of ZONE_KEYS) {
@@ -72,7 +75,8 @@ export default function BrainstormingBoard({ projectId }) {
   };
 
   const deleteItem = async (id) => {
-    await supabase.from('brainstorming_items').delete().eq('id', id);
+    const { error } = await supabase.from('brainstorming_items').delete().eq('id', id);
+    if (error) { toast.error('항목 삭제 실패: ' + error.message); return; }
     setItems(prev => {
       const next = { ...prev };
       for (const zone of ZONE_KEYS) {

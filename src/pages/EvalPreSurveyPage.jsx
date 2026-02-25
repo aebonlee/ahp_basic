@@ -6,6 +6,7 @@ import { useEvaluators } from '../hooks/useEvaluators';
 import { useSurveyQuestions, useSurveyConfig, useSurveyResponses, useConsentRecords } from '../hooks/useSurvey';
 import { EVAL_METHOD } from '../lib/constants';
 import { findEvaluatorId } from '../lib/evaluatorUtils';
+import { useToast } from '../contexts/ToastContext';
 import PageLayout from '../components/layout/PageLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
@@ -23,6 +24,7 @@ export default function EvalPreSurveyPage() {
   const { submitResponses } = useSurveyResponses(id);
   const { submitConsent, hasConsented } = useConsentRecords(id);
 
+  const toast = useToast();
   const [step, setStep] = useState(0); // 0: 연구소개, 1: 동의, 2: 설문
   const [agreed, setAgreed] = useState(false);
   const [answers, setAnswers] = useState({});
@@ -75,7 +77,7 @@ export default function EvalPreSurveyPage() {
       await submitConsent(evaluatorId);
       setStep(2);
     } catch (e) {
-      console.error(e);
+      toast.error('동의 저장 실패: ' + e.message);
     }
     setSubmitting(false);
   };
@@ -107,7 +109,7 @@ export default function EvalPreSurveyPage() {
       await submitResponses(evaluatorId, answers);
       navigateToEval();
     } catch (e) {
-      console.error(e);
+      toast.error('설문 제출 실패: ' + e.message);
     }
     setSubmitting(false);
   };

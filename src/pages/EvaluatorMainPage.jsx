@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
-import { PROJECT_STATUS, PROJECT_STATUS_LABELS, EVAL_METHOD_LABELS, USER_MODE } from '../lib/constants';
+import { PROJECT_STATUS, PROJECT_STATUS_LABELS, EVAL_METHOD, EVAL_METHOD_LABELS, USER_MODE } from '../lib/constants';
+import { useToast } from '../contexts/ToastContext';
 import PageLayout from '../components/layout/PageLayout';
 import EvaluatorGuide from '../components/evaluation/EvaluatorGuide';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -21,6 +22,7 @@ export default function EvaluatorMainPage() {
   const { user, isAdmin, mode, setMode } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   const isAdminPreview = isAdmin && mode === USER_MODE.EVALUATOR;
 
@@ -162,12 +164,13 @@ export default function EvaluatorMainPage() {
                     <div className={styles.cardFooter}>
                       <Button onClick={async () => {
                         if (!p.hasEvaluator) {
-                          await supabase.from('evaluators').insert({
+                          const { error: insertErr } = await supabase.from('evaluators').insert({
                             project_id: p.id,
                             user_id: user.id,
                             name: user.user_metadata?.full_name || user.email,
                             email: user.email,
                           });
+                          if (insertErr) { toast.error('평가자 등록 실패: ' + insertErr.message); return; }
                         }
                         // 설문이 설정된 프로젝트인지 확인
                         const { data: surveyQs } = await supabase
@@ -185,6 +188,8 @@ export default function EvaluatorMainPage() {
                           (projData?.consent_text);
                         if (hasSurvey) {
                           navigate(`/eval/project/${p.id}/pre-survey`);
+                        } else if (p.eval_method === EVAL_METHOD.DIRECT_INPUT) {
+                          navigate(`/eval/project/${p.id}/direct`);
                         } else {
                           navigate(`/eval/project/${p.id}`);
                         }

@@ -6,6 +6,7 @@ import { useEvaluators } from '../hooks/useEvaluators';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { buildPageSequence } from '../lib/pairwiseUtils';
+import { useToast } from '../contexts/ToastContext';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import ProgressBar from '../components/common/ProgressBar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -20,14 +21,16 @@ export default function WorkshopPage() {
   const { criteria, loading: critLoading } = useCriteria(id);
   const { alternatives, loading: altLoading } = useAlternatives(id);
   const [rawComparisons, setRawComparisons] = useState([]);
+  const toast = useToast();
 
   const loadComparisons = useCallback(async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('pairwise_comparisons')
       .select('evaluator_id, criterion_id, row_id, col_id')
       .eq('project_id', id);
+    if (error) { toast.error('비교 데이터 로딩 실패'); }
     setRawComparisons(data || []);
-  }, [id]);
+  }, [id, toast]);
 
   useEffect(() => {
     const channel = supabase
