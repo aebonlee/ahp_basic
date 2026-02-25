@@ -16,6 +16,12 @@ export default function InviteLandingPage() {
   const [project, setProject] = useState(null);
   const [evaluator, setEvaluator] = useState(null);
 
+  // 전화번호 인증 관련 상태
+  const [phoneLast4, setPhoneLast4] = useState('');
+  const [verifyError, setVerifyError] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [matchedEvaluators, setMatchedEvaluators] = useState([]);
+
   // 사전설문 관련 hooks
   const { config, loading: configLoading } = useSurveyConfig(token);
   const { questions, loading: questionsLoading } = useSurveyQuestions(token);
@@ -58,7 +64,8 @@ export default function InviteLandingPage() {
         setStatus('not_assigned');
       }
     } else {
-      setStatus('need_login');
+      // 비로그인 → 전화번호 뒷자리 인증
+      setStatus('need_verify');
     }
   }, [token, user]);
 
@@ -67,6 +74,49 @@ export default function InviteLandingPage() {
   }, [checkInvite]);
 
   const surveyLoading = configLoading || questionsLoading || consentLoading || responsesLoading;
+
+  const handleVerifyPhone = async () => {
+    if (phoneLast4.length !== 4 || !/^\d{4}$/.test(phoneLast4)) {
+      setVerifyError('전화번호 뒷 4자리(숫자)를 입력해주세요.');
+      return;
+    }
+    setVerifying(true);
+    setVerifyError('');
+
+    const { data: matches, error } = await supabase
+      .from('evaluators')
+      .select('*')
+      .eq('project_id', token)
+      .like('phone_number', `%${phoneLast4}`);
+
+    if (error) {
+      setVerifyError('확인 중 오류가 발생했습니다.');
+      setVerifying(false);
+      return;
+    }
+
+    if (!matches || matches.length === 0) {
+      setVerifyError('등록된 전화번호와 일치하지 않습니다.');
+      setVerifying(false);
+      return;
+    }
+
+    if (matches.length === 1) {
+      // 1명 매치 → 바로 인증 완료
+      completeVerification(matches[0]);
+    } else {
+      // 2명+ 매치 → 이름 선택
+      setMatchedEvaluators(matches);
+      setStatus('select_evaluator');
+    }
+    setVerifying(false);
+  };
+
+  const completeVerification = (ev) => {
+    sessionStorage.setItem(`evaluator_${token}`, ev.id);
+    setEvaluator(ev);
+    setStatus('ready');
+  };
 
   const handleStartEval = () => {
     const hasSurvey = questions.length > 0 ||
@@ -101,11 +151,45 @@ export default function InviteLandingPage() {
           </>
         )}
 
-        {status === 'need_login' && (
+        {status === 'need_verify' && (
           <>
             <h2 className={styles.projectName}>{project?.name}</h2>
-            <p className={styles.desc}>평가에 참여하려면 로그인이 필요합니다.</p>
-            <Button onClick={() => navigate('/login', { state: { from: location } })}>로그인</Button>
+            <p className={styles.desc}>본인 확인을 위해 등록된 전화번호 뒷 4자리를 입력해주세요.</p>
+            <div className={styles.verifyForm}>
+              <input
+                type="tel"
+                maxLength={4}
+                value={phoneLast4}
+                onChange={(e) => {
+                  setPhoneLast4(e.target.value.replace(/\D/g, '').slice(0, 4));
+                  setVerifyError('');
+                }}
+                placeholder="뒷 4자리"
+                className={styles.phoneInput}
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') handleVerifyPhone(); }}
+              />
+              {verifyError && <p className={styles.errorDesc}>{verifyError}</p>}
+              <Button onClick={handleVerifyPhone} loading={verifying}>확인</Button>
+            </div>
+          </>
+        )}
+
+        {status === 'select_evaluator' && (
+          <>
+            <h2 className={styles.projectName}>{project?.name}</h2>
+            <p className={styles.desc}>동일한 전화번호 뒷자리가 여러 명 있습니다. 본인을 선택해주세요.</p>
+            <div className={styles.selectList}>
+              {matchedEvaluators.map(ev => (
+                <button
+                  key={ev.id}
+                  className={styles.selectItem}
+                  onClick={() => completeVerification(ev)}
+                >
+                  {ev.name} ({ev.email})
+                </button>
+              ))}
+            </div>
           </>
         )}
 

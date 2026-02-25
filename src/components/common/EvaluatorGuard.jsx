@@ -11,7 +11,19 @@ export default function EvaluatorGuard({ children }) {
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
 
+  // sessionStorage 기반 인증 체크
+  const storedEvalId = typeof sessionStorage !== 'undefined'
+    ? sessionStorage.getItem(`evaluator_${id}`)
+    : null;
+
   useEffect(() => {
+    // sessionStorage에 evaluatorId가 있으면 인증 허용
+    if (storedEvalId) {
+      setAuthorized(true);
+      setChecking(false);
+      return;
+    }
+
     if (authLoading || !user || !id) return;
 
     const checkAccess = async () => {
@@ -41,14 +53,18 @@ export default function EvaluatorGuard({ children }) {
     };
 
     checkAccess();
-  }, [authLoading, user, id]);
+  }, [authLoading, user, id, storedEvalId]);
 
   if (authLoading || checking) {
+    // sessionStorage 인증이 없고, 로그인도 안 된 경우 빠르게 리다이렉트
+    if (!authLoading && !user && !storedEvalId) {
+      return <Navigate to={`/eval/invite/${id}`} replace />;
+    }
     return <LoadingSpinner message="권한 확인 중..." />;
   }
 
-  if (!isLoggedIn) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!user && !storedEvalId) {
+    return <Navigate to={`/eval/invite/${id}`} replace />;
   }
 
   if (!authorized) {

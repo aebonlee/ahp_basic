@@ -7,6 +7,7 @@ import { useEvaluators } from '../hooks/useEvaluators';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { calculateAHP } from '../lib/ahpEngine';
 import { CR_THRESHOLD } from '../lib/constants';
+import { findEvaluatorId } from '../lib/evaluatorUtils';
 import PageLayout from '../components/layout/PageLayout';
 import ResultSummary from '../components/results/ResultSummary';
 import ComprehensiveChart from '../components/results/ComprehensiveChart';
@@ -27,8 +28,8 @@ export default function EvalResultPage() {
   const [activeTab, setActiveTab] = useState('summary');
 
   const evaluatorId = useMemo(() => {
-    return evaluators.find(e => e.user_id === user?.id)?.id || null;
-  }, [evaluators, user?.id]);
+    return findEvaluatorId(evaluators, user, id);
+  }, [evaluators, user?.id, id]);
 
   useEffect(() => {
     if (evaluatorId) {

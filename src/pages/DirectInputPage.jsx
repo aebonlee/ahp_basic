@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useEvaluators } from '../hooks/useEvaluators';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { calculateDirectPriorities } from '../lib/directInputEngine';
+import { findEvaluatorId } from '../lib/evaluatorUtils';
 import PageLayout from '../components/layout/PageLayout';
 import DirectInputPanel from '../components/evaluation/DirectInputPanel';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -22,8 +23,8 @@ export default function DirectInputPage() {
   const [validations, setValidations] = useState({});
 
   const evaluatorId = useMemo(() => {
-    return evaluators.find(e => e.user_id === user?.id)?.id || null;
-  }, [evaluators, user?.id]);
+    return findEvaluatorId(evaluators, user, id);
+  }, [evaluators, user?.id, id]);
 
   // 설문 완료 여부 체크 → 미완료면 pre-survey로 리다이렉트
   useEffect(() => {

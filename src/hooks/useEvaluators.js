@@ -38,9 +38,10 @@ export function useEvaluators(projectId) {
         .single();
       if (profile) userId = profile.id;
     }
+    const { phone_number, ...rest } = evaluator;
     const { data, error } = await supabase
       .from('evaluators')
-      .insert({ ...evaluator, project_id: projectId, user_id: userId })
+      .insert({ ...rest, phone_number, project_id: projectId, user_id: userId })
       .select()
       .single();
     if (error) throw error;

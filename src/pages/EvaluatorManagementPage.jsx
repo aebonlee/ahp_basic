@@ -89,6 +89,7 @@ export default function EvaluatorManagementPage() {
               <tr>
                 <th>이름</th>
                 <th>이메일</th>
+                <th>전화번호</th>
                 <th>상태</th>
                 <th>관리</th>
               </tr>
@@ -98,6 +99,7 @@ export default function EvaluatorManagementPage() {
                 <tr key={ev.id}>
                   <td>{ev.name}</td>
                   <td>{ev.email}</td>
+                  <td>{ev.phone_number || '-'}</td>
                   <td>{ev.completed ? '완료' : '미완료'}</td>
                   <td>
                     <button className={common.linkAction} onClick={handleCopyLink}>

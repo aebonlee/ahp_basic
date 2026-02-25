@@ -5,6 +5,7 @@ import styles from './ProjectForm.module.css';
 export default function ParticipantForm({ evaluator, onSave, onClose }) {
   const [name, setName] = useState(evaluator?.name || '');
   const [email, setEmail] = useState(evaluator?.email || '');
+  const [phoneNumber, setPhoneNumber] = useState(evaluator?.phone_number || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -12,9 +13,10 @@ export default function ParticipantForm({ evaluator, onSave, onClose }) {
     e.preventDefault();
     if (!email.trim()) { setError('이메일을 입력해주세요.'); return; }
     if (!name.trim()) { setError('이름을 입력해주세요.'); return; }
+    if (!phoneNumber.trim()) { setError('전화번호를 입력해주세요.'); return; }
     setLoading(true);
     try {
-      await onSave({ name, email });
+      await onSave({ name, email, phone_number: phoneNumber });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,6 +34,10 @@ export default function ParticipantForm({ evaluator, onSave, onClose }) {
       <label className={styles.field}>
         <span>이름</span>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" />
+      </label>
+      <label className={styles.field}>
+        <span>전화번호</span>
+        <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="010-1234-5678" />
       </label>
       <div className={styles.actions}>
         <Button type="submit" size="sm" loading={loading}>

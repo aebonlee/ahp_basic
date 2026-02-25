@@ -15,6 +15,7 @@ import EvaluationProgress from '../components/evaluation/EvaluationProgress';
 import AhpIntroduction from '../components/evaluation/AhpIntroduction';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HelpButton from '../components/common/HelpButton';
+import { findEvaluatorId } from '../lib/evaluatorUtils';
 import { usePairwiseComparison } from '../hooks/usePairwiseComparison';
 import { CR_THRESHOLD } from '../lib/constants';
 import styles from './PairwiseRatingPage.module.css';
@@ -42,8 +43,8 @@ export default function PairwiseRatingPage() {
 
   // evaluators.id (FK target) vs user?.id (auth UUID) — must use evaluators.id
   const evaluatorId = useMemo(() => {
-    return evaluators.find(e => e.user_id === user?.id)?.id || null;
-  }, [evaluators, user?.id]);
+    return findEvaluatorId(evaluators, user, id);
+  }, [evaluators, user?.id, id]);
 
   // 설문 완료 여부 체크 → 미완료면 pre-survey로 리다이렉트
   useEffect(() => {

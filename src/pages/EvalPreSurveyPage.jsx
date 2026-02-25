@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useEvaluators } from '../hooks/useEvaluators';
 import { useSurveyQuestions, useSurveyConfig, useSurveyResponses, useConsentRecords } from '../hooks/useSurvey';
 import { EVAL_METHOD } from '../lib/constants';
+import { findEvaluatorId } from '../lib/evaluatorUtils';
 import PageLayout from '../components/layout/PageLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
@@ -29,8 +30,8 @@ export default function EvalPreSurveyPage() {
   const [validationErrors, setValidationErrors] = useState({});
 
   const evaluatorId = useMemo(() => {
-    return evaluators.find(e => e.user_id === user?.id)?.id || null;
-  }, [evaluators, user?.id]);
+    return findEvaluatorId(evaluators, user, id);
+  }, [evaluators, user?.id, id]);
 
   // 프로젝트 eval_method 로드
   const [evalMethod, setEvalMethod] = useState(null);
