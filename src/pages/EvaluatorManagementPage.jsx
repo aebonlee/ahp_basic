@@ -30,9 +30,8 @@ export default function EvaluatorManagementPage() {
 
   const inviteUrl = `${window.location.origin}${window.location.pathname}#/eval/invite/${id}`;
 
-  const handleCopyLink = (evalId) => {
-    const url = `${inviteUrl}?eval=${evalId}`;
-    navigator.clipboard.writeText(url);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(inviteUrl);
     toast.success('초대 링크가 복사되었습니다.');
   };
 
@@ -101,7 +100,7 @@ export default function EvaluatorManagementPage() {
                   <td>{ev.email}</td>
                   <td>{ev.completed ? '완료' : '미완료'}</td>
                   <td>
-                    <button className={common.linkAction} onClick={() => handleCopyLink(ev.id)}>
+                    <button className={common.linkAction} onClick={handleCopyLink}>
                       링크 복사
                     </button>
                     <button className={common.linkActionDanger} onClick={() => handleDeleteEvaluator(ev.id)}>
