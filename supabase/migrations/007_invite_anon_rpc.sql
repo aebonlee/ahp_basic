@@ -31,17 +31,3 @@ BEGIN
     AND evaluators.phone_number LIKE '%' || p_phone_last4;
 END;
 $$;
-
--- 3) 전화번호 인증 후 익명 사용자 ↔ 평가자 연결
---    signInAnonymously() 후 호출하여 evaluator.user_id를 설정
-CREATE OR REPLACE FUNCTION public.link_evaluator_to_user(p_evaluator_id UUID)
-RETURNS void
-LANGUAGE plpgsql SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  UPDATE evaluators
-  SET user_id = auth.uid()
-  WHERE id = p_evaluator_id;
-END;
-$$;

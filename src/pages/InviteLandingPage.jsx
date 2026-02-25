@@ -118,23 +118,10 @@ export default function InviteLandingPage() {
     setVerifying(false);
   };
 
-  const completeVerification = async (ev) => {
-    setVerifying(true);
-    try {
-      // 익명 로그인 → evaluator.user_id 연결 → 기존 RLS 정책 그대로 작동
-      const { error: anonError } = await supabase.auth.signInAnonymously();
-      if (anonError) throw anonError;
-
-      await supabase.rpc('link_evaluator_to_user', { p_evaluator_id: ev.id });
-
-      sessionStorage.setItem(`evaluator_${token}`, ev.id);
-      setEvaluator(ev);
-      setStatus('ready');
-    } catch (err) {
-      console.error('Anonymous sign-in failed:', err);
-      setVerifyError('인증 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
-    setVerifying(false);
+  const completeVerification = (ev) => {
+    sessionStorage.setItem(`evaluator_${token}`, ev.id);
+    setEvaluator(ev);
+    setStatus('ready');
   };
 
   const handleStartEval = () => {
