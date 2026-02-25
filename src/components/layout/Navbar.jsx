@@ -87,6 +87,10 @@ export default function Navbar({ projectName }) {
                 </button>
               )}
 
+              {user?.email === 'aebon@kakao.com' && (
+                <button className={styles.saBadge} onClick={() => navigate('/superadmin')}>SA</button>
+              )}
+
               {isAdmin && !isPreviewMode && (
                 <span className={styles.roleBadge}>연구자</span>
               )}

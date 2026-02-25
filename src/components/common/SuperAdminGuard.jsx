@@ -1,0 +1,24 @@
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import LoadingSpinner from './LoadingSpinner';
+
+const SUPERADMIN_EMAIL = 'aebon@kakao.com';
+
+export default function SuperAdminGuard({ children }) {
+  const { user, isLoggedIn, loading, profileLoading } = useAuth();
+  const location = useLocation();
+
+  if (loading || profileLoading) {
+    return <LoadingSpinner message="인증 확인 중..." />;
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (user?.email !== SUPERADMIN_EMAIL) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}

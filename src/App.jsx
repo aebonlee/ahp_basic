@@ -7,6 +7,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import AdminGuard from './components/common/AdminGuard';
+import SuperAdminGuard from './components/common/SuperAdminGuard';
 import EvaluatorGuard from './components/common/EvaluatorGuard';
 import ToastContainer from './components/common/Toast';
 import LoadingSpinner from './components/common/LoadingSpinner';
@@ -35,6 +36,7 @@ const PairwiseRatingPage = lazy(() => import('./pages/PairwiseRatingPage'));
 const DirectInputPage = lazy(() => import('./pages/DirectInputPage'));
 const EvalResultPage = lazy(() => import('./pages/EvalResultPage'));
 const EvalPreSurveyPage = lazy(() => import('./pages/EvalPreSurveyPage'));
+const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const FeaturesPage = lazy(() => import('./pages/FeaturesPage'));
 const GuidePage = lazy(() => import('./pages/GuidePage'));
@@ -59,6 +61,9 @@ export default function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/features" element={<FeaturesPage />} />
               <Route path="/guide" element={<GuidePage />} />
+
+              {/* Super Admin */}
+              <Route path="/superadmin" element={<SuperAdminGuard><SuperAdminPage /></SuperAdminGuard>} />
 
               {/* Admin */}
               <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />

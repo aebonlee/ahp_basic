@@ -114,6 +114,25 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* ─── Super Admin badge ─── */
+.saBadge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: var(--radius-round);
+  background: var(--color-danger);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.saBadge:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
 /* ─── Role badge (admin in researcher mode) ─── */
 .roleBadge {
   font-size: 0.72rem;
