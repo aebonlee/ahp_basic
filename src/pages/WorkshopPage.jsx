@@ -6,7 +6,6 @@ import { useEvaluators } from '../hooks/useEvaluators';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { buildPageSequence } from '../lib/pairwiseUtils';
-import { pairCount } from '../lib/ahpEngine';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import ProgressBar from '../components/common/ProgressBar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -20,19 +19,14 @@ export default function WorkshopPage() {
   const { evaluators, loading: evalLoading } = useEvaluators(id);
   const { criteria, loading: critLoading } = useCriteria(id);
   const { alternatives, loading: altLoading } = useAlternatives(id);
-  const [progress, setProgress] = useState({});
+  const [rawComparisons, setRawComparisons] = useState([]);
 
-  const loadProgress = useCallback(async () => {
+  const loadComparisons = useCallback(async () => {
     const { data } = await supabase
       .from('pairwise_comparisons')
-      .select('evaluator_id')
+      .select('evaluator_id, criterion_id, row_id, col_id')
       .eq('project_id', id);
-
-    const counts = {};
-    for (const row of (data || [])) {
-      counts[row.evaluator_id] = (counts[row.evaluator_id] || 0) + 1;
-    }
-    setProgress(counts);
+    setRawComparisons(data || []);
   }, [id]);
 
   useEffect(() => {
@@ -44,23 +38,41 @@ export default function WorkshopPage() {
         table: 'pairwise_comparisons',
         filter: `project_id=eq.${id}`,
       }, () => {
-        loadProgress();
+        loadComparisons();
       })
       .subscribe();
 
-    loadProgress();
+    loadComparisons();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [id, loadProgress]);
+  }, [id, loadComparisons]);
 
-  // Calculate total required comparisons
-  const totalRequired = useMemo(() => {
-    if (criteria.length === 0) return 0;
+  // Build page sequence and valid pair keys
+  const { totalRequired, validKeys } = useMemo(() => {
+    if (criteria.length === 0) return { totalRequired: 0, validKeys: new Set() };
     const pages = buildPageSequence(criteria, alternatives, id);
-    return pages.reduce((sum, page) => sum + pairCount(page.items.length), 0);
+    const keys = new Set();
+    for (const page of pages) {
+      for (const pair of page.pairs) {
+        keys.add(`${page.parentId}:${pair.left.id}:${pair.right.id}`);
+      }
+    }
+    return { totalRequired: keys.size, validKeys: keys };
   }, [criteria, alternatives, id]);
+
+  // Count only valid comparisons per evaluator (exclude orphaned DB rows)
+  const progress = useMemo(() => {
+    const counts = {};
+    for (const row of rawComparisons) {
+      const key = `${row.criterion_id}:${row.row_id}:${row.col_id}`;
+      if (validKeys.has(key)) {
+        counts[row.evaluator_id] = (counts[row.evaluator_id] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [rawComparisons, validKeys]);
 
   if (projLoading || critLoading || altLoading || evalLoading) {
     return <ProjectLayout><LoadingSpinner /></ProjectLayout>;
