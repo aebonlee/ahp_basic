@@ -35,6 +35,7 @@ BEGIN
 END; $$;
 
 -- 3) 전체 프로젝트 목록 (소유자 이메일 포함)
+DROP FUNCTION IF EXISTS public.sa_list_projects();
 CREATE OR REPLACE FUNCTION public.sa_list_projects()
 RETURNS TABLE(id UUID, name TEXT, description TEXT, status INTEGER,
               created_at TIMESTAMPTZ, owner_email TEXT)
