@@ -17,9 +17,9 @@ import styles from './WorkshopPage.module.css';
 export default function WorkshopPage() {
   const { id } = useParams();
   const { currentProject, loading: projLoading } = useProject(id);
-  const { evaluators } = useEvaluators(id);
-  const { criteria } = useCriteria(id);
-  const { alternatives } = useAlternatives(id);
+  const { evaluators, loading: evalLoading } = useEvaluators(id);
+  const { criteria, loading: critLoading } = useCriteria(id);
+  const { alternatives, loading: altLoading } = useAlternatives(id);
   const [progress, setProgress] = useState({});
 
   const loadProgress = useCallback(async () => {
@@ -60,9 +60,11 @@ export default function WorkshopPage() {
     if (criteria.length === 0) return 0;
     const pages = buildPageSequence(criteria, alternatives, id);
     return pages.reduce((sum, page) => sum + pairCount(page.items.length), 0);
-  }, [criteria, alternatives]);
+  }, [criteria, alternatives, id]);
 
-  if (projLoading) return <ProjectLayout><LoadingSpinner /></ProjectLayout>;
+  if (projLoading || critLoading || altLoading || evalLoading) {
+    return <ProjectLayout><LoadingSpinner /></ProjectLayout>;
+  }
 
   return (
     <ProjectLayout projectName={currentProject?.name}>
@@ -84,7 +86,7 @@ export default function WorkshopPage() {
                   <div className={styles.evalRow}>
                     <span className={styles.evalName}>{ev.name}</span>
                     <span className={ev.completed ? styles.evalStatusDone : styles.evalStatusPending}>
-                      {ev.completed ? '완료' : `${count} / ${totalRequired}`}
+                      {count} / {totalRequired}{ev.completed ? ' (완료)' : ''}
                     </span>
                   </div>
                   <ProgressBar
