@@ -42,6 +42,7 @@ const FeaturesPage = lazy(() => import('./pages/FeaturesPage'));
 const GuidePage = lazy(() => import('./pages/GuidePage'));
 const ManualPage = lazy(() => import('./pages/ManualPage'));
 const StatisticalAnalysisPage = lazy(() => import('./pages/StatisticalAnalysisPage'));
+const SurveyStatsPage = lazy(() => import('./pages/SurveyStatsPage'));
 
 export default function App() {
   return (
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="/features" element={<FeaturesPage />} />
               <Route path="/guide" element={<GuidePage />} />
               <Route path="/manual" element={<ManualPage />} />
+              <Route path="/survey-stats" element={<SurveyStatsPage />} />
 
               {/* Super Admin */}
               <Route path="/superadmin" element={<SuperAdminGuard><SuperAdminPage /></SuperAdminGuard>} />
