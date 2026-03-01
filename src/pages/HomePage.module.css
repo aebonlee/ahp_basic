@@ -1,24 +1,22 @@
-/* ─── Hero ─── */
+/* ─── Hero (compact, books.dreamitbiz.com style) ─── */
 .hero {
   position: relative;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px var(--spacing-xl) 80px;
-  background: #0a0f1e;
+  padding: 120px var(--spacing-xl) 80px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 40%, #1e3a8a 100%);
   overflow: hidden;
 }
 
-/* 4-color radial gradient background layer */
+/* Decorative blur circles */
 .heroBgGradient {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 25% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 75% 25%, rgba(124, 58, 237, 0.12) 0%, transparent 45%),
-    radial-gradient(circle at 60% 70%, rgba(8, 145, 178, 0.10) 0%, transparent 45%),
-    radial-gradient(circle at 30% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 40%);
+    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.20) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, rgba(14, 165, 233, 0.10) 0%, transparent 45%);
   pointer-events: none;
 }
 
@@ -35,38 +33,38 @@
 }
 
 .heroOrb1 {
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 200px;
   top: 10%;
   left: 15%;
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(59, 130, 246, 0.20);
   animation: orbDrift1 24s ease-in-out infinite;
 }
 
 .heroOrb2 {
-  width: 250px;
-  height: 250px;
+  width: 160px;
+  height: 160px;
   top: 20%;
   right: 10%;
-  background: rgba(124, 58, 237, 0.15);
+  background: rgba(99, 102, 241, 0.15);
   animation: orbDrift2 20s ease-in-out infinite;
 }
 
 .heroOrb3 {
-  width: 200px;
-  height: 200px;
+  width: 140px;
+  height: 140px;
   bottom: 15%;
   right: 25%;
-  background: rgba(8, 145, 178, 0.14);
+  background: rgba(14, 165, 233, 0.12);
   animation: orbDrift3 28s ease-in-out infinite;
 }
 
 .heroOrb4 {
-  width: 180px;
-  height: 180px;
+  width: 120px;
+  height: 120px;
   bottom: 20%;
   left: 10%;
-  background: rgba(5, 150, 105, 0.12);
+  background: rgba(99, 102, 241, 0.10);
   animation: orbDrift4 22s ease-in-out infinite;
 }
 
@@ -251,15 +249,14 @@
   align-items: center;
   gap: 8px;
   padding: 6px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(203, 213, 225, 0.9);
-  margin-bottom: 32px;
-  background: rgba(148, 163, 184, 0.08);
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 28px;
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -279,33 +276,23 @@
 }
 
 .heroTitle {
-  font-size: 4rem;
-  font-weight: 800;
+  font-size: 3.2rem;
+  font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.04em;
-  color: #f1f5f9;
-  margin-bottom: 28px;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 24px;
 }
 
 .heroAccent {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 30%, #06b6d4 65%, #10b981 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 8s ease-in-out infinite;
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  color: #dbeafe;
 }
 
 .heroDesc {
-  font-size: 1.1rem;
-  line-height: var(--line-height-relaxed);
-  color: rgba(148, 163, 184, 0.8);
-  margin-bottom: 44px;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: #dbeafe;
+  margin-bottom: 36px;
 }
 
 .brMobile { display: none; }
@@ -323,29 +310,29 @@
   padding: 14px 32px;
   border: none;
   border-radius: 8px;
-  background: #0066CC;
-  color: #fff;
+  background: #ffffff;
+  color: #1d4ed8;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 12px rgba(0, 102, 204, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 .ctaPrimary:hover {
-  background: #004C99;
+  background: #F7F9FC;
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 102, 204, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .ctaSecondary {
   padding: 14px 32px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -354,43 +341,13 @@
 
 .ctaSecondary:hover {
   border-color: rgba(255, 255, 255, 0.5);
-  color: #fff;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Scroll indicator */
-.scrollDown {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-}
-
-.scrollMouse {
-  width: 24px;
-  height: 38px;
-  border: 2px solid rgba(148, 163, 184, 0.3);
-  border-radius: 12px;
-  position: relative;
-}
-
-.scrollDot {
-  width: 3px;
-  height: 8px;
-  background: rgba(148, 163, 184, 0.6);
-  border-radius: 3px;
-  position: absolute;
-  left: 50%;
-  top: 6px;
-  transform: translateX(-50%);
-  animation: scrollBounce 1.8s infinite;
-}
-
-@keyframes scrollBounce {
-  0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
-  50% { opacity: 1; transform: translateX(-50%) translateY(10px); }
-}
+/* Scroll indicator (hidden in compact hero) */
+.scrollDown { display: none; }
+.scrollMouse { display: none; }
+.scrollDot { display: none; }
 
 /* ─── Stats Bar ─── */
 .statsBar {
@@ -416,7 +373,7 @@
   display: block;
   font-size: 2rem;
   font-weight: 800;
-  color: #0066CC;
+  color: #0046C8;
   letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
@@ -446,7 +403,7 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #0066CC;
+  color: #0046C8;
   margin-bottom: 12px;
 }
 
@@ -486,7 +443,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #0066CC;
+  color: #0046C8;
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -494,7 +451,7 @@
 }
 
 .moreLink:hover {
-  color: #004C99;
+  color: #002E8A;
   gap: 10px;
 }
 
@@ -548,14 +505,14 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #0066CC, #3385D6);
+  background: linear-gradient(90deg, #0046C8, #4A8FE7);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .featureCard:hover {
-  border-color: #0066CC;
+  border-color: #0046C8;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   transform: translateY(-4px);
 }
@@ -569,7 +526,7 @@
   height: 52px;
   border-radius: 8px;
   background: #F7F9FC;
-  color: #0066CC;
+  color: #0046C8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -595,7 +552,7 @@
   right: 24px;
   font-size: 3rem;
   font-weight: 800;
-  color: rgba(0, 102, 204, 0.05);
+  color: rgba(0, 70, 200, 0.05);
   line-height: 1;
   pointer-events: none;
 }
@@ -627,7 +584,7 @@
 
 /* ─── Process ─── */
 .process {
-  background: #0066CC;
+  background: #0046C8;
   padding: 100px 0;
 }
 
@@ -724,7 +681,7 @@
 .statCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border-color: #0066CC;
+  border-color: #0046C8;
 }
 
 .statCardIcon {
@@ -762,8 +719,8 @@
   width: 600px;
   height: 400px;
   background:
-    radial-gradient(circle at 40% 50%, rgba(0, 102, 204, 0.04) 0%, transparent 60%),
-    radial-gradient(circle at 60% 50%, rgba(0, 76, 153, 0.03) 0%, transparent 60%);
+    radial-gradient(circle at 40% 50%, rgba(0, 70, 200, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 60% 50%, rgba(0, 46, 138, 0.03) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -807,10 +764,10 @@
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 60px var(--spacing-md) 80px; min-height: 90vh; }
+  .hero { padding: 100px var(--spacing-md) 60px; }
 
   .heroTitle {
-    font-size: 2.4rem;
+    font-size: 2rem;
   }
 
   .heroDesc {

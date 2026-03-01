@@ -86,32 +86,22 @@ export default function HomePage() {
 
   return (
     <PublicLayout>
-      {/* ─── Hero ─── */}
+      {/* ─── Hero (compact, books style) ─── */}
       <section className={styles.hero}>
         <div className={styles.heroBgGradient} />
         <div className={styles.heroOrb1} />
         <div className={styles.heroOrb2} />
         <div className={styles.heroOrb3} />
         <div className={styles.heroOrb4} />
-        <div className={styles.heroGrid} />
-        <div className={styles.heroHierarchy}>
-          <div className={styles.hierNode1} />
-          <div className={styles.hierNode2} />
-          <div className={styles.hierNode3} />
-          <div className={styles.hierNode4} />
-          <div className={styles.hierNode5} />
-        </div>
         <div className={styles.heroContent}>
           <p className={styles.heroBadge}>
-            <span className={styles.badgeDot} />
             Decision Analysis Platform
           </p>
           <h1 className={styles.heroTitle}>
-            The Best Decision.<br />
-            <span className={styles.heroAccent}>AHP Basic.</span>
+            체계적 의사결정 분석을 위한<br />
+            <span className={styles.heroAccent}>올인원 AHP 플랫폼</span>
           </h1>
           <p className={styles.heroDesc}>
-            체계적 의사결정 분석을 위한 올인원 AHP 플랫폼.<br />
             다기준 의사결정 문제를 계층적으로 분석하고,<br className={styles.brMobile} />
             최적의 대안을 과학적으로 도출하세요.
           </p>
@@ -132,12 +122,6 @@ export default function HomePage() {
                 </button>
               </>
             )}
-          </div>
-        </div>
-        {/* Scroll indicator */}
-        <div className={styles.scrollDown}>
-          <div className={styles.scrollMouse}>
-            <div className={styles.scrollDot} />
           </div>
         </div>
       </section>

@@ -1,25 +1,126 @@
+/* ── Footer (books.dreamitbiz.com style) ── */
 .footer {
-  background: var(--color-dark);
-  border-top: 1px solid var(--color-dark-border);
-  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(180deg, #111827 0%, #0A0F1A 100%);
+  color: #fff;
+  padding: 64px 0 32px;
   margin-top: auto;
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 0 1rem;
 }
 
-.links a {
-  color: var(--color-text-muted);
-  transition: color var(--transition-fast);
+@media (min-width: 640px) { .inner { padding: 0 1.5rem; } }
+@media (min-width: 1024px) { .inner { padding: 0 2rem; } }
+
+/* Grid layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
 }
 
-.links a:hover {
-  color: var(--color-primary-light);
+@media (min-width: 768px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: 2fr 1.5fr 1.3fr; }
+}
+
+/* Brand section */
+.brandName {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.brandDream { color: #4A8FE7; }
+.brandIt { color: #FFFFFF; }
+.brandBiz { color: #4A8FE7; }
+
+.brandDesc {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.companyInfo {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.companyInfo p {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  margin-bottom: 4px;
+  line-height: 1.7;
+}
+
+.companyInfo p strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Section headings */
+.section h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #FFFFFF;
+}
+
+/* Links list */
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  columns: 2;
+  column-gap: 24px;
+}
+
+.linkList li {
+  margin-bottom: 8px;
+  break-inside: avoid;
+}
+
+.linkList a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+  line-height: 1.6;
+}
+
+.linkList a:hover {
+  color: #93C5FD;
+}
+
+/* Contact info */
+.section p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+
+.hours {
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* Copyright bottom */
+.bottom {
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bottom p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
 }
