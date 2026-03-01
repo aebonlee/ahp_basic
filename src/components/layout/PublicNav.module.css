@@ -27,25 +27,32 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
   text-decoration: none;
 }
 
+.logo:hover,
+.logo:focus,
+.logo:active {
+  text-decoration: none;
+}
+
 .logoMark {
-  background: #0046C8;
+  background: linear-gradient(135deg, #0046C8 0%, #002E8A 100%);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.08em;
+  box-shadow: 0 2px 8px rgba(0, 70, 200, 0.25);
 }
 
 .logoText {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
 }
@@ -68,16 +75,44 @@
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s ease;
+  position: relative;
   white-space: nowrap;
+}
+
+.navLink:hover,
+.navLink:focus,
+.navLink:active {
+  text-decoration: none;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 14px;
+  right: 14px;
+  height: 3px;
+  background: #0046C8;
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
 .navLink:hover {
   color: #0046C8;
 }
 
+.navLink:hover::after {
+  transform: scaleX(1);
+}
+
 .navLink.active {
   color: #0046C8;
   font-weight: 600;
+}
+
+.navLink.active::after {
+  transform: scaleX(1);
 }
 
 .navActions {
