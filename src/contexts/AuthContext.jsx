@@ -79,6 +79,11 @@ export function AuthProvider({ children }) {
         dispatch({ type: 'SET_SESSION', payload: session });
         if (session?.user) {
           loadProfile(session.user.id);
+          // signup_domain + visited_sites 자동 설정
+          supabase.rpc('check_user_status', {
+            target_user_id: session.user.id,
+            current_domain: window.location.hostname,
+          }).catch(() => {}); // 실패해도 로그인 흐름에 영향 없음
         } else {
           dispatch({ type: 'SET_PROFILE', payload: null });
         }
