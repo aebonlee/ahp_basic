@@ -1,164 +1,46 @@
-/* ── Footer (compact, www.dreamitbiz.com style) ── */
+/* ── Footer (Dashboard — simple) ── */
 .footer {
-  background: linear-gradient(180deg, #111827 0%, #0A0F1A 100%);
-  color: #fff;
-  padding: 48px 0 24px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 24px 1rem;
   margin-top: auto;
 }
 
 .inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-@media (min-width: 640px) { .inner { padding: 0 1.5rem; } }
-@media (min-width: 1024px) { .inner { padding: 0 2rem; } }
-
-/* Grid layout */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-  margin-bottom: 24px;
-}
-
-@media (min-width: 900px) {
-  .grid { grid-template-columns: 1fr 1fr; }
-}
-
-@media (min-width: 1200px) {
-  .grid { grid-template-columns: 2fr 1.5fr 1.3fr; gap: 40px; }
-}
-
-/* Brand section */
-.brandName {
-  font-size: 22px;
+.brand {
+  font-size: 0.95rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  color: #0046C8;
+  letter-spacing: -0.01em;
 }
 
-.brandDream { color: #4A8FE7; }
-.brandIt { color: #FFFFFF; }
-.brandBiz { color: #4A8FE7; }
-
-.brandDesc {
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-  margin-bottom: 0;
-  font-size: 14px;
+.sub {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.companyInfo {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.companyInfo p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
-  margin-bottom: 3px;
-  line-height: 1.6;
-}
-
-.companyInfo p strong {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* Section headings */
-.section h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #FFFFFF;
-  letter-spacing: 0.02em;
-}
-
-/* Links list */
-.linkList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  columns: 2;
-  column-gap: 24px;
-}
-
-.linkList li {
-  margin-bottom: 6px;
-  break-inside: avoid;
-}
-
-.linkList a {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color 0.2s ease;
-  line-height: 1.5;
-}
-
-.linkList a:hover {
-  color: #93C5FD;
-}
-
-/* Contact info */
-.section p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 13px;
-  margin-bottom: 5px;
-  line-height: 1.6;
-}
-
-.hours {
-  margin-top: 8px;
-  font-style: italic;
-}
-
-/* Family Site dropdown */
-.family {
-  margin-top: 14px;
-}
-
-.family select {
-  width: 100%;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 5px;
-  font-size: 12px;
-  cursor: pointer;
-  appearance: auto;
-}
-
-.family select:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.family select option {
-  background: #1f2937;
-  color: #e5e7eb;
-}
-
-/* Copyright bottom */
-.bottom {
-  text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.bottom p {
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 12px;
+.copy {
+  font-size: 0.75rem;
+  color: #cbd5e1;
 }
 
 /* ─── Responsive ─── */
-@media (max-width: 768px) {
-  .footer { padding: 36px 0 20px; }
-  .grid { gap: 28px; }
-}
-
-@media (max-width: 480px) {
-  .footer { padding: 28px 0 16px; }
-  .brandName { font-size: 18px; }
+@media (max-width: 640px) {
+  .inner {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
 }
