@@ -53,6 +53,19 @@ const FEATURES = [
   },
 ];
 
+const STAT_FEATURES = [
+  { icon: '📊', title: '기술통계', desc: '평균, 표준편차, 왜도, 첨도 등' },
+  { icon: '📏', title: '독립표본 T검정', desc: '두 집단 간 평균 차이 검정' },
+  { icon: '🔁', title: '대응표본 T검정', desc: '사전-사후 비교 등 대응 검정' },
+  { icon: '📈', title: '일원분산분석', desc: '3개 이상 집단 간 평균 비교' },
+  { icon: '📋', title: '카이제곱 검정', desc: '범주형 변수 간 독립성 검정' },
+  { icon: '🔗', title: '상관분석', desc: 'Pearson 상관계수 행렬' },
+  { icon: '📉', title: '단순선형회귀', desc: '독립-종속 변수 회귀 분석' },
+  { icon: '✅', title: '크론바흐 알파', desc: '리커트 문항 신뢰도 분석' },
+  { icon: '🗂', title: '교차분석', desc: '빈도표, 비율, 기대빈도, 잔차' },
+  { icon: '📇', title: 'Spearman 순위상관', desc: '비정규 데이터 순위 상관분석' },
+];
+
 const STEPS = [
   { num: '01', title: '프로젝트 생성', desc: '의사결정 주제를 설정하고 프로젝트를 시작합니다.' },
   { num: '02', title: '모델 구축', desc: '브레인스토밍으로 기준과 대안을 계층 구조로 구성합니다.' },
@@ -175,6 +188,29 @@ export default function HomePage() {
             <Link to="/manual" className={styles.moreLinkLight} style={{ marginLeft: 24 }}>
               사용설명서
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Statistics ─── */}
+      <section id="statistics" className={styles.statsSection}>
+        <div className={styles.sectionInner}>
+          <p className={styles.sectionTag}>STATISTICS</p>
+          <h2 className={styles.sectionTitle}>통계 분석</h2>
+          <p className={styles.sectionSub}>SPSS 없이도 주요 통계분석을 바로 수행</p>
+          <div className={styles.statCardGrid}>
+            {STAT_FEATURES.map((s, i) => (
+              <div key={i} className={styles.statCard}>
+                <div className={styles.statCardIcon}>{s.icon}</div>
+                <h3 className={styles.statCardTitle}>{s.title}</h3>
+                <p className={styles.statCardDesc}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className={styles.sectionMore}>
+            <Link to="/features" className={styles.moreLink}>
+              자세히 보기 →
             </Link>
           </div>
         </div>
