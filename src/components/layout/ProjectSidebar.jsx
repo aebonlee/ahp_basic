@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styles from './ProjectSidebar.module.css';
 
@@ -15,13 +16,30 @@ const STEPS = [
   { key: 'statistics',   path: '/statistics',   label: '통계 분석',     step: 11 },
 ];
 
+const STAT_SUBS = [
+  { key: 'descriptive',  label: '기술통계' },
+  { key: 'independentT', label: '독립표본 T검정' },
+  { key: 'pairedT',      label: '대응표본 T검정' },
+  { key: 'anova',        label: '일원분산분석' },
+  { key: 'chiSquare',    label: '카이제곱 검정' },
+  { key: 'correlation',  label: '상관분석' },
+  { key: 'regression',   label: '단순선형회귀' },
+  { key: 'cronbach',     label: '크론바흐 알파' },
+  { key: 'crossTab',     label: '교차분석' },
+];
+
 export default function ProjectSidebar({ projectName, collapsed }) {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
+  const search = location.search;
   const hasProject = !!id;
   const basePath = hasProject ? `/admin/project/${id}` : '';
+  const statsPath = basePath + '/statistics';
+  const isOnStats = hasProject && currentPath === statsPath;
+
+  const [statsOpen, setStatsOpen] = useState(isOnStats);
 
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
@@ -46,7 +64,57 @@ export default function ProjectSidebar({ projectName, collapsed }) {
       <nav className={styles.nav}>
         {STEPS.map((s) => {
           const fullPath = basePath + s.path;
-          const isActive = hasProject && currentPath === fullPath;
+          const isActive = s.key === 'statistics'
+            ? isOnStats
+            : hasProject && currentPath === fullPath;
+
+          if (s.key === 'statistics') {
+            return (
+              <div key={s.key}>
+                <button
+                  className={`${styles.menuItem} ${isActive ? styles.active : ''} ${!hasProject ? styles.disabled : ''}`}
+                  onClick={() => {
+                    if (!hasProject) return;
+                    if (isOnStats) {
+                      setStatsOpen(v => !v);
+                    } else {
+                      navigate(fullPath);
+                      setStatsOpen(true);
+                    }
+                  }}
+                  disabled={!hasProject}
+                  title={collapsed ? s.label : undefined}
+                >
+                  <span className={styles.stepNum}>{s.step}</span>
+                  {!collapsed && (
+                    <>
+                      <span className={styles.menuLabel}>{s.label}</span>
+                      <span className={`${styles.arrow} ${statsOpen && isOnStats ? styles.arrowOpen : ''}`}>&#9656;</span>
+                    </>
+                  )}
+                </button>
+                {/* 하위 메뉴 */}
+                {!collapsed && statsOpen && isOnStats && (
+                  <div className={styles.subMenu}>
+                    {STAT_SUBS.map((sub, idx) => {
+                      const subActive = search === `?type=${sub.key}`;
+                      return (
+                        <button
+                          key={sub.key}
+                          className={`${styles.subItem} ${subActive ? styles.subActive : ''}`}
+                          onClick={() => navigate(`${statsPath}?type=${sub.key}`)}
+                        >
+                          <span className={styles.subNum}>{idx + 1}</span>
+                          <span>{sub.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <button
               key={s.key}

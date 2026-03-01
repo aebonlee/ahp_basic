@@ -2,8 +2,8 @@
  * 통계분석 페이지 — SPSS 대체 통계분석
  * 3단계 UI: 분석 유형 카드 선택 → 변수 설정 → 결과 표시
  */
-import { useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import VariableSelector from '../components/statistics/VariableSelector';
@@ -30,8 +30,12 @@ const ANALYSIS_CARDS = [
   { key: 'crossTab',     icon: '\u{1F5C2}', title: '교차분석',         desc: '빈도표, 비율, 기대빈도, 잔차' },
 ];
 
+const VALID_TYPES = new Set(ANALYSIS_CARDS.map(c => c.key));
+
 export default function StatisticalAnalysisPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const {
     loading, variables, respondentCount,
     getNumericValues, getCategoricalValues,
@@ -42,9 +46,18 @@ export default function StatisticalAnalysisPage() {
   const [analysisType, setAnalysisType] = useState(null);
   const [result, setResult] = useState(null);
 
+  // URL ?type= 파라미터로 바로 분석 유형 진입
+  useEffect(() => {
+    const typeParam = searchParams.get('type');
+    if (typeParam && VALID_TYPES.has(typeParam)) {
+      setAnalysisType(typeParam);
+      setStep('config');
+      setResult(null);
+    }
+  }, [searchParams]);
+
   const handleSelectAnalysis = (key) => {
-    setAnalysisType(key);
-    setStep('config');
+    navigate(`/admin/project/${id}/statistics?type=${key}`, { replace: true });
   };
 
   const handleBack = () => {
@@ -54,6 +67,7 @@ export default function StatisticalAnalysisPage() {
     } else {
       setStep('select');
       setAnalysisType(null);
+      navigate(`/admin/project/${id}/statistics`, { replace: true });
     }
   };
 
@@ -182,7 +196,7 @@ export default function StatisticalAnalysisPage() {
         <div className={styles.resultWrap}>
           <div className={styles.resultHeader}>
             <button className={styles.backBtn} onClick={handleBack}>&larr; 변수 변경</button>
-            <button className={styles.backBtn} onClick={() => { setStep('select'); setAnalysisType(null); setResult(null); }}>
+            <button className={styles.backBtn} onClick={() => { setStep('select'); setAnalysisType(null); setResult(null); navigate(`/admin/project/${id}/statistics`, { replace: true }); }}>
               &larr; 다른 분석
             </button>
             <button className={styles.exportBtn} onClick={handleExport}>

@@ -161,6 +161,75 @@
   display: flex;
   align-items: center;
   word-break: keep-all;
+  flex: 1;
+}
+
+/* 화살표 토글 */
+.arrow {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  transition: transform 200ms ease;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.arrowOpen {
+  transform: rotate(90deg);
+}
+
+/* 하위 메뉴 */
+.subMenu {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  border-left: 2px solid var(--color-primary-border, #c7d2fe);
+  margin-left: 26px;
+  padding: 2px 0;
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.subItem:hover {
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.subActive {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: var(--color-primary-bg);
+}
+
+.subNum {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.subActive .subNum {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 /* Mobile */
