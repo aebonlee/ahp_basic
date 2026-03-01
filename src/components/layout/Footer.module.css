@@ -1,8 +1,8 @@
-/* ── Footer (www.dreamitbiz.com style) ── */
+/* ── Footer (compact, www.dreamitbiz.com style) ── */
 .footer {
   background: linear-gradient(180deg, #111827 0%, #0A0F1A 100%);
   color: #fff;
-  padding: 80px 0 32px;
+  padding: 48px 0 24px;
   margin-top: auto;
 }
 
@@ -19,8 +19,8 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 48px;
-  margin-bottom: 40px;
+  gap: 32px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 900px) {
@@ -28,14 +28,14 @@
 }
 
 @media (min-width: 1200px) {
-  .grid { grid-template-columns: 2fr 1.5fr 1.3fr; }
+  .grid { grid-template-columns: 2fr 1.5fr 1.3fr; gap: 40px; }
 }
 
 /* Brand section */
 .brandName {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .brandDream { color: #4A8FE7; }
@@ -43,35 +43,36 @@
 .brandBiz { color: #4A8FE7; }
 
 .brandDesc {
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.7;
-  margin-bottom: 24px;
-  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: 0;
+  font-size: 14px;
 }
 
 .companyInfo {
-  margin-top: 24px;
-  padding-top: 24px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .companyInfo p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  margin-bottom: 6px;
-  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-bottom: 3px;
+  line-height: 1.6;
 }
 
 .companyInfo p strong {
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Section headings */
 .section h4 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: #FFFFFF;
+  letter-spacing: 0.02em;
 }
 
 /* Links list */
@@ -80,20 +81,20 @@
   padding: 0;
   margin: 0;
   columns: 2;
-  column-gap: 28px;
+  column-gap: 24px;
 }
 
 .linkList li {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   break-inside: avoid;
 }
 
 .linkList a {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  font-size: 15px;
+  font-size: 13px;
   transition: color 0.2s ease;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .linkList a:hover {
@@ -102,36 +103,36 @@
 
 /* Contact info */
 .section p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 15px;
-  margin-bottom: 10px;
-  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  margin-bottom: 5px;
+  line-height: 1.6;
 }
 
 .hours {
-  margin-top: 12px;
+  margin-top: 8px;
   font-style: italic;
 }
 
 /* Family Site dropdown */
 .family {
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .family select {
   width: 100%;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  font-size: 12px;
   cursor: pointer;
   appearance: auto;
 }
 
 .family select:hover {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .family select option {
@@ -142,24 +143,22 @@
 /* Copyright bottom */
 .bottom {
   text-align: center;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .bottom p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
 }
 
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
-  .footer { padding: 48px 0 24px; }
+  .footer { padding: 36px 0 20px; }
+  .grid { gap: 28px; }
 }
 
 @media (max-width: 480px) {
-  .footer { padding: 36px 0 20px; }
-  .brandName { font-size: 20px; }
-  .brandDesc { font-size: 14px; }
-  .linkList a { font-size: 14px; }
-  .bottom p { font-size: 12px; }
+  .footer { padding: 28px 0 16px; }
+  .brandName { font-size: 18px; }
 }
