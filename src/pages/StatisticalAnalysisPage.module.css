@@ -105,6 +105,180 @@
   background: var(--color-success-dark, #059669);
 }
 
+/* ── 가이드 카드 ── */
+.guideCard {
+  border-style: dashed;
+  background: var(--color-bg);
+}
+
+/* ── 통계 가이드 ── */
+.guideWrap {
+  margin-top: var(--spacing-sm);
+}
+
+.guideHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.guideTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.guideSectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-md) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-primary-bg);
+}
+
+/* 분석 선택 안내 리스트 */
+.guideList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.guideItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.guideItem:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.guideQ {
+  color: var(--color-text);
+  flex: 1;
+}
+
+.guideA {
+  color: var(--color-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+/* 가이드 테이블 */
+.guideTableWrap {
+  overflow-x: auto;
+}
+
+.guideTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.guideTable th,
+.guideTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border-light);
+  text-align: left;
+}
+
+.guideTable th {
+  background: var(--color-primary-bg);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.guideTable td {
+  color: var(--color-text);
+}
+
+.guideTable tbody tr:hover {
+  background: var(--color-bg);
+}
+
+/* 체크리스트 */
+.guideChecklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.guideChecklist li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 0.88rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.guideChecklist li::before {
+  content: '\2610';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  font-size: 1.05rem;
+  color: var(--color-primary);
+}
+
+/* 용어 사전 */
+.guideGlossary {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.glossaryItem {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 0.88rem;
+}
+
+.glossaryItem:last-child {
+  border-bottom: none;
+}
+
+.glossaryItem dt {
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 160px;
+  flex-shrink: 0;
+}
+
+.glossaryItem dd {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
 /* ── 빈 상태 ── */
 .emptyMsg {
   text-align: center;
@@ -140,5 +314,20 @@
 
   .exportBtn {
     margin-left: 0;
+  }
+
+  .guideItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .glossaryItem {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .glossaryItem dt {
+    min-width: unset;
   }
 }

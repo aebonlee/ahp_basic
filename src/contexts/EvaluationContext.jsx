@@ -87,7 +87,7 @@ export function EvaluationProvider({ children }) {
       if (altRes.error) throw altRes.error;
       if (compRes.error) throw compRes.error;
       if (directRes.error) {
-        console.warn('direct_input_values query error (table may not exist yet):', directRes.error.message);
+        // direct_input_values 테이블 미존재 가능 — 무시
       }
 
       dispatch({ type: 'SET_CRITERIA', payload: criteriaRes.data });

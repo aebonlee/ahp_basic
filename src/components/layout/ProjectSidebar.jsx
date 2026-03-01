@@ -27,6 +27,7 @@ const STAT_SUBS = [
   { key: 'cronbach',     label: '크론바흐 알파' },
   { key: 'crossTab',     label: '교차분석' },
   { key: 'spearman',     label: 'Spearman 순위상관' },
+  { key: 'guide',        label: '통계 가이드' },
 ];
 
 export default function ProjectSidebar({ projectName, collapsed }) {

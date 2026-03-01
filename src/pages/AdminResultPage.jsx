@@ -41,10 +41,10 @@ export default function AdminResultPage() {
       ]);
 
       if (compRes.error) {
-        console.error('Failed to load pairwise comparisons:', compRes.error);
+        // pairwise comparisons 로드 실패 — 데이터 없이 계속 진행
       }
       if (directRes.error) {
-        console.warn('Failed to load direct input values:', directRes.error);
+        // direct_input_values 로드 실패 — 테이블 미존재 가능, 무시
       }
 
       // Pairwise comparisons by evaluator
@@ -68,8 +68,8 @@ export default function AdminResultPage() {
       const w = {};
       evaluators.forEach(e => { w[e.id] = 1; });
       setWeights(w);
-    } catch (err) {
-      console.error('loadAllData error:', err);
+    } catch {
+      // 데이터 로드 실패 시 빈 상태로 표시
     } finally {
       setLoading(false);
     }

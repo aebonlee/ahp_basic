@@ -91,6 +91,7 @@ export default function ParticipantPanel({ project }) {
                     type="checkbox"
                     checked={selectedIds.size === evaluators.length && evaluators.length > 0}
                     onChange={toggleAll}
+                    aria-label="전체 선택"
                   />
                 </th>
                 <th>이름</th>
@@ -102,7 +103,7 @@ export default function ParticipantPanel({ project }) {
             <tbody>
               {evaluators.map(ev => (
                 <tr key={ev.id}>
-                  <td><input type="checkbox" checked={selectedIds.has(ev.id)} onChange={() => toggleSelect(ev.id)} /></td>
+                  <td><input type="checkbox" checked={selectedIds.has(ev.id)} onChange={() => toggleSelect(ev.id)} aria-label={`${ev.name} 선택`} /></td>
                   <td>{ev.name}</td>
                   <td>{ev.email}</td>
                   <td>

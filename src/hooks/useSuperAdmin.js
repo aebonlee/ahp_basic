@@ -9,7 +9,6 @@ export function useSuperAdminUsers() {
     setLoading(true);
     const { data, error } = await supabase.rpc('sa_list_users');
     if (error) {
-      console.error('sa_list_users error:', error);
       setUsers([]);
     } else {
       setUsers(data || []);
@@ -41,7 +40,6 @@ export function useSuperAdminProjects() {
     setLoading(true);
     const { data, error } = await supabase.rpc('sa_list_projects');
     if (error) {
-      console.error('sa_list_projects error:', error);
       setProjects([]);
     } else {
       setProjects(data || []);

@@ -77,6 +77,7 @@ export default function SignupPage() {
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="이름 입력"
               required
+              aria-required="true"
               autoFocus
             />
           </label>
@@ -89,6 +90,8 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@example.com"
               required
+              aria-required="true"
+              aria-invalid={!!error}
             />
           </label>
 
@@ -100,6 +103,7 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="6자 이상"
               required
+              aria-required="true"
             />
           </label>
 
@@ -111,6 +115,7 @@ export default function SignupPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="비밀번호 재입력"
               required
+              aria-required="true"
             />
           </label>
 

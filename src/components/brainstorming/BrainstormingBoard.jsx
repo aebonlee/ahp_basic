@@ -124,7 +124,7 @@ export default function BrainstormingBoard({ projectId }) {
     try {
       await importToModel(criteria, alternatives, addCriterion, addAlternative);
     } catch (err) {
-      console.error('Import failed:', err);
+      toast.error('모델 가져오기 실패: ' + (err.message || ''));
     }
   };
 

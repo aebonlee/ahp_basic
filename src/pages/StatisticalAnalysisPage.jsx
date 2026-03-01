@@ -32,7 +32,157 @@ const ANALYSIS_CARDS = [
   { key: 'spearman',     icon: '\u{1F4C7}', title: 'Spearman 순위상관', desc: '비정규 데이터 순위 상관분석' },
 ];
 
-const VALID_TYPES = new Set(ANALYSIS_CARDS.map(c => c.key));
+const VALID_TYPES = new Set([...ANALYSIS_CARDS.map(c => c.key), 'guide']);
+
+const GUIDE_SECTIONS = [
+  {
+    title: '1. 어떤 분석을 선택해야 할까?',
+    content: [
+      { q: '변수 하나의 분포를 파악하고 싶다', a: '기술통계', key: 'descriptive' },
+      { q: '두 집단(예: 남/여)의 평균 차이를 비교하고 싶다', a: '독립표본 T검정', key: 'independentT' },
+      { q: '같은 집단의 사전-사후 차이를 비교하고 싶다', a: '대응표본 T검정', key: 'pairedT' },
+      { q: '3개 이상 집단의 평균 차이를 비교하고 싶다', a: '일원분산분석 (ANOVA)', key: 'anova' },
+      { q: '두 범주형 변수의 연관성을 보고 싶다', a: '카이제곱 검정', key: 'chiSquare' },
+      { q: '두 수치 변수 간 관련성 방향과 크기를 알고 싶다', a: '상관분석 (Pearson)', key: 'correlation' },
+      { q: '순위 데이터이거나 정규분포가 아닌 경우', a: 'Spearman 순위상관', key: 'spearman' },
+      { q: '독립변수(X)로 종속변수(Y)를 예측하고 싶다', a: '단순선형회귀', key: 'regression' },
+      { q: '리커트 척도 문항의 내적 일관성을 확인하고 싶다', a: '크론바흐 알파', key: 'cronbach' },
+      { q: '두 범주형 변수의 빈도/비율/기대빈도를 상세히 보고 싶다', a: '교차분석', key: 'crossTab' },
+    ],
+  },
+  {
+    title: '2. p값 해석 가이드',
+    table: {
+      headers: ['p값 범위', '판정', '의미'],
+      rows: [
+        ['p < 0.001', '매우 유의 (***)', '차이/관계가 매우 강하게 지지됨'],
+        ['p < 0.01', '유의 (**)', '통계적으로 유의한 결과'],
+        ['p < 0.05', '유의 (*)', '일반적 유의수준 충족'],
+        ['p < 0.10', '경계 유의', '추가 데이터 수집 권장'],
+        ['p ≥ 0.10', '유의하지 않음', '귀무가설을 기각하기 어려움'],
+      ],
+    },
+  },
+  {
+    title: '3. 효과크기 해석 기준',
+    table: {
+      headers: ['지표', '작은 효과', '중간 효과', '큰 효과'],
+      rows: [
+        ["Cohen's d (T검정)", '0.2', '0.5', '0.8'],
+        ['η² (ANOVA)', '0.01', '0.06', '0.14'],
+        ['r (상관)', '0.1', '0.3', '0.5'],
+        ["Cramér's V (χ²)", '0.1', '0.3', '0.5'],
+        ['R² (회귀)', '0.02', '0.13', '0.26'],
+      ],
+    },
+  },
+  {
+    title: '4. 크론바흐 알파 신뢰도 기준',
+    table: {
+      headers: ['α 범위', '신뢰도 판단', '권고'],
+      rows: [
+        ['α ≥ 0.9', '매우 우수', '그대로 사용'],
+        ['0.8 ≤ α < 0.9', '우수', '그대로 사용'],
+        ['0.7 ≤ α < 0.8', '양호', '그대로 사용 (탐색적 연구)'],
+        ['0.6 ≤ α < 0.7', '보통', '항목 제거/수정 검토'],
+        ['α < 0.6', '미흡', '문항 재구성 필요'],
+      ],
+    },
+  },
+  {
+    title: '5. 분석 전 체크리스트',
+    checklist: [
+      '데이터 수집이 완료되었는지 확인 (응답자 수 ≥ 30 권장)',
+      '결측값이나 이상치가 없는지 기술통계로 먼저 확인',
+      '수치형 변수와 범주형 변수를 구분하여 적절한 분석 선택',
+      'T검정/ANOVA는 수치형 종속변수 + 범주형 독립변수 필요',
+      '상관/회귀 분석은 두 변수 모두 수치형이어야 함',
+      '카이제곱/교차분석은 두 변수 모두 범주형이어야 함',
+      '크론바흐 알파는 같은 척도(리커트)의 문항 3개 이상 필요',
+    ],
+  },
+  {
+    title: '6. 용어 사전',
+    glossary: [
+      { term: '귀무가설 (H₀)', def: '차이/관계가 없다는 가설. p값이 0.05 미만이면 기각' },
+      { term: '자유도 (df)', def: '통계량 계산에 사용된 독립적 정보의 수' },
+      { term: '표준편차 (SD)', def: '데이터가 평균에서 얼마나 퍼져 있는지 나타내는 척도' },
+      { term: '왜도 (Skewness)', def: '분포의 비대칭 정도. 0이면 대칭, 양수면 오른쪽 꼬리' },
+      { term: '첨도 (Kurtosis)', def: '분포의 꼬리 두께. 0이면 정규분포, 양수면 뾰족한 분포' },
+      { term: 'Bonferroni 보정', def: 'ANOVA 사후검정에서 다중 비교 시 유의수준을 조정하는 방법' },
+    ],
+  },
+];
+
+function StatsGuide({ onBack, onSelect }) {
+  return (
+    <div className={styles.guideWrap}>
+      <div className={styles.guideHeader}>
+        <button className={styles.backBtn} onClick={onBack}>&larr; 분석 선택</button>
+        <h2 className={styles.guideTitle}>통계 분석 가이드</h2>
+      </div>
+
+      {GUIDE_SECTIONS.map((section, si) => (
+        <section key={si} className={styles.guideSection}>
+          <h3 className={styles.guideSectionTitle}>{section.title}</h3>
+
+          {/* 분석 선택 안내 (클릭 가능) */}
+          {section.content && (
+            <div className={styles.guideList}>
+              {section.content.map((item, i) => (
+                <button
+                  key={i}
+                  className={styles.guideItem}
+                  onClick={() => onSelect(item.key)}
+                >
+                  <span className={styles.guideQ}>{item.q}</span>
+                  <span className={styles.guideA}>&rarr; {item.a}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* 테이블 형태 */}
+          {section.table && (
+            <div className={styles.guideTableWrap}>
+              <table className={styles.guideTable}>
+                <thead>
+                  <tr>{section.table.headers.map((h, i) => <th key={i}>{h}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {section.table.rows.map((row, ri) => (
+                    <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{cell}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* 체크리스트 */}
+          {section.checklist && (
+            <ul className={styles.guideChecklist}>
+              {section.checklist.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          )}
+
+          {/* 용어 사전 */}
+          {section.glossary && (
+            <dl className={styles.guideGlossary}>
+              {section.glossary.map((item, i) => (
+                <div key={i} className={styles.glossaryItem}>
+                  <dt>{item.term}</dt>
+                  <dd>{item.def}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+      ))}
+    </div>
+  );
+}
 
 export default function StatisticalAnalysisPage() {
   const { id } = useParams();
@@ -195,11 +345,19 @@ export default function StatisticalAnalysisPage() {
               <span className={styles.cardDesc}>{card.desc}</span>
             </button>
           ))}
+          <button
+            className={`${styles.card} ${styles.guideCard}`}
+            onClick={() => handleSelectAnalysis('guide')}
+          >
+            <span className={styles.cardIcon}>{'\u{1F4D6}'}</span>
+            <span className={styles.cardTitle}>통계 가이드</span>
+            <span className={styles.cardDesc}>분석 방법 선택 안내 및 해석 가이드</span>
+          </button>
         </div>
       )}
 
-      {/* Step 2: 변수 설정 */}
-      {step === 'config' && (
+      {/* Step 2: 변수 설정 (가이드가 아닌 경우) */}
+      {step === 'config' && analysisType !== 'guide' && (
         <VariableSelector
           analysisType={analysisType}
           variables={variables}
@@ -207,6 +365,11 @@ export default function StatisticalAnalysisPage() {
           onBack={handleBack}
           responseCounts={responseCounts}
         />
+      )}
+
+      {/* 통계 가이드 */}
+      {step === 'config' && analysisType === 'guide' && (
+        <StatsGuide onBack={handleBack} onSelect={handleSelectAnalysis} />
       )}
 
       {/* Step 3: 결과 표시 */}

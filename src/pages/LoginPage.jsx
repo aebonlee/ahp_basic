@@ -103,6 +103,8 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email@example.com"
                   required
+                  aria-required="true"
+                  aria-invalid={!!error}
                   autoFocus
                 />
               </label>
@@ -115,6 +117,8 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="비밀번호 입력"
                   required
+                  aria-required="true"
+                  aria-invalid={!!error}
                 />
               </label>
 

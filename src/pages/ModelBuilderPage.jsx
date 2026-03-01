@@ -4,6 +4,7 @@ import { useProject } from '../hooks/useProjects';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { useConfirm } from '../hooks/useConfirm';
+import { useToast } from '../contexts/ToastContext';
 import { useBrainstormingImport } from '../hooks/useBrainstormingImport';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import CriteriaForm from '../components/model/CriteriaForm';
@@ -32,6 +33,7 @@ export default function ModelBuilderPage() {
   const [orientation, setOrientation] = useState('vertical');
   const [paperMode, setPaperMode] = useState(false);
   const { confirm, confirmDialogProps } = useConfirm();
+  const toast = useToast();
   const { importing, result: importResult, importToModel, clearResult: clearImportResult } = useBrainstormingImport(id);
 
   if (projectLoading || criteriaLoading || altLoading) {
@@ -93,7 +95,7 @@ export default function ModelBuilderPage() {
     try {
       await importToModel(criteria, alternatives, addCriterion, addAlternative);
     } catch (err) {
-      console.error('Brainstorming import failed:', err);
+      toast.error('브레인스토밍 가져오기 실패: ' + (err.message || ''));
     }
   };
 
@@ -125,7 +127,7 @@ export default function ModelBuilderPage() {
         await moveAlternative(draggedId, newIdx);
       }
     } catch (err) {
-      console.error('Move failed:', err);
+      toast.error('이동 실패: ' + (err.message || ''));
     }
   };
 
