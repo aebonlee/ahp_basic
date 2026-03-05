@@ -98,17 +98,8 @@ export function AuthProvider({ children }) {
     }
   }, [state.user?.id]);
 
-  // 저장된 모드 복원
-  useEffect(() => {
-    const savedMode = localStorage.getItem('ahp_mode');
-    if (savedMode && Object.values(USER_MODE).includes(savedMode)) {
-      dispatch({ type: 'SET_MODE', payload: savedMode });
-    }
-  }, []);
-
   const setMode = useCallback((mode) => {
     dispatch({ type: 'SET_MODE', payload: mode });
-    localStorage.setItem('ahp_mode', mode);
   }, []);
 
   // 이메일 로그인

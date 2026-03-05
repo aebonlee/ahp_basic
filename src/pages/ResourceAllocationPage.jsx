@@ -125,10 +125,7 @@ export default function ResourceAllocationPage() {
   const [adjustedPcts, setAdjustedPcts] = useState(null);
   const [constraints, setConstraints] = useState({});
   const [constraintsEnabled, setConstraintsEnabled] = useState(false);
-  const [scenarios, setScenarios] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(`ahp-scenarios-${id}`)) || []; }
-    catch { return []; }
-  });
+  const [scenarios, setScenarios] = useState([]);
   const [scenarioName, setScenarioName] = useState('');
   const [compareMode, setCompareMode] = useState(false);
   const [selectedScenarios, setSelectedScenarios] = useState([]);
@@ -136,10 +133,6 @@ export default function ResourceAllocationPage() {
 
   useEffect(() => { loadProjectData(id); }, [id, loadProjectData]);
 
-  // Sync scenarios to localStorage
-  useEffect(() => {
-    localStorage.setItem(`ahp-scenarios-${id}`, JSON.stringify(scenarios));
-  }, [scenarios, id]);
 
   // ── Feature 1: Completion & CR ──
   const completionInfo = useMemo(() => {

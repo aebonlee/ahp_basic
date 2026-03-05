@@ -17,12 +17,11 @@ export default function Navbar({ projectName }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, mode, setMode, isAdmin, signOut } = useAuth();
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('ahp_theme') === 'dark');
+  const [darkMode, setDarkMode] = useState(false);
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem('ahp_theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
   // Update time every minute
