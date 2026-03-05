@@ -113,8 +113,35 @@ D:\ahp_basic\
 
 ---
 
+## 4. 회원 관리 — 가입 사이트 필터 추가 (`b80cda2`)
+
+### 변경 파일
+
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/pages/SuperAdminPage.jsx` | 도메인 필터 버튼 + 가입 사이트 컬럼 추가 |
+| `src/pages/SuperAdminPage.module.css` | 필터 바, 도메인 배지, 통계 보조 텍스트 스타일 |
+
+### 기능 상세
+
+**필터 버튼 (3개):**
+- **전체**: 모든 사용자 표시
+- **AHP Basic**: `signup_domain === 'ahp-basic.dreamitbiz.com'` 만 표시 (기본 선택)
+- **기타 사이트**: AHP Basic 외 도메인에서 가입한 사용자
+
+**테이블 컬럼 추가:**
+- "가입 사이트" 컬럼 — 도메인 배지로 표시
+- AHP Basic 가입자: 파란색 배지 (`#dbeafe` 배경, `#1d4ed8` 텍스트)
+- 기타: 회색 배지
+
+**통계 영역:**
+- 필터 적용 시: `{필터 회원 수} 필터 회원 / {전체}명 중` 형식으로 표시
+
+---
+
 ## 검증
 
 - `git fetch origin` 성공 (리모트 동기화 확인)
-- `git status` — 코드 변경 없음 확인
-- GitHub 리포지토리 접근 정상 확인
+- `npm run build` 성공 (6.42s)
+- `npm run deploy` Published
+- 총 2건 커밋 (`244d087`, `b80cda2`)
