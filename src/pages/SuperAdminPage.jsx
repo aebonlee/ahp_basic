@@ -14,8 +14,21 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
+const DOMAIN_FILTERS = [
+  { value: 'all', label: '전체' },
+  { value: 'ahp-basic.dreamitbiz.com', label: 'AHP Basic' },
+  { value: 'other', label: '기타 사이트' },
+];
+
 function UsersTab({ toast }) {
   const { users, loading, updateRole } = useSuperAdminUsers();
+  const [domainFilter, setDomainFilter] = useState('ahp-basic.dreamitbiz.com');
+
+  const filteredUsers = users.filter(u => {
+    if (domainFilter === 'all') return true;
+    if (domainFilter === 'other') return u.signup_domain && u.signup_domain !== 'ahp-basic.dreamitbiz.com';
+    return u.signup_domain === domainFilter;
+  });
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -32,11 +45,26 @@ function UsersTab({ toast }) {
     <>
       <div className={styles.stats}>
         <div className={styles.stat}>
-          <strong>{users.length}</strong>전체 회원
+          <strong>{filteredUsers.length}</strong>
+          {domainFilter === 'all' ? '전체 회원' : '필터 회원'}
+          {domainFilter !== 'all' && (
+            <span className={styles.statSub}> / {users.length}명 중</span>
+          )}
         </div>
         <div className={styles.stat}>
-          <strong>{users.filter(u => u.role === 'admin').length}</strong>관리자
+          <strong>{filteredUsers.filter(u => u.role === 'admin').length}</strong>관리자
         </div>
+      </div>
+      <div className={styles.filterBar}>
+        {DOMAIN_FILTERS.map(f => (
+          <button
+            key={f.value}
+            className={`${styles.filterBtn} ${domainFilter === f.value ? styles.filterBtnActive : ''}`}
+            onClick={() => setDomainFilter(f.value)}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
       <div className={styles.tableWrap}>
         <table className={styles.table}>
@@ -44,15 +72,21 @@ function UsersTab({ toast }) {
             <tr>
               <th>이메일</th>
               <th>이름</th>
+              <th>가입 사이트</th>
               <th>역할</th>
               <th>가입일</th>
             </tr>
           </thead>
           <tbody>
-            {users.map(u => (
+            {filteredUsers.map(u => (
               <tr key={u.id}>
                 <td>{u.email}</td>
                 <td>{u.display_name || '-'}</td>
+                <td>
+                  <span className={styles.domainBadge} data-site={u.signup_domain === 'ahp-basic.dreamitbiz.com' ? 'ahp' : 'other'}>
+                    {u.signup_domain || '-'}
+                  </span>
+                </td>
                 <td>
                   <select
                     className={styles.roleSelect}
