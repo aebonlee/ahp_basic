@@ -31,6 +31,13 @@ const STAT_SUBS = [
   { key: 'guide',        label: '통계 가이드' },
 ];
 
+const AI_SUBS = [
+  { key: 'chatbot',      label: 'AI 분석 챗봇' },
+  { key: 'paperDraft',   label: '논문 초안 생성' },
+  { key: 'reference',    label: '참고문헌 관리' },
+  { key: 'researchEval', label: '연구 평가/조언' },
+];
+
 export default function ProjectSidebar({ projectName, collapsed }) {
   const { id } = useParams();
   const location = useLocation();
@@ -40,9 +47,12 @@ export default function ProjectSidebar({ projectName, collapsed }) {
   const hasProject = !!id;
   const basePath = hasProject ? `/admin/project/${id}` : '';
   const statsPath = basePath + '/statistics';
+  const aiPath = basePath + '/ai-analysis';
   const isOnStats = hasProject && currentPath === statsPath;
+  const isOnAi = hasProject && currentPath === aiPath;
 
   const [statsOpen, setStatsOpen] = useState(isOnStats);
+  const [aiOpen, setAiOpen] = useState(isOnAi);
 
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
@@ -69,7 +79,9 @@ export default function ProjectSidebar({ projectName, collapsed }) {
           const fullPath = basePath + s.path;
           const isActive = s.key === 'statistics'
             ? isOnStats
-            : hasProject && currentPath === fullPath;
+            : s.key === 'ai-analysis'
+              ? isOnAi
+              : hasProject && currentPath === fullPath;
 
           if (s.key === 'statistics') {
             return (
@@ -96,7 +108,6 @@ export default function ProjectSidebar({ projectName, collapsed }) {
                     </>
                   )}
                 </button>
-                {/* 하위 메뉴 */}
                 {!collapsed && statsOpen && isOnStats && (
                   <div className={styles.subMenu}>
                     {STAT_SUBS.map((sub, idx) => {
@@ -106,6 +117,52 @@ export default function ProjectSidebar({ projectName, collapsed }) {
                           key={sub.key}
                           className={`${styles.subItem} ${subActive ? styles.subActive : ''}`}
                           onClick={() => navigate(`${statsPath}?type=${sub.key}`)}
+                        >
+                          <span className={styles.subNum}>{idx + 1}</span>
+                          <span>{sub.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          if (s.key === 'ai-analysis') {
+            return (
+              <div key={s.key}>
+                <button
+                  className={`${styles.menuItem} ${isActive ? styles.active : ''} ${!hasProject ? styles.disabled : ''}`}
+                  onClick={() => {
+                    if (!hasProject) return;
+                    if (isOnAi) {
+                      setAiOpen(v => !v);
+                    } else {
+                      navigate(fullPath);
+                      setAiOpen(true);
+                    }
+                  }}
+                  disabled={!hasProject}
+                  title={collapsed ? s.label : undefined}
+                >
+                  <span className={styles.stepNum}>{s.step}</span>
+                  {!collapsed && (
+                    <>
+                      <span className={styles.menuLabel}>{s.label}</span>
+                      <span className={`${styles.arrow} ${aiOpen && isOnAi ? styles.arrowOpen : ''}`}>&#9656;</span>
+                    </>
+                  )}
+                </button>
+                {!collapsed && aiOpen && isOnAi && (
+                  <div className={styles.subMenu}>
+                    {AI_SUBS.map((sub, idx) => {
+                      const subActive = search === `?type=${sub.key}`;
+                      return (
+                        <button
+                          key={sub.key}
+                          className={`${styles.subItem} ${subActive ? styles.subActive : ''}`}
+                          onClick={() => navigate(`${aiPath}?type=${sub.key}`)}
                         >
                           <span className={styles.subNum}>{idx + 1}</span>
                           <span>{sub.label}</span>
