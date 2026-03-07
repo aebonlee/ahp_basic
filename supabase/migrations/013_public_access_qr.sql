@@ -14,7 +14,8 @@ ALTER TABLE public.projects
 ALTER TABLE public.evaluators
   ADD COLUMN IF NOT EXISTS registration_source TEXT DEFAULT 'admin';
 
--- 2) get_project_for_invite 확장 — public_access_enabled 반환 추가
+-- 2) get_project_for_invite 확장 — 반환 타입 변경을 위해 DROP 후 재생성
+DROP FUNCTION IF EXISTS public.get_project_for_invite(UUID);
 CREATE OR REPLACE FUNCTION public.get_project_for_invite(p_project_id UUID)
 RETURNS TABLE(id UUID, name TEXT, public_access_enabled BOOLEAN)
 LANGUAGE plpgsql SECURITY DEFINER STABLE
