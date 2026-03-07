@@ -156,7 +156,7 @@ export default function EvaluatorManagementPage() {
                       </div>
                       <span className={styles.progressPct}>{pct}%</span>
                     </td>
-                    <td>{ev.completed ? '완료' : '미완료'}</td>
+                    <td>{(ev.completed || pct >= 100) ? '완료' : '미완료'}</td>
                     <td>
                       <button className={common.linkAction} onClick={handleCopyLink}>
                         링크 복사
