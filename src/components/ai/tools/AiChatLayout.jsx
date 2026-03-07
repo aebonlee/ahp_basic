@@ -31,13 +31,12 @@ export default function AiChatLayout({
     chatEndRef, textareaRef,
   } = useAiChat(systemPrompt);
 
+  // requireData=true: 데이터 필수 (chatbot, paperDraft)
+  // requireData=false: 데이터 없어도 사용 가능 (reference, researchEval)
   const canUse = requireData ? hasData : true;
-  const showTemplates = canUse && messages.length === 0;
-  const showEmpty = requireData && !hasData && messages.length === 0;
-
-  if (ctxLoading) {
-    return <LoadingSpinner message="데이터 로딩 중..." />;
-  }
+  const showLoading = ctxLoading && requireData && messages.length === 0;
+  const showTemplates = canUse && !(ctxLoading && requireData) && messages.length === 0;
+  const showEmpty = !ctxLoading && requireData && !hasData && messages.length === 0;
 
   return (
     <>
@@ -55,6 +54,12 @@ export default function AiChatLayout({
         />
 
         <div className={styles.chatArea}>
+          {showLoading && (
+            <div className={styles.emptyState}>
+              <LoadingSpinner message="데이터 로딩 중..." />
+            </div>
+          )}
+
           {showEmpty && (
             <div className={styles.emptyState}>
               <p className={styles.emptyIcon}>📋</p>

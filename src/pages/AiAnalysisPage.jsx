@@ -1,7 +1,6 @@
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import { useProject } from '../hooks/useProjects';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import AiChatbotTool from '../components/ai/tools/AiChatbotTool';
 import AiPaperDraftTool from '../components/ai/tools/AiPaperDraftTool';
 import AiReferenceTool from '../components/ai/tools/AiReferenceTool';
@@ -27,14 +26,10 @@ export default function AiAnalysisPage() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { currentProject, loading } = useProject(id);
+  const { currentProject } = useProject(id);
 
   const type = searchParams.get('type');
   const ToolComponent = type ? TOOL_COMPONENTS[type] : null;
-
-  if (loading) {
-    return <ProjectLayout><LoadingSpinner message="로딩 중..." /></ProjectLayout>;
-  }
 
   const basePath = `/admin/project/${id}/ai-analysis`;
 
