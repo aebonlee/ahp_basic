@@ -297,7 +297,7 @@ function StepConsent({ config, savingField, onBlur, onLoadTemplate }) {
 }
 
 /* ============================================
-   STEP 3: 인구통계 (기존 compact 스타일)
+   STEP 3: 인구통계 (Google Forms 스타일 — 항상 편집 가능)
    ============================================ */
 function StepQuestions({
   title, desc, category, questions: filteredQs,
@@ -328,12 +328,46 @@ function StepQuestions({
           </button>
         </div>
       )}
-      {filteredQs.map((q, idx) => (
-        <QuestionCard key={q.id} question={q} index={idx} total={filteredQs.length}
-          isActive={activeId === q.id} onActivate={() => setActiveId(q.id)}
-          onUpdate={onUpdate} onDelete={onDelete} onDuplicate={onDuplicate}
-          onMove={(i, d) => onMove(i, d, filteredQs)} />
-      ))}
+
+      <div className={styles.gfLayout}>
+        <div className={styles.gfCards}>
+          {filteredQs.map((q, idx) => (
+            <GFormCard key={q.id} question={q} index={idx} total={filteredQs.length}
+              isActive={activeId === q.id} onActivate={() => setActiveId(q.id)}
+              onUpdate={onUpdate} onDelete={onDelete} onDuplicate={onDuplicate}
+              onMove={(i, d) => onMove(i, d, filteredQs)} />
+          ))}
+        </div>
+
+        <div className={styles.gfToolbar}>
+          <div className={styles.gfToolbarInner}>
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'short_text')} title="단답형 추가">
+              <span className={styles.gfToolIcon}>Tt</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'long_text')} title="장문형 추가">
+              <span className={styles.gfToolIcon}>≡</span>
+            </button>
+            <div className={styles.gfToolDivider} />
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'radio')} title="객관식 추가">
+              <span className={styles.gfToolIcon}>⊙</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'checkbox')} title="체크박스 추가">
+              <span className={styles.gfToolIcon}>☑</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'dropdown')} title="드롭다운 추가">
+              <span className={styles.gfToolIcon}>▾</span>
+            </button>
+            <div className={styles.gfToolDivider} />
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'number')} title="숫자 추가">
+              <span className={styles.gfToolIcon}>#</span>
+            </button>
+            <button className={styles.gfToolBtn} onClick={() => onAdd(category, 'likert')} title="리커트 추가">
+              <span className={styles.gfToolIcon}>⊕</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className={styles.addBtnArea}>
         <button className={styles.addBtn} onClick={() => onAdd(category)}>
           <span className={styles.addBtnIcon}>+</span> 질문 추가
@@ -569,91 +603,6 @@ function GFormCard({ question, index, total, isActive, onActivate, onUpdate, onD
             <input type="checkbox" checked={question.required} onChange={handleRequiredChange} />
           </label>
         </div>
-      </div>
-    </div>
-  );
-}
-
-/* ============================================
-   질문 카드 (STEP 3 compact 용)
-   ============================================ */
-function QuestionCard({ question, index, total, isActive, onActivate, onUpdate, onDelete, onDuplicate, onMove }) {
-  const [text, setText] = useState(question.question_text);
-  const [options, setOptions] = useState(question.options || []);
-  const needsOptions = NEEDS_OPTIONS.includes(question.question_type);
-
-  const handleTextBlur = () => {
-    if (text !== question.question_text) onUpdate(question.id, { question_text: text });
-  };
-  const handleTypeChange = (e) => {
-    const newType = e.target.value;
-    const updates = { question_type: newType };
-    if (NEEDS_OPTIONS.includes(newType) && options.length === 0) {
-      const defaultOpts = newType === 'likert'
-        ? ['매우 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
-        : ['옵션 1', '옵션 2'];
-      updates.options = defaultOpts;
-      setOptions(defaultOpts);
-    }
-    onUpdate(question.id, updates);
-  };
-  const handleRequiredChange = (e) => onUpdate(question.id, { required: e.target.checked });
-  const handleOptionChange = (optIdx, value) => {
-    const next = [...options]; next[optIdx] = value; setOptions(next);
-  };
-  const handleOptionBlur = () => onUpdate(question.id, { options });
-  const handleAddOption = () => {
-    const next = [...options, `옵션 ${options.length + 1}`]; setOptions(next);
-    onUpdate(question.id, { options: next });
-  };
-  const handleRemoveOption = (optIdx) => {
-    const next = options.filter((_, i) => i !== optIdx); setOptions(next);
-    onUpdate(question.id, { options: next });
-  };
-
-  return (
-    <div className={`${styles.questionCard} ${isActive ? styles.active : ''}`} onClick={onActivate}>
-      <div className={styles.leftBar} />
-      <div className={styles.cardContent}>
-        <div className={styles.questionTop}>
-          <input className={styles.questionInput} value={text} onChange={e => setText(e.target.value)} onBlur={handleTextBlur} placeholder={`질문 ${index + 1}`} />
-          {isActive && (
-            <select className={styles.typeSelect} value={question.question_type} onChange={handleTypeChange} onClick={e => e.stopPropagation()}>
-              {QUESTION_TYPES.map(t => (<option key={t.value} value={t.value}>{t.label}</option>))}
-            </select>
-          )}
-        </div>
-        {isActive && needsOptions ? (
-          <div className={styles.optionsEditor}>
-            {options.map((opt, optIdx) => (
-              <div key={optIdx} className={styles.optionRow}>
-                {question.question_type === 'radio' && <div className={styles.optionDot} />}
-                {question.question_type === 'checkbox' && <div className={styles.optionSquare} />}
-                {(question.question_type === 'dropdown' || question.question_type === 'likert') && <span className={styles.optionNumber}>{optIdx + 1}.</span>}
-                <input className={styles.optionInput} value={opt} onChange={e => handleOptionChange(optIdx, e.target.value)} onBlur={handleOptionBlur} onClick={e => e.stopPropagation()} />
-                <button className={styles.removeOptionBtn} onClick={e => { e.stopPropagation(); handleRemoveOption(optIdx); }} title="삭제">✕</button>
-              </div>
-            ))}
-            <div className={styles.addOptionRow}>
-              {question.question_type === 'radio' && <div className={styles.optionDot} />}
-              {question.question_type === 'checkbox' && <div className={styles.optionSquare} />}
-              {(question.question_type === 'dropdown' || question.question_type === 'likert') && <span className={styles.optionNumber}>{options.length + 1}.</span>}
-              <button className={styles.addOptionText} onClick={e => { e.stopPropagation(); handleAddOption(); }}>옵션 추가</button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.previewArea}><QuestionPreview type={question.question_type} options={options} /></div>
-        )}
-        {isActive && (
-          <div className={styles.bottomBar} onClick={e => e.stopPropagation()}>
-            <button className={styles.bottomBarBtn} onClick={() => onDuplicate(question)} title="복제">⧉</button>
-            <button className={styles.bottomBarBtnDanger} onClick={() => onDelete(question.id)} title="삭제">🗑</button>
-            <button className={styles.bottomBarBtn} onClick={() => onMove(index, -1)} disabled={index === 0} title="위로">▲</button>
-            <button className={styles.bottomBarBtn} onClick={() => onMove(index, 1)} disabled={index === total - 1} title="아래로">▼</button>
-            <div className={styles.divider} />
-            <label className={styles.requiredToggle}>필수 <input type="checkbox" checked={question.required} onChange={handleRequiredChange} /></label>
-          </div>
-        )}
       </div>
     </div>
   );
