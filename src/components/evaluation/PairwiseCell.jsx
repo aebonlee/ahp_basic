@@ -16,6 +16,8 @@ export default function PairwiseCell({ index, isLeft, isCenter, isRight, isSelec
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
-    />
+    >
+      {isSelected && <span className={styles.checkmark}>✓</span>}
+    </div>
   );
 }
