@@ -4,18 +4,20 @@ export default function AlternativeResultView({ criterionName, items, priorities
   return (
     <div className={styles.resultBlock}>
       <h4 className={styles.blockTitle}>{criterionName}</h4>
-      {items.map((item, idx) => {
-        const pct = (priorities[idx] || 0) * 100;
-        return (
-          <div key={item.id} className={styles.barRow}>
-            <span className={styles.barLabel}>{item.name}</span>
-            <div className={styles.barTrack}>
-              <div className={styles.barFill} style={{ width: `${pct}%`, backgroundColor: 'var(--color-level-2)' }} />
+      <div className={styles.barList}>
+        {items.map((item, idx) => {
+          const pct = (priorities[idx] || 0) * 100;
+          return (
+            <div key={item.id} className={styles.barRow}>
+              <span className={styles.barLabel}>{item.name}</span>
+              <div className={styles.barTrack}>
+                <div className={styles.barFill} style={{ width: `${pct}%`, backgroundColor: 'var(--color-level-2)' }} />
+              </div>
+              <span className={styles.barValue}>{pct.toFixed(3)}%</span>
             </div>
-            <span className={styles.barValue}>{pct.toFixed(3)}%</span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

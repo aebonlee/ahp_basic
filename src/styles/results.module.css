@@ -35,8 +35,8 @@
 
 .barList {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 5px var(--spacing-sm);
+  grid-template-columns: minmax(80px, auto) 1fr minmax(76px, auto);
+  gap: 6px var(--spacing-md);
   align-items: center;
 }
 
@@ -55,7 +55,9 @@
 .barLabel {
   text-align: right;
   font-size: 0.88rem;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
+  line-height: 1.3;
   color: var(--color-text);
 }
 
@@ -72,10 +74,11 @@
 }
 
 .barTrack {
-  height: 20px;
+  height: 24px;
   background: var(--color-bg-alt);
   border-radius: var(--radius-sm);
   overflow: hidden;
+  min-width: 60px;
 }
 
 .barFill {
@@ -86,17 +89,25 @@
 }
 
 .barValue {
-  min-width: 64px;
+  min-width: 76px;
   text-align: right;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
   font-family: var(--font-mono);
-  color: var(--color-text-light);
+  color: var(--color-text);
+  white-space: nowrap;
+  background: var(--color-bg, #f9fafb);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-light);
 }
 
 .barValueTop {
   font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--color-text);
+  font-size: 0.92rem;
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary-light);
 }
 
 /* Table */
@@ -128,11 +139,15 @@
 .skip { color: var(--color-text-muted); }
 
 .crBadge {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--color-text-muted);
   margin-left: var(--spacing-sm);
   font-family: var(--font-mono);
+  background: var(--color-bg, #f9fafb);
+  padding: 1px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-light);
 }
 
 /* Detail */
