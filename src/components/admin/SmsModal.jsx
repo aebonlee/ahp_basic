@@ -138,7 +138,7 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
           <div className={styles.body}>
             {/* 왼쪽: 수신자 선택 */}
             <div className={styles.panelLeft}>
-              <label className={styles.sectionLabel}>수신자 선택</label>
+              <label className={`${styles.sectionLabel} ${styles.sectionLabelGreen}`}>수신자 선택</label>
               <div className={styles.recipientList}>
                 <label className={styles.recipientRow}>
                   <input
