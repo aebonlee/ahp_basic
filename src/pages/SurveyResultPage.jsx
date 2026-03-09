@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useSurveyQuestions, useSurveyResponses } from '../hooks/useSurvey';
 import { useEvaluators } from '../hooks/useEvaluators';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import SmsModal from '../components/admin/SmsModal';
 import common from '../styles/common.module.css';
 import styles from './SurveyResultPage.module.css';
 
@@ -25,6 +26,7 @@ export default function SurveyResultPage() {
   const { questions, loading: qLoading } = useSurveyQuestions(id);
   const { responses, loading: rLoading, getResponsesByQuestion } = useSurveyResponses(id);
   const { evaluators } = useEvaluators(id);
+  const [smsModalOpen, setSmsModalOpen] = useState(false);
 
   const respondedIds = useMemo(
     () => new Set(responses.map(r => r.evaluator_id)),
@@ -59,7 +61,12 @@ export default function SurveyResultPage() {
 
       {evaluators.length > 0 && (
         <div className={styles.statusCard}>
-          <h3 className={styles.statusTitle}>평가자별 현황</h3>
+          <div className={styles.statusHeader}>
+            <h3 className={styles.statusTitle}>평가자별 현황</h3>
+            <button className={styles.smsBtn} onClick={() => setSmsModalOpen(true)}>
+              SMS 발송
+            </button>
+          </div>
           <div className={styles.statusGrid}>
             {evaluators.map(ev => (
               <div key={ev.id} className={styles.statusItem}>
@@ -79,6 +86,13 @@ export default function SurveyResultPage() {
           </div>
         </div>
       )}
+
+      <SmsModal
+        isOpen={smsModalOpen}
+        onClose={() => setSmsModalOpen(false)}
+        evaluators={evaluators}
+        projectId={id}
+      />
 
       {questions.length === 0 ? (
         <div className={styles.emptyMsg}>설계된 설문 질문이 없습니다.</div>
