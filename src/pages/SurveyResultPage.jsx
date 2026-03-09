@@ -92,6 +92,7 @@ export default function SurveyResultPage() {
         onClose={() => setSmsModalOpen(false)}
         evaluators={evaluators}
         projectId={id}
+        respondedIds={respondedIds}
       />
 
       {questions.length === 0 ? (

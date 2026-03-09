@@ -5,7 +5,7 @@
 }
 
 .panelLeft {
-  flex: 0 0 260px;
+  flex: 0 0 290px;
   min-width: 0;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
@@ -39,6 +39,71 @@
 .sectionLabelGreen {
   color: #15803d;
   border-bottom-color: #86efac;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectedBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  background: #16a34a;
+  padding: 2px 8px;
+  border-radius: var(--radius-round);
+}
+
+/* 필터 칩 */
+.filterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.filterChip {
+  padding: 3px 8px;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-round);
+  background: #fff;
+  color: #15803d;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.filterChip:hover:not(:disabled) {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
+
+.filterChipActive {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+  box-shadow: 0 1px 4px rgba(22, 163, 74, 0.3);
+}
+
+.filterChipActive:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.filterCount {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0 4px;
+  border-radius: 6px;
+  min-width: 14px;
+  text-align: center;
+}
+
+.filterChipActive .filterCount {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* 수신자 목록 */
@@ -69,12 +134,36 @@
   cursor: not-allowed;
 }
 
+.recipientRowAll {
+  background: #f0fdf4;
+  border-bottom: 2px solid #86efac;
+  padding: 8px var(--spacing-sm);
+}
+
+.recipientRowAll:hover {
+  background: #dcfce7;
+}
+
+.recipientNameAll {
+  flex: 1;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #15803d;
+}
+
 .recipientName {
   flex: 1;
   font-weight: 500;
 }
 
 .recipientPhone {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+.emptyFilter {
+  padding: 16px;
+  text-align: center;
   color: var(--color-text-muted);
   font-size: 0.82rem;
 }

@@ -17,21 +17,73 @@ const TEMPLATES = [
   { name: '평가 감사', content: '[AHP 설문] 평가에 참여해 주셔서 감사합니다.' },
 ];
 
-export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
+const FILTERS = [
+  { key: 'all', label: '전체' },
+  { key: 'eval_done', label: '평가 완료' },
+  { key: 'eval_pending', label: '평가 미완료' },
+  { key: 'survey_done', label: '설문 완료' },
+  { key: 'survey_pending', label: '설문 미응답' },
+  { key: 'registered', label: '가입 완료' },
+  { key: 'unregistered', label: '미가입' },
+  { key: 'no_phone', label: '번호 없음' },
+];
+
+export default function SmsModal({ isOpen, onClose, evaluators, projectId, respondedIds }) {
   const [message, setMessage] = useState('');
   const [selected, setSelected] = useState(new Set());
   const [sending, setSending] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [results, setResults] = useState(null);
   const [activeTab, setActiveTab] = useState('templates');
+  const [filter, setFilter] = useState('all');
   const textareaRef = useRef(null);
 
   const inviteUrl = `${window.location.origin}${window.location.pathname}#/eval/invite/${projectId}`;
 
-  // 전화번호 있는 평가자만 선택 가능
+  // 설문 관련 필터가 의미있는지 (respondedIds가 전달된 경우만)
+  const hasSurveyData = !!respondedIds;
+
+  // 필터 적용된 평가자 목록
+  const filteredEvaluators = useMemo(() => {
+    return evaluators.filter((ev) => {
+      switch (filter) {
+        case 'eval_done': return ev.completed;
+        case 'eval_pending': return !ev.completed;
+        case 'survey_done': return respondedIds?.has(ev.id);
+        case 'survey_pending': return respondedIds ? !respondedIds.has(ev.id) : true;
+        case 'registered': return !!ev.user_id;
+        case 'unregistered': return !ev.user_id;
+        case 'no_phone': return !ev.phone_number;
+        default: return true;
+      }
+    });
+  }, [evaluators, filter, respondedIds]);
+
+  // 필터된 목록 중 전화번호 있는 평가자만 선택 가능
   const selectableEvaluators = useMemo(
-    () => evaluators.filter((ev) => ev.phone_number),
-    [evaluators]
+    () => filteredEvaluators.filter((ev) => ev.phone_number),
+    [filteredEvaluators]
+  );
+
+  // 현재 필터 항목별 인원수
+  const filterCounts = useMemo(() => {
+    const counts = { all: evaluators.length };
+    counts.eval_done = evaluators.filter((ev) => ev.completed).length;
+    counts.eval_pending = evaluators.filter((ev) => !ev.completed).length;
+    if (hasSurveyData) {
+      counts.survey_done = evaluators.filter((ev) => respondedIds.has(ev.id)).length;
+      counts.survey_pending = evaluators.filter((ev) => !respondedIds.has(ev.id)).length;
+    }
+    counts.registered = evaluators.filter((ev) => !!ev.user_id).length;
+    counts.unregistered = evaluators.filter((ev) => !ev.user_id).length;
+    counts.no_phone = evaluators.filter((ev) => !ev.phone_number).length;
+    return counts;
+  }, [evaluators, respondedIds, hasSurveyData]);
+
+  // 표시할 필터 목록 (설문 데이터 없으면 설문 관련 필터 숨김)
+  const visibleFilters = useMemo(
+    () => FILTERS.filter((f) => hasSurveyData || (f.key !== 'survey_done' && f.key !== 'survey_pending')),
+    [hasSurveyData]
   );
 
   const byteInfo = useMemo(() => getByteInfo(message), [message]);
@@ -47,8 +99,15 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
 
   const handleToggleAll = useCallback(() => {
     setSelected((prev) => {
-      if (prev.size === selectableEvaluators.length) return new Set();
-      return new Set(selectableEvaluators.map((ev) => ev.id));
+      const selectableIds = selectableEvaluators.map((ev) => ev.id);
+      const allChecked = selectableIds.every((id) => prev.has(id));
+      const next = new Set(prev);
+      if (allChecked) {
+        selectableIds.forEach((id) => next.delete(id));
+      } else {
+        selectableIds.forEach((id) => next.add(id));
+      }
+      return next;
     });
   }, [selectableEvaluators]);
 
@@ -105,12 +164,12 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
   };
 
   const selectedCount = selected.size;
-  const allSelected =
+  const allFiltered =
     selectableEvaluators.length > 0 &&
-    selectedCount === selectableEvaluators.length;
+    selectableEvaluators.every((ev) => selected.has(ev.id));
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="SMS 발송" width="780px">
+    <Modal isOpen={isOpen} onClose={handleClose} title="SMS 발송" width="820px">
       {results ? (
         <div className={styles.results}>
           <h4 className={styles.resultsTitle}>발송 결과</h4>
@@ -138,20 +197,40 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
           <div className={styles.body}>
             {/* 왼쪽: 수신자 선택 */}
             <div className={styles.panelLeft}>
-              <label className={`${styles.sectionLabel} ${styles.sectionLabelGreen}`}>수신자 선택</label>
+              <label className={`${styles.sectionLabel} ${styles.sectionLabelGreen}`}>
+                수신자 선택
+                <span className={styles.selectedBadge}>{selectedCount}명 선택</span>
+              </label>
+
+              {/* 필터 칩 */}
+              <div className={styles.filterChips}>
+                {visibleFilters.map((f) => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    className={`${styles.filterChip} ${filter === f.key ? styles.filterChipActive : ''}`}
+                    onClick={() => setFilter(f.key)}
+                    disabled={sending}
+                  >
+                    {f.label}
+                    <span className={styles.filterCount}>{filterCounts[f.key] ?? 0}</span>
+                  </button>
+                ))}
+              </div>
+
               <div className={styles.recipientList}>
-                <label className={styles.recipientRow}>
+                <label className={`${styles.recipientRow} ${styles.recipientRowAll}`}>
                   <input
                     type="checkbox"
-                    checked={allSelected}
+                    checked={allFiltered}
                     onChange={handleToggleAll}
-                    disabled={sending}
+                    disabled={sending || selectableEvaluators.length === 0}
                   />
-                  <span className={styles.recipientName}>
-                    전체 선택 ({selectedCount}/{selectableEvaluators.length}명)
+                  <span className={styles.recipientNameAll}>
+                    전체 선택 ({selectableEvaluators.length}명)
                   </span>
                 </label>
-                {evaluators.map((ev) => {
+                {filteredEvaluators.map((ev) => {
                   const hasPhone = !!ev.phone_number;
                   return (
                     <label
@@ -171,6 +250,9 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
                     </label>
                   );
                 })}
+                {filteredEvaluators.length === 0 && (
+                  <div className={styles.emptyFilter}>해당 조건의 평가자가 없습니다.</div>
+                )}
               </div>
             </div>
 
