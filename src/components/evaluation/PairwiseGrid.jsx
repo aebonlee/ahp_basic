@@ -16,9 +16,11 @@ export default function PairwiseGrid({ pageData, projectId, evaluatorId }) {
       {/* Scale numbers */}
       <div className={styles.scaleNumbers}>
         <span className={styles.labelSpace} />
-        {[9,8,7,6,5,4,3,2,1,2,3,4,5,6,7,8,9].map((n, i) => (
-          <span key={i} className={styles.scaleNum}>{n}</span>
-        ))}
+        <div className={styles.cells}>
+          {[9,8,7,6,5,4,3,2,1,2,3,4,5,6,7,8,9].map((n, i) => (
+            <span key={i} className={styles.scaleNum}>{n}</span>
+          ))}
+        </div>
         <span className={styles.labelSpace} />
       </div>
 

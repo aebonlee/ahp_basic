@@ -45,7 +45,7 @@ export default function PageNavigator({ current, total, pageStatuses, onPrev, on
         variant={current === total - 1 ? 'success' : 'primary'}
         onClick={onNext}
       >
-        {current === total - 1 ? '결과 보기' : '다음 \u2192'}
+        {current === total - 1 ? '\u2714 평가 완료 및 결과 확인' : '다음 \u2192'}
       </Button>
     </div>
   );

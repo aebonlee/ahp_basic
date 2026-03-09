@@ -32,6 +32,7 @@ export default function PairwiseRatingPage() {
   const [showIntro, setShowIntro] = useState(true);
   const [showModel, setShowModel] = useState(false);
   const [projectName, setProjectName] = useState('');
+  const [resultsLayout, setResultsLayout] = useState('bottom');
 
   // Handle #page=N hash navigation (from result page "돌아가기")
   useEffect(() => {
@@ -159,29 +160,49 @@ export default function PairwiseRatingPage() {
               </svg>
               모델 보기
             </button>
+            <button
+              className={styles.layoutBtn}
+              onClick={() => setResultsLayout(l => l === 'bottom' ? 'right' : 'bottom')}
+              title={resultsLayout === 'bottom' ? '결과를 오른쪽에 배치' : '결과를 아래에 배치'}
+            >
+              {resultsLayout === 'bottom' ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/>
+                </svg>
+              )}
+              {resultsLayout === 'bottom' ? '우측 배치' : '하단 배치'}
+            </button>
             <span className={styles.pageNum}>{currentPage + 1}/{pageSequence.length}</span>
             <HelpButton helpKey="evalProgress" />
           </span>
         </div>
 
-        <PairwiseGrid
-          pageData={currentPageData}
-          projectId={id}
-          evaluatorId={evaluatorId}
-        />
-
-        <div className={styles.results}>
-          <PriorityBarChart
-            items={currentPageData.items}
-            priorities={comparison.priorities}
-          />
-          <ConsistencyDisplay cr={comparison.cr} />
-          {comparison.cr > CR_THRESHOLD && comparison.bestFit.length > 0 && (
-            <BestFitHelper
-              recommendations={comparison.bestFit}
-              items={currentPageData.items}
+        <div className={`${styles.body} ${resultsLayout === 'right' ? styles.bodyRight : ''}`}>
+          <div className={styles.gridArea}>
+            <PairwiseGrid
+              pageData={currentPageData}
+              projectId={id}
+              evaluatorId={evaluatorId}
             />
-          )}
+          </div>
+
+          <div className={`${styles.results} ${resultsLayout === 'right' ? styles.resultsRight : ''}`}>
+            <PriorityBarChart
+              items={currentPageData.items}
+              priorities={comparison.priorities}
+            />
+            <ConsistencyDisplay cr={comparison.cr} />
+            {comparison.cr > CR_THRESHOLD && comparison.bestFit.length > 0 && (
+              <BestFitHelper
+                recommendations={comparison.bestFit}
+                items={currentPageData.items}
+              />
+            )}
+          </div>
         </div>
       </div>
 

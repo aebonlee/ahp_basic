@@ -16,6 +16,8 @@ import DetailView from '../components/results/DetailView';
 import SignaturePanel from '../components/results/SignaturePanel';
 import ExportButtons from '../components/results/ExportButtons';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import Button from '../components/common/Button';
+import { supabase } from '../lib/supabaseClient';
 import styles from './EvalResultPage.module.css';
 
 export default function EvalResultPage() {
@@ -26,6 +28,7 @@ export default function EvalResultPage() {
   const { evaluators } = useEvaluators(id);
   const { criteria, alternatives, comparisons, loading, loadProjectData } = useEvaluation();
   const [activeTab, setActiveTab] = useState('summary');
+  const [hasSurvey, setHasSurvey] = useState(false);
 
   const evaluatorId = useMemo(() => {
     return findEvaluatorId(evaluators, user, id);
@@ -36,6 +39,21 @@ export default function EvalResultPage() {
       loadProjectData(id, evaluatorId);
     }
   }, [id, evaluatorId, loadProjectData]);
+
+  // Check if project has pre-survey
+  useEffect(() => {
+    if (!id) return;
+    const check = async () => {
+      const { data: qs } = await supabase
+        .from('survey_questions').select('id').eq('project_id', id).limit(1);
+      const { data: proj } = await supabase
+        .from('projects').select('research_description, consent_text').eq('id', id).single();
+      setHasSurvey(
+        (qs && qs.length > 0) || !!proj?.research_description || !!proj?.consent_text
+      );
+    };
+    check();
+  }, [id]);
 
   // Calculate all results
   const results = useMemo(() => {
@@ -117,6 +135,23 @@ export default function EvalResultPage() {
 
   return (
     <PageLayout>
+      {/* 상단 네비게이션 */}
+      <div className={styles.navBar}>
+        <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}`)}>
+          &larr; 평가로 돌아가기
+        </Button>
+        <div className={styles.navRight}>
+          {hasSurvey && (
+            <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}/pre-survey`)}>
+              설문 응답 확인
+            </Button>
+          )}
+          <Button variant="secondary" onClick={() => navigate('/evaluator')}>
+            평가 목록
+          </Button>
+        </div>
+      </div>
+
       <div className={styles.header}>
         <h1 className={styles.title}>평가 결과</h1>
         <ExportButtons
