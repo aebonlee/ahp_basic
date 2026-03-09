@@ -109,6 +109,133 @@
   line-height: 1.5;
 }
 
+/* ── 분석 안내 박스 (접이식) ── */
+.guideBox {
+  margin-bottom: var(--spacing-md);
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: #5b21b6;
+}
+
+.guideBox summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+
+.guideBox summary:hover {
+  background: #ede9fe;
+  border-radius: var(--radius-md);
+}
+
+.guideBoxContent {
+  padding: 0 14px 12px;
+  line-height: 1.7;
+}
+
+.guideBoxContent dt {
+  font-weight: 600;
+  margin-top: 8px;
+  color: #4c1d95;
+}
+
+.guideBoxContent dd {
+  margin: 2px 0 0 0;
+  color: #6d28d9;
+}
+
+/* ── 구조화된 해석 섹션 ── */
+.interpretSection {
+  padding: 12px 16px;
+  margin-bottom: var(--spacing-md);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md);
+}
+
+.interpretSection h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 0 0 8px;
+}
+
+.interpretList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.interpretItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.82rem;
+  color: #1e40af;
+  line-height: 1.5;
+}
+
+.interpretIcon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  margin-top: 1px;
+}
+
+/* ── 가정 체크리스트 ── */
+.assumptionList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-md);
+}
+
+.assumptionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.assumptionIcon {
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+.assumptionOk {
+  color: #059669;
+}
+
+.assumptionWarn {
+  color: #d97706;
+}
+
+/* ── 표본 크기 경고 ── */
+.sampleWarn {
+  padding: 10px 14px;
+  margin-bottom: var(--spacing-md);
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: #92400e;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── 유의 셀 하이라이트 ── */
+.sigCellHighlight {
+  background: #fef2f2;
+  font-weight: 700;
+  color: #dc2626;
+}
+
 /* ── 에러 ── */
 .error {
   text-align: center;

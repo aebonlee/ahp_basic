@@ -27,6 +27,17 @@
   margin: 0 0 var(--spacing-xs);
 }
 
+.helpText {
+  font-size: 0.82rem;
+  color: #5b21b6;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: var(--spacing-sm) 0;
+  line-height: 1.5;
+}
+
 .subtitle {
   font-size: 0.85rem;
   color: var(--color-text-muted);

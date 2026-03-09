@@ -51,7 +51,27 @@ const GUIDE_SECTIONS = [
     ],
   },
   {
-    title: '2. p값 해석 가이드',
+    title: '2. 변수 유형별 분석 선택 흐름도',
+    flowChart: [
+      { step: '1단계', question: '독립변수(X)는?', options: ['범주형 \u2192 2단계A로', '수치형 \u2192 2단계B로'] },
+      { step: '2단계A', question: '종속변수(Y)는?', options: [
+        '수치형 + 2집단 \u2192 독립표본 T검정',
+        '수치형 + 3+집단 \u2192 ANOVA',
+        '범주형 \u2192 카이제곱 / 교차분석',
+      ]},
+      { step: '2단계B', question: '종속변수(Y)는?', options: [
+        '수치형 \u2192 상관분석 / 회귀분석',
+        '범주형 \u2192 로지스틱 회귀 (미지원)',
+      ]},
+      { step: '특수', question: '특수 상황', options: [
+        '같은 대상 사전-사후 \u2192 대응표본 T검정',
+        '비정규/순위 데이터 \u2192 Spearman',
+        '리커트 척도 신뢰도 \u2192 크론바흐 알파',
+      ]},
+    ],
+  },
+  {
+    title: '3. p값 해석 가이드',
     table: {
       headers: ['p값 범위', '판정', '의미'],
       rows: [
@@ -59,40 +79,55 @@ const GUIDE_SECTIONS = [
         ['p < 0.01', '유의 (**)', '통계적으로 유의한 결과'],
         ['p < 0.05', '유의 (*)', '일반적 유의수준 충족'],
         ['p < 0.10', '경계 유의', '추가 데이터 수집 권장'],
-        ['p ≥ 0.10', '유의하지 않음', '귀무가설을 기각하기 어려움'],
+        ['p \u2265 0.10', '유의하지 않음', '귀무가설을 기각하기 어려움'],
       ],
     },
   },
   {
-    title: '3. 효과크기 해석 기준',
+    title: '4. 효과크기 해석 기준',
     table: {
       headers: ['지표', '작은 효과', '중간 효과', '큰 효과'],
       rows: [
         ["Cohen's d (T검정)", '0.2', '0.5', '0.8'],
-        ['η² (ANOVA)', '0.01', '0.06', '0.14'],
+        ['\u03B7\u00B2 (ANOVA)', '0.01', '0.06', '0.14'],
         ['r (상관)', '0.1', '0.3', '0.5'],
-        ["Cramér's V (χ²)", '0.1', '0.3', '0.5'],
-        ['R² (회귀)', '0.02', '0.13', '0.26'],
+        ["Cram\u00E9r's V (\u03C7\u00B2)", '0.1', '0.3', '0.5'],
+        ['R\u00B2 (회귀)', '0.02', '0.13', '0.26'],
       ],
     },
   },
   {
-    title: '4. 크론바흐 알파 신뢰도 기준',
+    title: '5. 각 분석의 가정(Assumptions)',
     table: {
-      headers: ['α 범위', '신뢰도 판단', '권고'],
+      headers: ['분석 방법', '필수 가정', '위반 시 대안'],
       rows: [
-        ['α ≥ 0.9', '매우 우수', '그대로 사용'],
-        ['0.8 ≤ α < 0.9', '우수', '그대로 사용'],
-        ['0.7 ≤ α < 0.8', '양호', '그대로 사용 (탐색적 연구)'],
-        ['0.6 ≤ α < 0.7', '보통', '항목 제거/수정 검토'],
-        ['α < 0.6', '미흡', '문항 재구성 필요'],
+        ['독립표본 T검정', '정규성, 등분산 (Welch로 완화)', '비모수: Mann-Whitney U'],
+        ['대응표본 T검정', '차이값의 정규성', '비모수: Wilcoxon 부호순위'],
+        ['ANOVA', '정규성, 등분산', '비모수: Kruskal-Wallis'],
+        ['카이제곱', '기대빈도 \u2265 5 (80% 이상 셀)', 'Fisher 정확검정'],
+        ['Pearson 상관', '정규성, 선형 관계', 'Spearman 순위상관'],
+        ['단순선형회귀', '선형성, 독립성, 등분산성, 정규성', '비선형 회귀, 변환'],
+        ['크론바흐 알파', '동일 구성개념 측정, 3+ 문항', '문항 재구성'],
       ],
     },
   },
   {
-    title: '5. 분석 전 체크리스트',
+    title: '6. 크론바흐 알파 신뢰도 기준',
+    table: {
+      headers: ['\u03B1 범위', '신뢰도 판단', '권고'],
+      rows: [
+        ['\u03B1 \u2265 0.9', '매우 우수', '그대로 사용'],
+        ['0.8 \u2264 \u03B1 < 0.9', '우수', '그대로 사용'],
+        ['0.7 \u2264 \u03B1 < 0.8', '양호', '그대로 사용 (탐색적 연구)'],
+        ['0.6 \u2264 \u03B1 < 0.7', '보통', '항목 제거/수정 검토'],
+        ['\u03B1 < 0.6', '미흡', '문항 재구성 필요'],
+      ],
+    },
+  },
+  {
+    title: '7. 분석 전 체크리스트',
     checklist: [
-      '데이터 수집이 완료되었는지 확인 (응답자 수 ≥ 30 권장)',
+      '데이터 수집이 완료되었는지 확인 (응답자 수 \u2265 30 권장)',
       '결측값이나 이상치가 없는지 기술통계로 먼저 확인',
       '수치형 변수와 범주형 변수를 구분하여 적절한 분석 선택',
       'T검정/ANOVA는 수치형 종속변수 + 범주형 독립변수 필요',
@@ -102,14 +137,40 @@ const GUIDE_SECTIONS = [
     ],
   },
   {
-    title: '6. 용어 사전',
+    title: '8. 결과 보고 양식 (학술 논문 기준)',
+    reportTemplates: [
+      { analysis: '독립표본 T검정', template: 't(df) = X.XX, p = .XXX, Cohen\'s d = X.XX' },
+      { analysis: '대응표본 T검정', template: 't(df) = X.XX, p = .XXX, Cohen\'s d = X.XX' },
+      { analysis: 'ANOVA', template: 'F(df1, df2) = X.XX, p = .XXX, \u03B7\u00B2 = .XX' },
+      { analysis: '카이제곱', template: '\u03C7\u00B2(df) = X.XX, p = .XXX, Cram\u00E9r\'s V = .XX' },
+      { analysis: '상관분석', template: 'r(N) = .XX, p = .XXX' },
+      { analysis: '회귀분석', template: 'R\u00B2 = .XX, F(1, N-2) = X.XX, p = .XXX, \u03B2 = X.XX' },
+      { analysis: '크론바흐 알파', template: 'Cronbach\'s \u03B1 = .XX (k = 항목수, N = 응답자수)' },
+    ],
+  },
+  {
+    title: '9. 용어 사전',
     glossary: [
-      { term: '귀무가설 (H₀)', def: '차이/관계가 없다는 가설. p값이 0.05 미만이면 기각' },
+      { term: '귀무가설 (H\u2080)', def: '차이/관계가 없다는 가설. p값이 0.05 미만이면 기각' },
       { term: '자유도 (df)', def: '통계량 계산에 사용된 독립적 정보의 수' },
       { term: '표준편차 (SD)', def: '데이터가 평균에서 얼마나 퍼져 있는지 나타내는 척도' },
+      { term: '표준오차 (SE)', def: '표본 평균의 변동성. SE = SD / \u221AN' },
+      { term: '95% 신뢰구간 (CI)', def: '모평균이 포함될 것으로 예상되는 범위 (95% 확률)' },
       { term: '왜도 (Skewness)', def: '분포의 비대칭 정도. 0이면 대칭, 양수면 오른쪽 꼬리' },
       { term: '첨도 (Kurtosis)', def: '분포의 꼬리 두께. 0이면 정규분포, 양수면 뾰족한 분포' },
+      { term: '결정계수 (R\u00B2)', def: '독립변수가 종속변수 분산을 설명하는 비율 (0~1)' },
       { term: 'Bonferroni 보정', def: 'ANOVA 사후검정에서 다중 비교 시 유의수준을 조정하는 방법' },
+      { term: 'Durbin-Watson', def: '잔차의 자기상관을 검정. 1.5~2.5면 자기상관 없음' },
+    ],
+  },
+  {
+    title: '10. 자주 묻는 질문 (FAQ)',
+    faq: [
+      { q: 'p값이 0.05보다 크면 효과가 없는 건가요?', a: '아닙니다. p값은 표본에서 관찰된 차이가 우연에 의한 것인지를 판단하는 지표일 뿐, 효과의 크기나 실질적 의미를 나타내지 않습니다. 효과크기(Cohen\'s d, \u03B7\u00B2 등)를 함께 확인하세요.' },
+      { q: '표본 크기는 얼마나 필요한가요?', a: '일반적으로 N \u2265 30이 권장됩니다. T검정은 각 그룹 15~20명, ANOVA는 각 그룹 20명 이상, 상관분석은 50명 이상이 바람직합니다.' },
+      { q: 'Pearson과 Spearman 중 어떤 것을 사용해야 하나요?', a: '데이터가 정규분포를 따르고 선형 관계가 예상되면 Pearson, 비정규이거나 순서형 데이터면 Spearman을 사용하세요.' },
+      { q: '카이제곱과 교차분석의 차이는 무엇인가요?', a: '카이제곱은 독립성 검정에 초점, 교차분석은 빈도/비율/잔차 등 상세 분석에 초점을 둡니다. 교차분석이 더 풍부한 정보를 제공합니다.' },
+      { q: '크론바흐 알파가 낮으면 어떻게 해야 하나요?', a: '\'삭제 시 \u03B1\' 값을 확인하여 제거하면 알파가 향상되는 문항을 식별하세요. 항목-총점 상관이 0.3 미만인 항목도 재검토 대상입니다.' },
     ],
   },
 ];
@@ -142,6 +203,23 @@ function StatsGuide({ onBack, onSelect }) {
             </div>
           )}
 
+          {/* 흐름도 */}
+          {section.flowChart && (
+            <div className={styles.flowChart}>
+              {section.flowChart.map((item, i) => (
+                <div key={i} className={styles.flowStep}>
+                  <div className={styles.flowStepLabel}>{item.step}</div>
+                  <div className={styles.flowStepQ}>{item.question}</div>
+                  <ul className={styles.flowOptions}>
+                    {item.options.map((opt, oi) => (
+                      <li key={oi}>{opt}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* 테이블 형태 */}
           {section.table && (
             <div className={styles.guideTableWrap}>
@@ -158,6 +236,25 @@ function StatsGuide({ onBack, onSelect }) {
             </div>
           )}
 
+          {/* 결과 보고 양식 */}
+          {section.reportTemplates && (
+            <div className={styles.guideTableWrap}>
+              <table className={styles.guideTable}>
+                <thead>
+                  <tr><th>분석 방법</th><th>보고 양식</th></tr>
+                </thead>
+                <tbody>
+                  {section.reportTemplates.map((item, i) => (
+                    <tr key={i}>
+                      <td>{item.analysis}</td>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>{item.template}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
           {/* 체크리스트 */}
           {section.checklist && (
             <ul className={styles.guideChecklist}>
@@ -165,6 +262,18 @@ function StatsGuide({ onBack, onSelect }) {
                 <li key={i}>{item}</li>
               ))}
             </ul>
+          )}
+
+          {/* FAQ */}
+          {section.faq && (
+            <div className={styles.faqList}>
+              {section.faq.map((item, i) => (
+                <details key={i} className={styles.faqItem}>
+                  <summary className={styles.faqQ}>Q. {item.q}</summary>
+                  <p className={styles.faqA}>{item.a}</p>
+                </details>
+              ))}
+            </div>
           )}
 
           {/* 용어 사전 */}

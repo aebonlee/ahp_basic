@@ -1,5 +1,5 @@
 /**
- * 통계분석 엔진 — 9개 분석 함수
+ * 통계분석 엔진 — 10개 분석 함수
  * 각 함수는 { summary, details, chartData } 형태로 반환
  */
 import { tCDF, fCDF, chiSquaredCDF } from './statsDistributions';
@@ -107,6 +107,17 @@ function cohensLabel(d) {
   return '미미한 효과';
 }
 
+/** 사분위수 계산 */
+function quartiles(arr) {
+  if (!arr || arr.length < 4) return { q1: 0, q3: 0, iqr: 0 };
+  const sorted = [...arr].sort((a, b) => a - b);
+  const q1Idx = Math.floor(sorted.length * 0.25);
+  const q3Idx = Math.floor(sorted.length * 0.75);
+  const q1 = sorted[q1Idx];
+  const q3 = sorted[q3Idx];
+  return { q1: round(q1), q3: round(q3), iqr: round(q3 - q1) };
+}
+
 /** IQR 기반 이상치 탐지 */
 function detectOutliers(arr) {
   if (!arr || arr.length < 4) return { count: 0, indices: [], lower: 0, upper: 0 };
@@ -123,6 +134,22 @@ function detectOutliers(arr) {
     if (arr[i] < lower || arr[i] > upper) indices.push(i);
   }
   return { count: indices.length, indices, lower: round(lower, 2), upper: round(upper, 2) };
+}
+
+/** η² 효과크기 해석 */
+function etaSquaredLabel(eta) {
+  if (eta >= 0.14) return '큰 효과';
+  if (eta >= 0.06) return '중간 효과';
+  if (eta >= 0.01) return '작은 효과';
+  return '미미한 효과';
+}
+
+/** Cramér's V 해석 */
+function cramersVLabel(v) {
+  if (v >= 0.5) return '매우 강한 연관';
+  if (v >= 0.3) return '강한 연관';
+  if (v >= 0.1) return '약한~중간 연관';
+  return '매우 약한 연관';
 }
 
 /* ── 1. 기술통계 ── */
@@ -171,6 +198,11 @@ export function descriptiveStats(values) {
   }
 
   const outliers = detectOutliers(values);
+  const q = quartiles(values);
+  const se = n > 1 ? round(s / Math.sqrt(n)) : 0;
+  const tCrit = n >= 30 ? 1.96 : 2.045; // approximate t for 95% CI
+  const ciLower = round(m - tCrit * (s / Math.sqrt(n)));
+  const ciUpper = round(m + tCrit * (s / Math.sqrt(n)));
 
   return {
     summary: {
@@ -179,9 +211,21 @@ export function descriptiveStats(values) {
       표준편차: round(s), 왜도: round(sk), 첨도: round(ku),
       최솟값: round(sorted[0]), 최댓값: round(sorted[n - 1]),
     },
+    extended: {
+      SE: se,
+      Q1: q.q1, Q3: q.q3, IQR: q.iqr,
+      CI95_lower: ciLower, CI95_upper: ciUpper,
+    },
+    normality: {
+      skewnessOk: Math.abs(sk) <= 2,
+      kurtosisOk: Math.abs(ku) <= 7,
+      skewnessLabel: Math.abs(sk) <= 2 ? '정상 범위 (|왜도| ≤ 2)' : '정규성 위반 가능 (|왜도| > 2)',
+      kurtosisLabel: Math.abs(ku) <= 7 ? '정상 범위 (|첨도| ≤ 7)' : '정규성 위반 가능 (|첨도| > 7)',
+    },
     details: [],
     chartData: histogram,
     outliers,
+    sampleSize: n,
   };
 }
 
@@ -209,6 +253,15 @@ export function independentTTest(group1, group2) {
   const pooledSD = Math.sqrt(((n1 - 1) * v1 + (n2 - 1) * v2) / (n1 + n2 - 2));
   const cohensD = pooledSD > 0 ? Math.abs(m1 - m2) / pooledSD : 0;
 
+  // 95% CI for mean difference
+  const tCrit = df >= 30 ? 1.96 : 2.045;
+  const ciLower = round((m1 - m2) - tCrit * se);
+  const ciUpper = round((m1 - m2) + tCrit * se);
+
+  // Levene 등분산 검정 근사 (F-test of variance ratio)
+  const fLevene = v1 > v2 ? v1 / v2 : v2 / v1;
+  const leveneNote = fLevene > 2 ? '분산 비율이 크므로 Welch 보정이 적용됩니다 (이미 적용됨).' : '등분산 가정이 대체로 충족됩니다.';
+
   return {
     summary: {
       't값': round(t), '자유도(df)': round(df),
@@ -216,6 +269,13 @@ export function independentTTest(group1, group2) {
       "Cohen's d": round(cohensD),
       '효과크기': cohensLabel(cohensD),
       '유의성': significanceLabel(pValue),
+    },
+    extended: {
+      meanDiff: round(m1 - m2),
+      CI95_lower: ciLower,
+      CI95_upper: ciUpper,
+      leveneNote,
+      varianceRatio: round(fLevene, 2),
     },
     details: [
       { 그룹: '그룹 1', N: n1, 평균: round(m1), 표준편차: round(Math.sqrt(v1)) },
@@ -225,6 +285,7 @@ export function independentTTest(group1, group2) {
       { name: '그룹 1', 평균: round(m1, 2) },
       { name: '그룹 2', 평균: round(m2, 2) },
     ],
+    sampleSize: n1 + n2,
   };
 }
 
@@ -247,6 +308,14 @@ export function pairedTTest(values1, values2) {
   const df = n - 1;
   const pValue = tCDF(t, df);
 
+  // Cohen's d for paired
+  const cohensD = sD > 0 ? Math.abs(mD) / sD : 0;
+
+  // 95% CI for mean difference
+  const tCrit = df >= 30 ? 1.96 : 2.045;
+  const ciLower = round(mD - tCrit * se);
+  const ciUpper = round(mD + tCrit * se);
+
   return {
     summary: {
       '차이 평균': round(mD),
@@ -254,7 +323,13 @@ export function pairedTTest(values1, values2) {
       't값': round(t),
       '자유도(df)': df,
       'p값': round(pValue, 6),
+      "Cohen's d": round(cohensD),
+      '효과크기': cohensLabel(cohensD),
       '유의성': significanceLabel(pValue),
+    },
+    extended: {
+      CI95_lower: ciLower,
+      CI95_upper: ciUpper,
     },
     details: [
       { 변수: '변수 1', N: n, 평균: round(mean(values1)), 표준편차: round(std(values1, 1)) },
@@ -264,6 +339,7 @@ export function pairedTTest(values1, values2) {
       { name: '변수 1', 평균: round(mean(values1), 2) },
       { name: '변수 2', 평균: round(mean(values2), 2) },
     ],
+    sampleSize: n,
   };
 }
 
@@ -299,12 +375,17 @@ export function oneWayAnova(groups) {
   const pValue = dfW > 0 ? fCDF(F, dfB, dfW) : 1;
   const etaSquared = (SSB + SSW) > 0 ? SSB / (SSB + SSW) : 0;
 
-  const groupDetails = validGroups.map(g => ({
-    그룹: g.label,
-    N: g.values.length,
-    평균: round(mean(g.values)),
-    표준편차: round(g.values.length > 1 ? std(g.values, 1) : 0),
-  }));
+  const groupDetails = validGroups.map(g => {
+    const sorted = [...g.values].sort((a, b) => a - b);
+    return {
+      그룹: g.label,
+      N: g.values.length,
+      평균: round(mean(g.values)),
+      표준편차: round(g.values.length > 1 ? std(g.values, 1) : 0),
+      최솟값: round(sorted[0]),
+      최댓값: round(sorted[sorted.length - 1]),
+    };
+  });
 
   // 사후검정 (Bonferroni 보정 t-검정)
   const postHoc = [];
@@ -339,6 +420,7 @@ export function oneWayAnova(groups) {
       'df(그룹 내)': dfW,
       'p값': round(pValue, 6),
       'η² (에타제곱)': round(etaSquared),
+      '효과크기': etaSquaredLabel(etaSquared),
       '유의성': significanceLabel(pValue),
     },
     details: groupDetails,
@@ -347,6 +429,7 @@ export function oneWayAnova(groups) {
       name: g.label,
       평균: round(mean(g.values), 2),
     })),
+    sampleSize: N,
   };
 }
 
@@ -378,12 +461,15 @@ export function chiSquareTest(var1, var2) {
   }
 
   let chiSq = 0;
+  let lowExpectedCount = 0;
+  const totalCells = labels1.length * labels2.length;
   for (const r of labels1) {
     for (const c of labels2) {
       const expected = (rowTotals[r] * colTotals[c]) / n;
       if (expected > 0) {
         chiSq += (observed[r][c] - expected) ** 2 / expected;
       }
+      if (expected < 5) lowExpectedCount++;
     }
   }
 
@@ -410,14 +496,21 @@ export function chiSquareTest(var1, var2) {
       '자유도(df)': df,
       'p값': round(pValue, 6),
       "Cramér's V": round(cramersV),
+      '연관성': cramersVLabel(cramersV),
       '유의성': significanceLabel(pValue),
     },
+    lowExpectedWarning: lowExpectedCount > 0 ? {
+      count: lowExpectedCount,
+      total: totalCells,
+      percent: round(lowExpectedCount / totalCells * 100, 1),
+    } : null,
     details: crossTable,
     chartData: labels1.map(r => ({
       name: r,
       ...Object.fromEntries(labels2.map(c => [c, observed[r][c]])),
     })),
     categories: labels2,
+    sampleSize: n,
   };
 }
 
@@ -469,6 +562,17 @@ export function correlationMatrix(varsObj) {
   // 첫 2개 변수의 상관 해석
   const firstR = rMatrix[0][1];
   const firstP = pMatrix[0][1];
+  const firstR2 = firstR * firstR;
+
+  // 다중공선성 경고: r > 0.9 쌍 감지
+  const multicollinearPairs = [];
+  for (let i = 0; i < k; i++) {
+    for (let j = i + 1; j < k; j++) {
+      if (Math.abs(rMatrix[i][j]) > 0.9) {
+        multicollinearPairs.push(`${labels[i]}-${labels[j]}`);
+      }
+    }
+  }
 
   return {
     summary: {
@@ -477,6 +581,7 @@ export function correlationMatrix(varsObj) {
       [`r(${labels[0]}, ${labels[1]})`]: round(firstR),
       '해석': correlationLabel(firstR),
       'p값': round(firstP, 6),
+      'r²(결정계수)': round(firstR2),
     },
     details,
     pMatrix: labels.map((l, i) => {
@@ -486,8 +591,10 @@ export function correlationMatrix(varsObj) {
       }
       return row;
     }),
+    multicollinearPairs: multicollinearPairs.length > 0 ? multicollinearPairs : null,
     chartData,
     labels,
+    sampleSize: n,
   };
 }
 
@@ -584,6 +691,7 @@ export function spearmanCorrelation(varsObj) {
 
   const firstR = rMatrix[0][1];
   const firstP = pMatrix[0][1];
+  const firstR2 = firstR * firstR;
 
   return {
     summary: {
@@ -592,6 +700,7 @@ export function spearmanCorrelation(varsObj) {
       [`ρ(${labels[0]}, ${labels[1]})`]: round(firstR),
       '해석': correlationLabel(firstR),
       'p값': round(firstP, 6),
+      'ρ²(결정계수)': round(firstR2),
     },
     details,
     pMatrix: labels.map((l, i) => {
@@ -603,6 +712,7 @@ export function spearmanCorrelation(varsObj) {
     }),
     chartData,
     labels,
+    sampleSize: n,
   };
 }
 
@@ -628,10 +738,26 @@ export function linearRegression(x, y) {
   const predicted = x.map(xi => intercept + beta * xi);
   const residuals = y.map((yi, i) => yi - predicted[i]);
   const ssRes = residuals.reduce((s, r) => s + r * r, 0);
+  const ssReg = ssXY ** 2 / ssXX;
   const mse = n > 2 ? ssRes / (n - 2) : 0;
+  const msReg = ssReg; // df_reg = 1
   const seBeta = Math.sqrt(mse / ssXX);
   const tStat = seBeta > 0 ? beta / seBeta : 0;
   const pValue = tCDF(tStat, n - 2);
+
+  // Adjusted R²
+  const adjR2 = n > 2 ? 1 - ((1 - rSquared) * (n - 1) / (n - 2)) : rSquared;
+
+  // F-statistic
+  const fStat = mse > 0 ? msReg / mse : 0;
+  const fPValue = n > 2 ? fCDF(fStat, 1, n - 2) : 1;
+
+  // Durbin-Watson approximation
+  let dwNumer = 0;
+  for (let i = 1; i < residuals.length; i++) {
+    dwNumer += (residuals[i] - residuals[i - 1]) ** 2;
+  }
+  const dwStat = ssRes > 0 ? dwNumer / ssRes : 2;
 
   const chartData = x.map((xi, i) => ({
     x: round(xi, 2),
@@ -643,6 +769,7 @@ export function linearRegression(x, y) {
   return {
     summary: {
       'R²': round(rSquared),
+      'Adjusted R²': round(adjR2),
       '절편(β₀)': round(intercept),
       '기울기(β₁)': round(beta),
       't값': round(tStat),
@@ -650,13 +777,22 @@ export function linearRegression(x, y) {
       '표준오차': round(seBeta),
       '유의성': significanceLabel(pValue),
     },
+    extended: {
+      fStat: round(fStat),
+      fPValue: round(fPValue, 6),
+      durbinWatson: round(dwStat, 2),
+      dwInterpret: dwStat < 1.5 ? '양의 자기상관 의심' : dwStat > 2.5 ? '음의 자기상관 의심' : '자기상관 없음 (양호)',
+    },
     details: [
       { 항목: '회귀식', 값: `y = ${round(intercept, 2)} + ${round(beta, 2)}x` },
+      { 항목: 'F통계량', 값: `${round(fStat)} (p = ${round(fPValue, 6)})` },
+      { 항목: 'Durbin-Watson', 값: `${round(dwStat, 2)}` },
       { 항목: 'MSE', 값: round(mse) },
-      { 항목: 'SSR', 값: round(ssXY ** 2 / ssXX) },
+      { 항목: 'SSR', 값: round(ssReg) },
       { 항목: 'SSE', 값: round(ssRes) },
     ],
     chartData,
+    sampleSize: n,
   };
 }
 
@@ -707,6 +843,16 @@ export function cronbachAlpha(itemsMatrix) {
     });
   }
 
+  // 삭제 시 α가 현재보다 높은 항목 찾기
+  const deletionCandidates = itemDetails
+    .filter(d => typeof d['삭제 시 α'] === 'number' && d['삭제 시 α'] > alpha)
+    .map(d => ({ item: d.항목, alphaIfDeleted: d['삭제 시 α'], improvement: round(d['삭제 시 α'] - alpha) }));
+
+  // 항목-총점 상관이 낮은 항목
+  const lowCorrelationItems = itemDetails
+    .filter(d => typeof d['항목-총점 상관'] === 'number' && d['항목-총점 상관'] < 0.3)
+    .map(d => d.항목);
+
   return {
     summary: {
       "Cronbach's α": round(alpha),
@@ -717,6 +863,8 @@ export function cronbachAlpha(itemsMatrix) {
         alpha >= 0.7 ? '양호' :
         alpha >= 0.6 ? '보통' : '미흡',
     },
+    deletionCandidates: deletionCandidates.length > 0 ? deletionCandidates : null,
+    lowCorrelationItems: lowCorrelationItems.length > 0 ? lowCorrelationItems : null,
     details: itemDetails,
     chartData: itemDetails
       .filter(d => typeof d['삭제 시 α'] === 'number')
@@ -725,6 +873,7 @@ export function cronbachAlpha(itemsMatrix) {
         '삭제 시 α': d['삭제 시 α'],
         '항목-총점 상관': d['항목-총점 상관'],
       })),
+    sampleSize: n,
   };
 }
 
@@ -792,14 +941,55 @@ export function crossTabulation(var1, var2) {
     return row;
   });
 
+  // 표준화 잔차 (adjusted standardized residual)
+  const adjResidualTable = labels1.map(r => {
+    const row = { 항목: r };
+    for (const c of labels2) {
+      const expected = rowTotals[r] * colTotals[c] / n;
+      if (expected > 0) {
+        const adjRes = (freq[r][c] - expected) / Math.sqrt(expected * (1 - rowTotals[r] / n) * (1 - colTotals[c] / n));
+        row[c] = round(adjRes, 2);
+      } else {
+        row[c] = 0;
+      }
+    }
+    return row;
+  });
+
+  // 열 비율표 추가
+  const colPctTable = labels1.map(r => {
+    const row = { 항목: r };
+    for (const c of labels2) {
+      row[c] = colTotals[c] > 0 ? round(freq[r][c] / colTotals[c] * 100, 1) + '%' : '0%';
+    }
+    return row;
+  });
+
+  // 유의한 셀 (|adjusted residual| > 1.96)
+  const significantCells = [];
+  for (const r of labels1) {
+    for (const c of labels2) {
+      const expected = rowTotals[r] * colTotals[c] / n;
+      if (expected > 0) {
+        const adjRes = (freq[r][c] - expected) / Math.sqrt(expected * (1 - rowTotals[r] / n) * (1 - colTotals[c] / n));
+        if (Math.abs(adjRes) > 1.96) {
+          significantCells.push({ row: r, col: c, adjResidual: round(adjRes, 2), direction: adjRes > 0 ? '기대보다 많음' : '기대보다 적음' });
+        }
+      }
+    }
+  }
+
   // 카이제곱 통계량 계산
   let chiSq = 0;
+  let lowExpectedCount = 0;
+  const totalCells = labels1.length * labels2.length;
   for (const r of labels1) {
     for (const c of labels2) {
       const expected = rowTotals[r] * colTotals[c] / n;
       if (expected > 0) {
         chiSq += (freq[r][c] - expected) ** 2 / expected;
       }
+      if (expected < 5) lowExpectedCount++;
     }
   }
   const df = (labels1.length - 1) * (labels2.length - 1);
@@ -816,15 +1006,25 @@ export function crossTabulation(var1, var2) {
       '자유도(df)': df,
       'p값': round(pValue, 6),
       "Cramér's V": round(cramersV),
+      '연관성': cramersVLabel(cramersV),
     },
+    lowExpectedWarning: lowExpectedCount > 0 ? {
+      count: lowExpectedCount,
+      total: totalCells,
+      percent: round(lowExpectedCount / totalCells * 100, 1),
+    } : null,
+    significantCells: significantCells.length > 0 ? significantCells : null,
     details: freqTable,
     pctTable,
+    colPctTable,
     expectedTable,
     residualTable,
+    adjResidualTable,
     chartData: labels1.map(r => ({
       name: r,
       ...Object.fromEntries(labels2.map(c => [c, freq[r][c]])),
     })),
     categories: labels2,
+    sampleSize: n,
   };
 }

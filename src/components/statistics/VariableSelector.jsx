@@ -8,10 +8,12 @@ import styles from './VariableSelector.module.css';
 const ANALYSIS_CONFIG = {
   descriptive: {
     title: '기술통계',
+    help: '선택한 변수의 평균, 중앙값, 표준편차 등 기본 통계량을 산출합니다.',
     fields: [{ key: 'variable', label: '분석 변수', type: 'numeric', multi: false }],
   },
   independentT: {
     title: '독립표본 T검정',
+    help: '두 독립 집단(예: 남/여)의 평균을 비교합니다. 그룹 변수는 2개 범주를 가진 범주형 변수여야 합니다.',
     fields: [
       { key: 'groupVar', label: '그룹 변수 (2집단)', type: 'categorical', multi: false },
       { key: 'testVar', label: '검정 변수', type: 'numeric', multi: false },
@@ -19,13 +21,15 @@ const ANALYSIS_CONFIG = {
   },
   pairedT: {
     title: '대응표본 T검정',
+    help: '동일 대상의 두 시점/조건(예: 사전-사후) 평균을 비교합니다. 두 변수의 응답자 수가 같아야 합니다.',
     fields: [
-      { key: 'var1', label: '변수 1', type: 'numeric', multi: false },
-      { key: 'var2', label: '변수 2', type: 'numeric', multi: false },
+      { key: 'var1', label: '변수 1 (사전/조건A)', type: 'numeric', multi: false },
+      { key: 'var2', label: '변수 2 (사후/조건B)', type: 'numeric', multi: false },
     ],
   },
   anova: {
     title: '일원분산분석 (ANOVA)',
+    help: '3개 이상 집단의 평균 차이를 비교합니다. 유의하면 사후검정(Bonferroni)으로 어떤 쌍이 다른지 확인합니다.',
     fields: [
       { key: 'groupVar', label: '그룹 변수 (3+집단)', type: 'categorical', multi: false },
       { key: 'testVar', label: '검정 변수', type: 'numeric', multi: false },
@@ -33,6 +37,7 @@ const ANALYSIS_CONFIG = {
   },
   chiSquare: {
     title: '카이제곱 검정',
+    help: '두 범주형 변수 간 독립성(연관성)을 검정합니다. 두 변수 모두 범주형이어야 합니다.',
     fields: [
       { key: 'var1', label: '변수 1 (범주형)', type: 'categorical', multi: false },
       { key: 'var2', label: '변수 2 (범주형)', type: 'categorical', multi: false },
@@ -40,21 +45,25 @@ const ANALYSIS_CONFIG = {
   },
   correlation: {
     title: '상관분석',
+    help: '선택한 수치 변수들 간의 Pearson 상관계수를 계산하여 선형 관계를 파악합니다.',
     fields: [{ key: 'variables', label: '분석 변수 (2개 이상)', type: 'numeric', multi: true }],
   },
   regression: {
     title: '단순선형회귀',
+    help: '독립변수(X)로 종속변수(Y)를 예측하는 회귀식을 구합니다. 두 변수 모두 수치형이어야 합니다.',
     fields: [
-      { key: 'xVar', label: '독립변수 (X)', type: 'numeric', multi: false },
-      { key: 'yVar', label: '종속변수 (Y)', type: 'numeric', multi: false },
+      { key: 'xVar', label: '독립변수 (X) \u2014 예측에 사용', type: 'numeric', multi: false },
+      { key: 'yVar', label: '종속변수 (Y) \u2014 예측 대상', type: 'numeric', multi: false },
     ],
   },
   cronbach: {
     title: '크론바흐 알파',
+    help: '같은 척도(리커트)의 문항들이 내적으로 일관되게 측정하는지 신뢰도를 분석합니다.',
     fields: [{ key: 'items', label: '리커트 문항 (2개 이상)', type: 'numeric', multi: true }],
   },
   crossTab: {
     title: '교차분석',
+    help: '두 범주형 변수의 빈도, 비율, 기대빈도, 잔차를 상세히 분석합니다.',
     fields: [
       { key: 'var1', label: '행 변수 (범주형)', type: 'categorical', multi: false },
       { key: 'var2', label: '열 변수 (범주형)', type: 'categorical', multi: false },
@@ -62,6 +71,7 @@ const ANALYSIS_CONFIG = {
   },
   spearman: {
     title: 'Spearman 순위상관',
+    help: '순위 기반 비모수 상관분석입니다. 비정규 데이터나 순서형 변수에 적합합니다.',
     fields: [{ key: 'variables', label: '분석 변수 (2개 이상)', type: 'numeric', multi: true }],
   },
 };
@@ -116,6 +126,7 @@ export default function VariableSelector({
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={onBack}>&larr; 돌아가기</button>
         <h2 className={styles.title}>{config.title}</h2>
+        {config.help && <p className={styles.helpText}>{config.help}</p>}
         <p className={styles.subtitle}>분석에 사용할 변수를 선택하세요</p>
       </div>
 
