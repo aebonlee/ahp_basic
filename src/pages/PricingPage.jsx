@@ -43,7 +43,7 @@ const PLANS = [
       { text: 'AI 분석', ok: false },
     ],
     btnLabel: '구독하기',
-    btnStyle: 'default',
+    btnStyle: 'outline',
     popular: false,
   },
   {
@@ -220,7 +220,11 @@ export default function PricingPage() {
                 ))}
               </ul>
               <button
-                className={plan.btnStyle === 'primary' ? styles.planBtnPrimary : styles.planBtn}
+                className={
+                  plan.btnStyle === 'primary' ? styles.planBtnPrimary
+                    : plan.btnStyle === 'outline' ? styles.planBtnOutline
+                    : styles.planBtn
+                }
                 onClick={() => handlePlanClick(plan)}
               >
                 {plan.btnLabel}
@@ -270,6 +274,7 @@ export default function PricingPage() {
 
       {/* FAQ */}
       <section className={styles.faqSection}>
+        <div className={styles.faqInner}>
         <h2 className={styles.sectionTitle}>자주 묻는 질문</h2>
         <p className={styles.sectionDesc}>요금제와 결제에 대한 궁금증을 해결해 드립니다.</p>
         <div className={styles.faqList}>
@@ -282,6 +287,7 @@ export default function PricingPage() {
               {openFaq === i && <div className={styles.faqAnswer}>{item.a}</div>}
             </div>
           ))}
+        </div>
         </div>
       </section>
 
