@@ -21,7 +21,7 @@ export function buildPageSequence(criteria, alternatives, goalId = null) {
     if (children.length < 2) continue;
 
     const parentNode = criteria.find(c => c.id === parentId);
-    const items = children.map(c => ({ id: c.id, name: c.name }));
+    const items = children.map(c => ({ id: c.id, name: c.name, description: c.description || '' }));
     const pairs = generateItemPairs(items);
 
     pages.push({
@@ -39,7 +39,7 @@ export function buildPageSequence(criteria, alternatives, goalId = null) {
       return !criteria.some(other => other.parent_id === c.id);
     });
 
-    const altItems = alternatives.map(a => ({ id: a.id, name: a.name }));
+    const altItems = alternatives.map(a => ({ id: a.id, name: a.name, description: a.description || '' }));
     const altPairs = generateItemPairs(altItems);
 
     for (const leaf of leafCriteria) {

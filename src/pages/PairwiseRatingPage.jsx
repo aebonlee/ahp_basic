@@ -181,6 +181,20 @@ export default function PairwiseRatingPage() {
           </span>
         </div>
 
+        {/* 비교 항목 설명 */}
+        {currentPageData.items.some(item => item.description) && (
+          <div className={styles.itemDescriptions}>
+            {currentPageData.items.map(item => (
+              item.description ? (
+                <div key={item.id} className={styles.itemDesc}>
+                  <span className={styles.itemDescName}>{item.name}</span>
+                  <span className={styles.itemDescText}>{item.description}</span>
+                </div>
+              ) : null
+            ))}
+          </div>
+        )}
+
         <div className={`${styles.body} ${resultsLayout === 'right' ? styles.bodyRight : ''}`}>
           <div className={styles.gridArea}>
             <PairwiseGrid
