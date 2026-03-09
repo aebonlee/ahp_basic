@@ -185,7 +185,7 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
     selectableEvaluators.every((ev) => selected.has(ev.id));
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="SMS 발송" width="820px">
+    <Modal isOpen={isOpen} onClose={handleClose} title="SMS 발송" width="980px">
       {results ? (
         <div className={styles.results}>
           <h4 className={styles.resultsTitle}>발송 결과</h4>
@@ -369,7 +369,7 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="메시지를 입력하세요"
-                rows={8}
+                rows={10}
                 disabled={sending}
               />
               <div className={styles.byteCounter}>

@@ -5,12 +5,12 @@
 }
 
 .panelLeft {
-  flex: 0 0 290px;
+  flex: 0 0 340px;
   min-width: 0;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
 }
 
 .panelRight {
@@ -19,7 +19,7 @@
   background: #eef2ff;
   border: 1px solid #c7d2fe;
   border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
 }
 
 .section {
@@ -62,18 +62,18 @@
 }
 
 .filterChip {
-  padding: 3px 8px;
+  padding: 4px 10px;
   border: 1px solid #86efac;
   border-radius: var(--radius-round);
   background: #fff;
   color: #15803d;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
 .filterChip:hover:not(:disabled) {
@@ -93,12 +93,12 @@
 }
 
 .filterCount {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   background: rgba(0, 0, 0, 0.1);
-  padding: 0 4px;
+  padding: 1px 5px;
   border-radius: 6px;
-  min-width: 14px;
+  min-width: 16px;
   text-align: center;
 }
 
@@ -108,7 +108,7 @@
 
 /* 수신자 목록 */
 .recipientList {
-  max-height: 320px;
+  max-height: 400px;
   overflow-y: auto;
   border: 1px solid #86efac;
   border-radius: var(--radius-md);
@@ -120,9 +120,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: 6px var(--spacing-sm);
+  padding: 8px var(--spacing-sm);
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
 }
 
 .recipientRow:hover {
@@ -225,7 +225,7 @@
   font-size: 0.88rem;
   font-family: inherit;
   resize: vertical;
-  min-height: 140px;
+  min-height: 170px;
   box-sizing: border-box;
   background: #fff;
 }
