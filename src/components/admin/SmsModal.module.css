@@ -1,0 +1,188 @@
+.section {
+  margin-bottom: var(--spacing-md);
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* 수신자 목록 */
+.recipientList {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) 0;
+}
+
+.recipientRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px var(--spacing-sm);
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.recipientRow:hover {
+  background: var(--color-bg, #f9fafb);
+}
+
+.recipientRow.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recipientName {
+  flex: 1;
+  font-weight: 500;
+}
+
+.recipientPhone {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+/* 메시지 입력 */
+.textarea {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  box-sizing: border-box;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-surface, rgba(59, 130, 246, 0.15));
+}
+
+/* 바이트 카운터 */
+.byteCounter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.typeBadge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.badgeSms {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badgeLms {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badgeOver {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* 발송 버튼 영역 */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.progressText {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+/* 결과 표시 */
+.results {
+  padding: var(--spacing-xs) 0;
+}
+
+.resultsTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.resultsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.resultsList li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 0.85rem;
+}
+
+.resultsList li:last-child {
+  border-bottom: none;
+}
+
+.resultsList li span:first-child {
+  flex: 1;
+  font-weight: 500;
+}
+
+.resultSuccess {
+  color: var(--color-text);
+}
+
+.resultFail {
+  color: var(--color-danger, #dc2626);
+}
+
+.badgeSuccess {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badgeFail {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.resultsSummary {
+  margin-top: var(--spacing-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-align: center;
+}

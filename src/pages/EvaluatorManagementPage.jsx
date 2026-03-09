@@ -16,6 +16,7 @@ import Button from '../components/common/Button';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { formatPhone } from '../lib/evaluatorUtils';
+import SmsModal from '../components/admin/SmsModal';
 import common from '../styles/common.module.css';
 import styles from './EvaluatorManagementPage.module.css';
 
@@ -32,6 +33,7 @@ export default function EvaluatorManagementPage() {
   const [showForm, setShowForm] = useState(false);
   const [starting, setStarting] = useState(false);
   const [comparisonCounts, setComparisonCounts] = useState({});
+  const [smsModalOpen, setSmsModalOpen] = useState(false);
 
   // 전체 필요 비교 수 계산
   const totalRequired = useMemo(() => {
@@ -106,7 +108,12 @@ export default function EvaluatorManagementPage() {
       <div className={common.cardSpaced}>
         <div className={styles.listHeader}>
           <h2 className={common.cardTitle}>평가자 목록 ({evaluators.length}명)</h2>
-          <Button size="sm" onClick={() => setShowForm(true)}>+ 평가자 추가</Button>
+          <div className={styles.listHeaderActions}>
+            {evaluators.length > 0 && (
+              <Button size="sm" variant="secondary" onClick={() => setSmsModalOpen(true)}>SMS 발송</Button>
+            )}
+            <Button size="sm" onClick={() => setShowForm(true)}>+ 평가자 추가</Button>
+          </div>
         </div>
 
         {showForm && (
@@ -180,6 +187,13 @@ export default function EvaluatorManagementPage() {
       </div>
 
       <ConfirmDialog {...confirmDialogProps} />
+
+      <SmsModal
+        isOpen={smsModalOpen}
+        onClose={() => setSmsModalOpen(false)}
+        evaluators={evaluators}
+        projectId={id}
+      />
     </ProjectLayout>
   );
 }

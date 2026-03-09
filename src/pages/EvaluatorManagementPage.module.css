@@ -1,7 +1,13 @@
 .listHeader {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: var(--spacing-md);
+}
+
+.listHeaderActions {
+  display: flex;
+  gap: var(--spacing-xs);
 }
 
 /* 구분 배지 */
