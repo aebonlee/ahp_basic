@@ -41,6 +41,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const FeaturesPage = lazy(() => import('./pages/FeaturesPage'));
 const GuidePage = lazy(() => import('./pages/GuidePage'));
 const ManualPage = lazy(() => import('./pages/ManualPage'));
+const LearnPage = lazy(() => import('./pages/LearnPage'));
 const StatisticalAnalysisPage = lazy(() => import('./pages/StatisticalAnalysisPage'));
 const AiAnalysisPage = lazy(() => import('./pages/AiAnalysisPage'));
 const SurveyStatsPage = lazy(() => import('./pages/SurveyStatsPage'));
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/features" element={<FeaturesPage />} />
               <Route path="/guide" element={<GuidePage />} />
               <Route path="/manual" element={<ManualPage />} />
+              <Route path="/learn" element={<LearnPage />} />
               <Route path="/survey-stats" element={<SurveyStatsPage />} />
               <Route path="/management" element={<ManagementPage />} />
 

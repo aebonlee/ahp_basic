@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { to: '/survey-stats', label: '설문 및 통계' },
   { to: '/management', label: '관리 기능' },
   { to: '/guide', label: '이용 가이드' },
+  { to: '/learn', label: '학습 가이드' },
   { to: '/manual', label: '사용설명서' },
 ];
 
