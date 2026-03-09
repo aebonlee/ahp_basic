@@ -110,7 +110,7 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
     selectedCount === selectableEvaluators.length;
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="SMS 발송" width="480px">
+    <Modal isOpen={isOpen} onClose={handleClose} title="SMS 발송" width="780px">
       {results ? (
         <div className={styles.results}>
           <h4 className={styles.resultsTitle}>발송 결과</h4>
@@ -135,126 +135,128 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
         </div>
       ) : (
         <>
-          {/* 수신자 선택 */}
-          <div className={styles.section}>
-            <label className={styles.sectionLabel}>수신자 선택</label>
-            <div className={styles.recipientList}>
-              <label className={styles.recipientRow}>
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={handleToggleAll}
-                  disabled={sending}
-                />
-                <span className={styles.recipientName}>
-                  전체 선택 ({selectedCount}/{selectableEvaluators.length}명)
-                </span>
-              </label>
-              {evaluators.map((ev) => {
-                const hasPhone = !!ev.phone_number;
-                return (
-                  <label
-                    key={ev.id}
-                    className={`${styles.recipientRow} ${!hasPhone ? styles.disabled : ''}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selected.has(ev.id)}
-                      onChange={() => handleToggle(ev.id)}
-                      disabled={!hasPhone || sending}
-                    />
-                    <span className={styles.recipientName}>{ev.name}</span>
-                    <span className={styles.recipientPhone}>
-                      {hasPhone ? formatPhone(ev.phone_number) : '(번호 없음)'}
-                    </span>
-                  </label>
-                );
-              })}
+          <div className={styles.body}>
+            {/* 왼쪽: 수신자 선택 */}
+            <div className={styles.panelLeft}>
+              <label className={styles.sectionLabel}>수신자 선택</label>
+              <div className={styles.recipientList}>
+                <label className={styles.recipientRow}>
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={handleToggleAll}
+                    disabled={sending}
+                  />
+                  <span className={styles.recipientName}>
+                    전체 선택 ({selectedCount}/{selectableEvaluators.length}명)
+                  </span>
+                </label>
+                {evaluators.map((ev) => {
+                  const hasPhone = !!ev.phone_number;
+                  return (
+                    <label
+                      key={ev.id}
+                      className={`${styles.recipientRow} ${!hasPhone ? styles.disabled : ''}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected.has(ev.id)}
+                        onChange={() => handleToggle(ev.id)}
+                        disabled={!hasPhone || sending}
+                      />
+                      <span className={styles.recipientName}>{ev.name}</span>
+                      <span className={styles.recipientPhone}>
+                        {hasPhone ? formatPhone(ev.phone_number) : '(번호 없음)'}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          {/* 메시지 입력 */}
-          <div className={styles.section}>
-            <label className={styles.sectionLabel}>메시지</label>
+            {/* 오른쪽: 메시지 입력 */}
+            <div className={styles.panelRight}>
+              <label className={styles.sectionLabel}>메시지</label>
 
-            {/* 특수문자 / 기본문구 탭 */}
-            <div className={styles.toolbar}>
-              <div className={styles.tabBar}>
-                <button
-                  type="button"
-                  className={`${styles.tabBtn} ${activeTab === 'symbols' ? styles.tabBtnActive : ''}`}
-                  onClick={() => setActiveTab('symbols')}
-                  disabled={sending}
-                >
-                  특수문자
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.tabBtn} ${activeTab === 'templates' ? styles.tabBtnActive : ''}`}
-                  onClick={() => setActiveTab('templates')}
-                  disabled={sending}
-                >
-                  기본문구
-                </button>
+              {/* 특수문자 / 기본문구 탭 */}
+              <div className={styles.toolbar}>
+                <div className={styles.tabBar}>
+                  <button
+                    type="button"
+                    className={`${styles.tabBtn} ${activeTab === 'symbols' ? styles.tabBtnActive : ''}`}
+                    onClick={() => setActiveTab('symbols')}
+                    disabled={sending}
+                  >
+                    특수문자
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.tabBtn} ${activeTab === 'templates' ? styles.tabBtnActive : ''}`}
+                    onClick={() => setActiveTab('templates')}
+                    disabled={sending}
+                  >
+                    기본문구
+                  </button>
+                </div>
+
+                {activeTab === 'symbols' && (
+                  <div className={styles.symbolGrid}>
+                    {SYMBOLS.map((sym) => (
+                      <button
+                        key={sym}
+                        type="button"
+                        className={styles.symbolBtn}
+                        onClick={() => insertAtCursor(sym)}
+                        disabled={sending}
+                      >
+                        {sym}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'templates' && (
+                  <div className={styles.templateList}>
+                    {TEMPLATES.map((tpl) => (
+                      <button
+                        key={tpl.name}
+                        type="button"
+                        className={styles.templateItem}
+                        onClick={() => applyTemplate(tpl.content)}
+                        disabled={sending}
+                      >
+                        {tpl.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {activeTab === 'symbols' && (
-                <div className={styles.symbolGrid}>
-                  {SYMBOLS.map((sym) => (
-                    <button
-                      key={sym}
-                      type="button"
-                      className={styles.symbolBtn}
-                      onClick={() => insertAtCursor(sym)}
-                      disabled={sending}
-                    >
-                      {sym}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === 'templates' && (
-                <div className={styles.templateList}>
-                  {TEMPLATES.map((tpl) => (
-                    <button
-                      key={tpl.name}
-                      type="button"
-                      className={styles.templateItem}
-                      onClick={() => applyTemplate(tpl.content)}
-                      disabled={sending}
-                    >
-                      {tpl.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <textarea
-              ref={textareaRef}
-              className={styles.textarea}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="메시지를 입력하세요"
-              rows={5}
-              disabled={sending}
-            />
-            <div className={styles.byteCounter}>
-              <span>
-                {byteInfo.bytes}/{byteInfo.max} bytes
-              </span>
-              <span
-                className={`${styles.typeBadge} ${
-                  byteInfo.type === 'SMS'
-                    ? styles.badgeSms
-                    : byteInfo.type === 'LMS'
-                      ? styles.badgeLms
-                      : styles.badgeOver
-                }`}
-              >
-                {byteInfo.type}
-              </span>
+              <textarea
+                ref={textareaRef}
+                className={styles.textarea}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="메시지를 입력하세요"
+                rows={6}
+                disabled={sending}
+              />
+              <div className={styles.byteCounter}>
+                <span>
+                  {byteInfo.bytes}/{byteInfo.max} bytes
+                </span>
+                <span
+                  className={`${styles.typeBadge} ${
+                    byteInfo.type === 'SMS'
+                      ? styles.badgeSms
+                      : byteInfo.type === 'LMS'
+                        ? styles.badgeLms
+                        : styles.badgeOver
+                  }`}
+                >
+                  {byteInfo.type}
+                </span>
+              </div>
             </div>
           </div>
 

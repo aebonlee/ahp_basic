@@ -1,3 +1,19 @@
+/* 2단 가로 레이아웃 */
+.body {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.panelLeft {
+  flex: 0 0 260px;
+  min-width: 0;
+}
+
+.panelRight {
+  flex: 1;
+  min-width: 0;
+}
+
 .section {
   margin-bottom: var(--spacing-md);
 }
@@ -12,7 +28,7 @@
 
 /* 수신자 목록 */
 .recipientList {
-  max-height: 200px;
+  max-height: 320px;
   overflow-y: auto;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
