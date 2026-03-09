@@ -33,9 +33,10 @@ const PAGE_SIZE = 10;
 
 function getPageNumbers(total, current) {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  const pages = [1];
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
+  const pages = [];
+  const start = Math.max(2, current - 2);
+  const end = Math.min(total - 1, current + 2);
+  pages.push(1);
   if (start > 2) pages.push('...');
   for (let i = start; i <= end; i++) pages.push(i);
   if (end < total - 1) pages.push('...');
@@ -301,9 +302,19 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
                 <div className={styles.pagination}>
                   <button
                     type="button"
-                    className={styles.pageBtn}
+                    className={`${styles.pageBtn} ${styles.pageNav}`}
+                    onClick={() => setPage(1)}
+                    disabled={safePage <= 1}
+                    title="첫 페이지"
+                  >
+                    &laquo;
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.pageBtn} ${styles.pageNav}`}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={safePage <= 1}
+                    title="이전 페이지"
                   >
                     &lsaquo;
                   </button>
@@ -323,11 +334,21 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
                   )}
                   <button
                     type="button"
-                    className={styles.pageBtn}
+                    className={`${styles.pageBtn} ${styles.pageNav}`}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={safePage >= totalPages}
+                    title="다음 페이지"
                   >
                     &rsaquo;
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.pageBtn} ${styles.pageNav}`}
+                    onClick={() => setPage(totalPages)}
+                    disabled={safePage >= totalPages}
+                    title="마지막 페이지"
+                  >
+                    &raquo;
                   </button>
                 </div>
               )}

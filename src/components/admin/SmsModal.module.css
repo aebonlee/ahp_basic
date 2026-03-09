@@ -171,21 +171,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   margin-top: var(--spacing-sm);
   flex-wrap: wrap;
+  padding: 4px 0;
 }
 
 .pageEllipsis {
   font-size: 0.75rem;
   color: var(--color-text-muted);
-  padding: 0 2px;
+  padding: 0 4px;
   user-select: none;
 }
 
 .pageBtn {
-  min-width: 26px;
-  height: 26px;
+  min-width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -193,7 +194,7 @@
   border-radius: 6px;
   background: #fff;
   color: #15803d;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -206,7 +207,7 @@
 }
 
 .pageBtn:disabled {
-  opacity: 0.35;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
@@ -219,6 +220,19 @@
 
 .pageBtnActive:hover:not(:disabled) {
   background: #15803d;
+}
+
+.pageNav {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #059669;
+  border-color: #6ee7b7;
+  min-width: 30px;
+}
+
+.pageNav:hover:not(:disabled) {
+  background: #d1fae5;
+  border-color: #34d399;
 }
 
 /* 메시지 라벨 강화 */
