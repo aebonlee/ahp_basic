@@ -30,6 +30,13 @@ export default function EvalResultPage() {
   const [activeTab, setActiveTab] = useState('summary');
   const [hasSurvey, setHasSurvey] = useState(false);
 
+  // 평가 완료(잠금) 여부
+  const isCompleted = useMemo(() => {
+    if (!evaluatorId || evaluators.length === 0) return false;
+    const ev = evaluators.find(e => e.id === evaluatorId);
+    return !!ev?.completed;
+  }, [evaluatorId, evaluators]);
+
   const evaluatorId = useMemo(() => {
     return findEvaluatorId(evaluators, user, id);
   }, [evaluators, user?.id, id]);
@@ -137,9 +144,12 @@ export default function EvalResultPage() {
     <PageLayout>
       {/* 상단 네비게이션 */}
       <div className={styles.navBar}>
-        <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}`)}>
-          &larr; 평가로 돌아가기
-        </Button>
+        {!isCompleted && (
+          <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}`)}>
+            &larr; 평가로 돌아가기
+          </Button>
+        )}
+        {isCompleted && <div />}
         <div className={styles.navRight}>
           {hasSurvey && (
             <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}/pre-survey`)}>
@@ -194,19 +204,19 @@ export default function EvalResultPage() {
             criteria={criteria}
             alternatives={alternatives}
             results={results}
-            onNavigateToPage={(pageIdx) => navigate(`/eval/project/${id}#page=${pageIdx}`)}
+            onNavigateToPage={isCompleted ? undefined : (pageIdx) => navigate(`/eval/project/${id}#page=${pageIdx}`)}
           />
         )}
         {activeTab === 'consistency' && (
           <ConsistencyTable
             results={results}
-            onNavigateToPage={(pageIdx) => navigate(`/eval/project/${id}#page=${pageIdx}`)}
+            onNavigateToPage={isCompleted ? undefined : (pageIdx) => navigate(`/eval/project/${id}#page=${pageIdx}`)}
           />
         )}
       </div>
 
-      {/* Review Section: incomplete / inconsistent pages */}
-      {(results.incompletePages.length > 0 || results.inconsistentPages.length > 0) && (
+      {/* Review Section: incomplete / inconsistent pages (완료된 평가자에게는 숨김) */}
+      {!isCompleted && (results.incompletePages.length > 0 || results.inconsistentPages.length > 0) && (
         <div className={styles.reviewSection}>
           <h3 className={styles.reviewTitle}>재점검 필요 항목</h3>
 

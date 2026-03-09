@@ -28,11 +28,11 @@ export default function ConsistencyTable({ results, onNavigateToPage }) {
               <tr
                 key={page.parentId}
                 className={!pass ? styles.failRow : ''}
-                onClick={() => onNavigateToPage(idx)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigateToPage(idx); } }}
-                tabIndex={0}
-                role="button"
-                style={{ cursor: 'pointer' }}
+                onClick={onNavigateToPage ? () => onNavigateToPage(idx) : undefined}
+                onKeyDown={onNavigateToPage ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigateToPage(idx); } } : undefined}
+                tabIndex={onNavigateToPage ? 0 : undefined}
+                role={onNavigateToPage ? 'button' : undefined}
+                style={onNavigateToPage ? { cursor: 'pointer' } : undefined}
               >
                 <td>{page.parentName}</td>
                 <td>{n}</td>

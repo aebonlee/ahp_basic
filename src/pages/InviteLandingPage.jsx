@@ -209,6 +209,12 @@ export default function InviteLandingPage() {
   };
 
   const handleStartEval = () => {
+    // 평가 완료된 평가자는 결과 페이지로 바로 이동
+    if (evaluator?.completed) {
+      navigate(`/eval/project/${token}/result`);
+      return;
+    }
+
     const hasSurvey = questions.length > 0 ||
       config.research_description ||
       config.consent_text;
@@ -375,8 +381,17 @@ export default function InviteLandingPage() {
         {status === 'ready' && (
           <>
             <h2 className={styles.projectName}>{project?.name}</h2>
-            <p className={styles.desc}>평가에 참여할 준비가 되었습니다.</p>
-            <Button onClick={handleStartEval} loading={surveyLoading}>평가 시작</Button>
+            {evaluator?.completed ? (
+              <>
+                <p className={styles.desc}>이미 평가를 완료하셨습니다.</p>
+                <Button onClick={handleStartEval}>결과 확인</Button>
+              </>
+            ) : (
+              <>
+                <p className={styles.desc}>평가에 참여할 준비가 되었습니다.</p>
+                <Button onClick={handleStartEval} loading={surveyLoading}>평가 시작</Button>
+              </>
+            )}
           </>
         )}
       </div>

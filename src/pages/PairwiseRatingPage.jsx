@@ -50,6 +50,15 @@ export default function PairwiseRatingPage() {
     return findEvaluatorId(evaluators, user, id);
   }, [evaluators, user?.id, id]);
 
+  // 평가 완료 여부 체크 → completed이면 결과 페이지로 리다이렉트
+  useEffect(() => {
+    if (!evaluatorId || evaluators.length === 0) return;
+    const ev = evaluators.find(e => e.id === evaluatorId);
+    if (ev?.completed) {
+      navigate(`/eval/project/${id}/result`, { replace: true });
+    }
+  }, [evaluatorId, evaluators, id, navigate]);
+
   // 설문 완료 여부 체크 → 미완료면 pre-survey로 리다이렉트
   useEffect(() => {
     if (!evaluatorId || !id) return;
