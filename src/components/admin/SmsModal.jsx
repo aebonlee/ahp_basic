@@ -23,7 +23,7 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
   const [sending, setSending] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [results, setResults] = useState(null);
-  const [activeTab, setActiveTab] = useState('symbols');
+  const [activeTab, setActiveTab] = useState('templates');
   const textareaRef = useRef(null);
 
   const inviteUrl = `${window.location.origin}${window.location.pathname}#/eval/invite/${projectId}`;
@@ -183,21 +183,38 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
                 <div className={styles.tabBar}>
                   <button
                     type="button"
-                    className={`${styles.tabBtn} ${activeTab === 'symbols' ? styles.tabBtnActive : ''}`}
-                    onClick={() => setActiveTab('symbols')}
-                    disabled={sending}
-                  >
-                    특수문자
-                  </button>
-                  <button
-                    type="button"
                     className={`${styles.tabBtn} ${activeTab === 'templates' ? styles.tabBtnActive : ''}`}
                     onClick={() => setActiveTab('templates')}
                     disabled={sending}
                   >
                     기본문구
                   </button>
+                  <button
+                    type="button"
+                    className={`${styles.tabBtn} ${activeTab === 'symbols' ? styles.tabBtnActive : ''}`}
+                    onClick={() => setActiveTab('symbols')}
+                    disabled={sending}
+                  >
+                    특수문자
+                  </button>
                 </div>
+
+                {activeTab === 'templates' && (
+                  <div className={styles.templateList}>
+                    {TEMPLATES.map((tpl) => (
+                      <button
+                        key={tpl.name}
+                        type="button"
+                        className={styles.templateItem}
+                        onClick={() => applyTemplate(tpl.content)}
+                        disabled={sending}
+                      >
+                        <span className={styles.templateName}>{tpl.name}</span>
+                        <span className={styles.templateContent}>{tpl.content}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {activeTab === 'symbols' && (
                   <div className={styles.symbolGrid}>
@@ -214,22 +231,6 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
                     ))}
                   </div>
                 )}
-
-                {activeTab === 'templates' && (
-                  <div className={styles.templateList}>
-                    {TEMPLATES.map((tpl) => (
-                      <button
-                        key={tpl.name}
-                        type="button"
-                        className={styles.templateItem}
-                        onClick={() => applyTemplate(tpl.content)}
-                        disabled={sending}
-                      >
-                        {tpl.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <textarea
@@ -238,7 +239,7 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId }) {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="메시지를 입력하세요"
-                rows={6}
+                rows={8}
                 disabled={sending}
               />
               <div className={styles.byteCounter}>
