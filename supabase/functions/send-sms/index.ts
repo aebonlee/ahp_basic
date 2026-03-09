@@ -69,17 +69,16 @@ function buildRequestJson(
   // Normalize newlines (match Java: strData.replaceAll("\r\n", "\n"))
   const cleanMsg = msg.replace(/\r\n/g, "\n");
 
-  // Determine SMS vs LMS (match Java: byteLength <= 90 → SMS, else LMS)
+  // Determine SMS vs LMS (Java: byteLength <= 90 → SMS, title="")
   const byteLen = eucKrByteLength(cleanMsg);
   const title = byteLen <= 90 ? "" : "LMS";
 
-  // Build JSON matching Java SMSComponent structure exactly:
-  // Java builds: jsonB = "\"msg\":\""+msg+"\",\"title\":\""+title+"\"}"
-  // Then encodes Korean chars in jsonB
-  // Then: json = "{\"key\":\"...\",\"tel\":\"...\",\"cb\":\"...\",\"date\":\"...\"," + encodedJsonB
+  // Encode Korean characters in msg/title to \uXXXX (matching Java encode())
   const encodedMsg = encodeKorean(cleanMsg);
   const encodedTitle = encodeKorean(title);
 
+  // JSON matching Java SMSComponent exactly:
+  // key=token, tel=receiver, cb=sender(callback), date="" for immediate
   const json =
     `{"key":"${token}","tel":"${tel}","cb":"${cb}","date":"",` +
     `"msg":"${encodedMsg}","title":"${encodedTitle}"}`;
