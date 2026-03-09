@@ -36,7 +36,7 @@
 .barList {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 6px var(--spacing-sm);
+  gap: 5px var(--spacing-sm);
   align-items: center;
 }
 
@@ -44,34 +44,12 @@
   display: contents;
 }
 
-/* 상위기준 행 — 위에 간격 추가 */
-.barRowTop > .barLabel,
-.barRowTop > .barTrack,
-.barRowTop > .barValue {
-  padding-top: 4px;
-}
-
-.barRowTop > .barLabel {
-  border-top: 1px solid var(--color-border-light);
-  padding-top: 10px;
-}
-
-.barRowTop > .barTrack {
-  border-top: 1px solid var(--color-border-light);
-  padding-top: 10px;
-}
-
-.barRowTop > .barValue {
-  border-top: 1px solid var(--color-border-light);
-  padding-top: 10px;
-}
-
-/* 첫 번째 상위기준에는 상단 구분선 불필요 */
-.barRowTop:first-child > .barLabel,
-.barRowTop:first-child > .barTrack,
-.barRowTop:first-child > .barValue {
-  border-top: none;
-  padding-top: 0;
+/* 상위기준 그룹 사이 구분선 */
+.barDivider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--color-border-light);
+  margin: 4px 0;
 }
 
 .barLabel {
@@ -90,6 +68,7 @@
 .barLabelSub {
   font-weight: 400;
   color: var(--color-text-light);
+  font-size: 0.85rem;
 }
 
 .barTrack {
