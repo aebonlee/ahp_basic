@@ -43,12 +43,18 @@ export default function ResultSummary({ criteria, alternatives, results }) {
       <div className={styles.barList}>
         {criteria.map(c => {
           const level = getLevel(criteria, c.id);
+          const isTop = level === 0;
           const global = getGlobalPriority(c.id);
           const pct = (global * 100).toFixed(3);
 
           return (
-            <div key={c.id} className={styles.barRow} style={{ paddingLeft: level * 16 }}>
-              <span className={styles.barLabel}>{c.name}</span>
+            <div key={c.id} className={`${styles.barRow} ${isTop ? styles.barRowTop : styles.barRowSub}`}>
+              <span
+                className={`${styles.barLabel} ${isTop ? styles.barLabelTop : styles.barLabelSub}`}
+                style={{ paddingLeft: level * 16 }}
+              >
+                {isTop ? '■ ' : '└ '}{c.name}
+              </span>
               <div className={styles.barTrack}>
                 <div
                   className={styles.barFill}
@@ -58,7 +64,7 @@ export default function ResultSummary({ criteria, alternatives, results }) {
                   }}
                 />
               </div>
-              <span className={styles.barValue}>{pct}%</span>
+              <span className={`${styles.barValue} ${isTop ? styles.barValueTop : ''}`}>{pct}%</span>
             </div>
           );
         })}

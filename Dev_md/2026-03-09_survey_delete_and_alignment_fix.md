@@ -52,6 +52,34 @@
 
 ---
 
+## 3. 기준 종합중요도 차트 정렬 + 상위/하위기준 시각 구분
+
+### 배경
+- 기준 종합중요도 차트에서 `paddingLeft: level * 16`이 행 전체에 적용되어 바 트랙 시작점이 레벨마다 달라짐
+- 상위기준과 하위기준의 시각적 구분이 없어 가독성 저하
+
+### 변경 파일
+
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/components/results/ResultSummary.jsx` | 상위기준(■)/하위기준(└) 접두어, `barRowTop`/`barRowSub` 클래스 분리, 인덴트를 라벨에만 적용 |
+| `src/styles/results.module.css` | CSS Grid 레이아웃(`auto 1fr auto`), `display: contents`, 상위기준 굵은 폰트 + 구분선, 하위기준 연한 색상 |
+
+### 시각 결과
+```
+■ 상위기준A       ████████████████  35.200%   ← 굵은 글씨, 큰 폰트
+  └ 하위기준1     ████████          18.500%   ← 연한 색, 인덴트
+  └ 하위기준2     ███████           16.700%
+─────────────────────────────────────────────  ← 구분선
+■ 상위기준B       ████████████████  34.800%
+  └ 하위기준3     ██████████        20.100%
+```
+
+- 바 트랙 시작점이 모든 행에서 동일 (CSS Grid `auto` 컬럼)
+- 상위기준 그룹 사이에 구분선으로 시각적 분리
+
+---
+
 ## 수정 파일 요약
 
 | # | 파일 | 변경 |
@@ -61,5 +89,7 @@
 | 3 | `src/pages/SurveyBuilderPage.module.css` | 헤더 액션 버튼 스타일 |
 | 4 | `src/styles/pairwise.module.css` | 9점 척도 라벨 고정폭 정렬 |
 | 5 | `src/components/evaluation/PriorityBarChart.module.css` | CSS Grid 정렬 |
+| 6 | `src/components/results/ResultSummary.jsx` | 상위/하위 기준 시각 구분 + 정렬 |
+| 7 | `src/styles/results.module.css` | CSS Grid 정렬 + 상위/하위 스타일 |
 
-**총 5개 파일 수정, 신규 파일 0개 (문서 1개 추가)**
+**총 7개 파일 수정, 신규 파일 0개 (문서 1개 추가)**
