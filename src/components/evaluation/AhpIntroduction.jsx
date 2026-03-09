@@ -1,8 +1,9 @@
 import Button from '../common/Button';
+import { PreviewContent } from '../model/ModelPreview';
 import { PAIRWISE_SCALE } from '../../lib/constants';
 import styles from './AhpIntroduction.module.css';
 
-export default function AhpIntroduction({ onStart }) {
+export default function AhpIntroduction({ onStart, projectName, criteriaTree, alternatives }) {
   return (
     <div className={styles.container}>
       <div className={styles.hero}>
@@ -52,6 +53,18 @@ export default function AhpIntroduction({ onStart }) {
           </div>
         </div>
       </div>
+
+      {criteriaTree && criteriaTree.length > 0 && (
+        <div className={styles.modelSection}>
+          <h3 className={styles.modelTitle}>이번 평가의 모델 구조</h3>
+          <p className={styles.modelDesc}>아래는 이번 평가의 기준 계층과 대안입니다.</p>
+          <PreviewContent
+            projectName={projectName}
+            criteriaTree={criteriaTree}
+            alternatives={alternatives || []}
+          />
+        </div>
+      )}
 
       <details className={styles.scaleDetails}>
         <summary className={styles.scaleSummary}>17점 척도 상세 보기</summary>

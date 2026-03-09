@@ -59,6 +59,8 @@ function PreviewContent({ projectName, criteriaTree, alternatives }) {
   );
 }
 
+export { PreviewContent };
+
 export default function ModelPreview({ projectName, criteriaTree, alternatives, onClose, inline }) {
   if (inline) {
     return <PreviewContent projectName={projectName} criteriaTree={criteriaTree} alternatives={alternatives} />;

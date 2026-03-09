@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { useSurveyConfig, useSurveyQuestions, useConsentRecords, useSurveyResponses } from '../hooks/useSurvey';
-import { formatPhone } from '../lib/evaluatorUtils';
+import { formatPhone, isRepeatedName } from '../lib/evaluatorUtils';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
 import styles from './InviteLandingPage.module.css';
@@ -30,6 +30,7 @@ export default function InviteLandingPage() {
   const [regPhone, setRegPhone] = useState('');
   const [regError, setRegError] = useState('');
   const [registering, setRegistering] = useState(false);
+  const [pendingEvaluator, setPendingEvaluator] = useState(null);
 
   // 사전설문 관련 hooks
   const { config, loading: configLoading } = useSurveyConfig(token);
@@ -158,6 +159,10 @@ export default function InviteLandingPage() {
       setRegError('이름을 입력해주세요.');
       return;
     }
+    if (isRepeatedName(regName)) {
+      setRegError('올바른 이름을 입력해주세요.');
+      return;
+    }
     const cleanPhone = regPhone.replace(/\D/g, '');
     if (cleanPhone.length < 10) {
       setRegError('올바른 전화번호를 입력해주세요.');
@@ -181,7 +186,18 @@ export default function InviteLandingPage() {
     }
 
     if (data && data.length > 0) {
-      completeVerification({ id: data[0].id, name: data[0].name });
+      const row = data[0];
+      if (row.is_existing) {
+        // 기존 평가자: 이름 일치 여부 확인
+        if (row.name === regName.trim()) {
+          setPendingEvaluator(row);
+          setStatus('confirm_existing');
+        } else {
+          setRegError('이 전화번호로 이미 등록된 평가자가 있습니다. 등록된 이름을 정확히 입력해주세요.');
+        }
+      } else {
+        completeVerification({ id: row.id, name: row.name });
+      }
     }
     setRegistering(false);
   };
@@ -320,6 +336,30 @@ export default function InviteLandingPage() {
                   {ev.name} ({ev.email})
                 </button>
               ))}
+            </div>
+          </>
+        )}
+
+        {status === 'confirm_existing' && pendingEvaluator && (
+          <>
+            <h2 className={styles.projectName}>{project?.name}</h2>
+            <p className={styles.desc}>
+              <strong>{pendingEvaluator.name}</strong>님의 기존 평가 기록이 있습니다.<br />
+              이전 평가를 이어서 진행하시겠습니까?
+            </p>
+            <div className={styles.verifyForm}>
+              <Button onClick={() => completeVerification(pendingEvaluator)}>
+                이어서 진행하기
+              </Button>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => {
+                  setPendingEvaluator(null);
+                  setStatus('need_registration');
+                }}
+              >
+                돌아가기
+              </button>
             </div>
           </>
         )}

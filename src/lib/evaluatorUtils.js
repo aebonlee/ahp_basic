@@ -9,6 +9,17 @@ export function formatPhone(value) {
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
+/**
+ * 이름이 같은 글자만 반복되는지 검사 (예: "김김김", "ㅋㅋㅋ", "aaa")
+ * 2글자 미만이거나 모든 글자가 동일하면 true
+ */
+export function isRepeatedName(name) {
+  const trimmed = name.trim();
+  if (trimmed.length < 2) return true;
+  const chars = [...trimmed];
+  return chars.every(c => c === chars[0]);
+}
+
 export function findEvaluatorId(evaluators, user, projectId) {
   // 1. 로그인 사용자: user_id 매칭 (기존 로직)
   if (user?.id) {

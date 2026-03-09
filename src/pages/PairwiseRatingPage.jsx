@@ -13,6 +13,7 @@ import BestFitHelper from '../components/evaluation/BestFitHelper';
 import PageNavigator from '../components/evaluation/PageNavigator';
 import EvaluationProgress from '../components/evaluation/EvaluationProgress';
 import AhpIntroduction from '../components/evaluation/AhpIntroduction';
+import ModelPreview from '../components/model/ModelPreview';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HelpButton from '../components/common/HelpButton';
 import { findEvaluatorId } from '../lib/evaluatorUtils';
@@ -29,6 +30,8 @@ export default function PairwiseRatingPage() {
   const { criteria, alternatives, comparisons, loading, loadProjectData } = useEvaluation();
   const [currentPage, setCurrentPage] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
+  const [showModel, setShowModel] = useState(false);
+  const [projectName, setProjectName] = useState('');
 
   // Handle #page=N hash navigation (from result page "돌아가기")
   useEffect(() => {
@@ -68,6 +71,30 @@ export default function PairwiseRatingPage() {
     }
   }, [id, evaluatorId, loadProjectData]);
 
+  // Fetch project name for model preview
+  useEffect(() => {
+    if (!id) return;
+    supabase.from('projects').select('name').eq('id', id).single()
+      .then(({ data }) => { if (data) setProjectName(data.name); });
+  }, [id]);
+
+  // Build criteria tree for model preview
+  const criteriaTree = useMemo(() => {
+    const map = {};
+    const roots = [];
+    for (const c of criteria) {
+      map[c.id] = { ...c, children: [] };
+    }
+    for (const c of criteria) {
+      if (c.parent_id && map[c.parent_id]) {
+        map[c.parent_id].children.push(map[c.id]);
+      } else {
+        roots.push(map[c.id]);
+      }
+    }
+    return roots;
+  }, [criteria]);
+
   const pageSequence = useMemo(
     () => buildPageSequence(criteria, alternatives, id),
     [criteria, alternatives, id]
@@ -94,7 +121,12 @@ export default function PairwiseRatingPage() {
   if (showIntro) {
     return (
       <PageLayout>
-        <AhpIntroduction onStart={() => setShowIntro(false)} />
+        <AhpIntroduction
+          onStart={() => setShowIntro(false)}
+          projectName={projectName}
+          criteriaTree={criteriaTree}
+          alternatives={alternatives}
+        />
       </PageLayout>
     );
   }
@@ -121,6 +153,12 @@ export default function PairwiseRatingPage() {
             </span>
           </h2>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <button className={styles.modelBtn} onClick={() => setShowModel(true)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+              모델 보기
+            </button>
             <span className={styles.pageNum}>{currentPage + 1}/{pageSequence.length}</span>
             <HelpButton helpKey="evalProgress" />
           </span>
@@ -161,6 +199,15 @@ export default function PairwiseRatingPage() {
         }}
         onGoTo={setCurrentPage}
       />
+
+      {showModel && (
+        <ModelPreview
+          projectName={projectName}
+          criteriaTree={criteriaTree}
+          alternatives={alternatives}
+          onClose={() => setShowModel(false)}
+        />
+      )}
     </PageLayout>
   );
 }

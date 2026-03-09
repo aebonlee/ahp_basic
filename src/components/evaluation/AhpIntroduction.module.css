@@ -143,6 +143,29 @@
   font-family: var(--font-mono);
 }
 
+/* Model Structure Section */
+.modelSection {
+  margin-bottom: var(--spacing-xl);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+.modelTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.modelDesc {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-md);
+}
+
 /* Start Button */
 .startBtn {
   display: block;
