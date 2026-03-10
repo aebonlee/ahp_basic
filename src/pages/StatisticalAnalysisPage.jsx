@@ -305,6 +305,31 @@ const GUIDE_SECTIONS = [
       { q: '크론바흐 알파가 낮으면 어떻게 해야 하나요?', a: '\'삭제 시 \u03B1\' 값을 확인하여 제거하면 알파가 향상되는 문항을 식별하세요. 항목-총점 상관이 0.3 미만인 항목도 재검토 대상입니다.' },
     ],
   },
+  {
+    title: '11. 통계 분석별 변수 제약사항',
+    constraintIntro: '각 통계 분석은 수행을 위해 최소한의 변수 유형과 개수가 필요합니다. 설문에 포함된 질문 유형에 따라 사용 가능한 분석이 달라집니다.',
+    table: {
+      headers: ['분석 방법', '필요 변수', '최소 개수', '수치 변수 1개', '수치 변수 2개+'],
+      rows: [
+        ['기술통계', '수치형', '1개', '\u2705 사용 가능', '\u2705 사용 가능'],
+        ['독립표본 T검정', '범주형 1 + 수치형 1', '각 1개', '\u2705 사용 가능', '\u2705 사용 가능'],
+        ['대응표본 T검정', '수치형 2개 (서로 다른 변수)', '2개', '\u274C 변수 부족', '\u2705 사용 가능'],
+        ['일원분산분석 (ANOVA)', '범주형 1 + 수치형 1', '각 1개', '\u2705 사용 가능', '\u2705 사용 가능'],
+        ['카이제곱 검정', '범주형 2개', '2개', '\u2014 (범주형 필요)', '\u2014 (범주형 필요)'],
+        ['상관분석 (Pearson)', '수치형 2개+', '2개', '\u274C 변수 부족', '\u2705 사용 가능'],
+        ['Spearman 순위상관', '수치형 2개+', '2개', '\u274C 변수 부족', '\u2705 사용 가능'],
+        ['단순선형회귀', '수치형 2개 (X, Y)', '2개', '\u274C 변수 부족', '\u2705 사용 가능'],
+        ['크론바흐 알파', '수치형 (리커트) 2개+', '2개', '\u274C 변수 부족', '\u2705 사용 가능'],
+        ['교차분석', '범주형 2개', '2개', '\u2014 (범주형 필요)', '\u2014 (범주형 필요)'],
+      ],
+    },
+    constraintNotes: [
+      { label: '수치형 변수', desc: '숫자 입력, 리커트 척도(1~5, 1~7 등) 문항이 해당됩니다.' },
+      { label: '범주형 변수', desc: '단일 선택(라디오), 드롭다운, 체크박스 문항이 해당됩니다.' },
+      { label: '변수 부족 시', desc: '해당 분석의 변수 선택 화면에서 부족 안내와 대체 분석이 표시됩니다.' },
+      { label: '해결 방법', desc: '설문 설계 단계에서 필요한 유형의 질문을 추가하면 모든 분석을 사용할 수 있습니다.' },
+    ],
+  },
 ];
 
 function MethodGuideBox({ analysisType, onOpenGuide }) {
@@ -414,6 +439,11 @@ function StatsGuide({ onBack, onSelect }) {
             </div>
           )}
 
+          {/* 제약사항 소개문 */}
+          {section.constraintIntro && (
+            <p className={styles.guideIntro}>{section.constraintIntro}</p>
+          )}
+
           {/* 테이블 형태 */}
           {section.table && (
             <div className={styles.guideTableWrap}>
@@ -466,6 +496,18 @@ function StatsGuide({ onBack, onSelect }) {
                   <summary className={styles.faqQ}>Q. {item.q}</summary>
                   <p className={styles.faqA}>{item.a}</p>
                 </details>
+              ))}
+            </div>
+          )}
+
+          {/* 제약사항 참고 사항 */}
+          {section.constraintNotes && (
+            <div className={styles.constraintNotes}>
+              {section.constraintNotes.map((item, i) => (
+                <div key={i} className={styles.constraintNoteItem}>
+                  <strong>{item.label}</strong>
+                  <span>{item.desc}</span>
+                </div>
               ))}
             </div>
           )}
