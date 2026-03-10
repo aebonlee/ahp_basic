@@ -549,15 +549,15 @@ function EvalDetail({ evaluator, questions, getResponsesByEvaluator, evalCount, 
           {myResponses.length === 0 ? (
             <div className={styles.detailEmpty}>설문에 응답하지 않았습니다.</div>
           ) : (
-            <div className={styles.answerGrid}>
-              {questions.map((q, qi) => {
+            <div className={styles.answerList}>
+              {questions.map(q => {
                 const ans = answerMap[q.id];
                 return (
-                  <div key={q.id} className={styles.answerCell}>
-                    <div className={styles.answerLabel}>{q.question_text}</div>
-                    <div className={styles.answerVal}>
+                  <div key={q.id} className={styles.answerRow}>
+                    <span className={styles.answerLabel}>{q.question_text}</span>
+                    <span className={styles.answerVal}>
                       {ans ? formatAnswer(ans) : <span className={styles.answerNone}>-</span>}
-                    </div>
+                    </span>
                   </div>
                 );
               })}

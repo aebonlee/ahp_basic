@@ -503,32 +503,34 @@
   padding: 8px 0;
 }
 
-/* 설문 응답 그리드 (3~4열) */
-.answerGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+/* 설문 응답 리스트 */
+.answerList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.answerCell {
-  padding: 6px 8px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-sm);
-  min-width: 0;
+.answerRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.answerRow:last-child {
+  border-bottom: none;
 }
 
 .answerLabel {
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .answerVal {
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text);
   word-break: break-word;
@@ -731,10 +733,6 @@
   .masterList {
     grid-template-columns: 1fr;
   }
-
-  .answerGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 @media (max-width: 900px) {
@@ -771,10 +769,6 @@
 
   .masterList {
     grid-template-columns: 1fr;
-  }
-
-  .answerGrid {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .statsGrid {
