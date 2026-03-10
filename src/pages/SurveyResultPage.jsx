@@ -727,12 +727,29 @@ function QuestionResult({ question, index, responses }) {
 
 function TextResults({ responses }) {
   if (responses.length === 0) return <p className={styles.emptyMsg}>응답 없음</p>;
+
+  const cols = useMemo(() => {
+    const maxLen = responses.reduce((mx, r) => {
+      const txt = r.answer?.value ?? JSON.stringify(r.answer);
+      return Math.max(mx, txt.length);
+    }, 0);
+    if (maxLen <= 5) return 6;
+    if (maxLen <= 10) return 5;
+    if (maxLen <= 15) return 4;
+    if (maxLen <= 25) return 3;
+    if (maxLen <= 40) return 2;
+    return 1;
+  }, [responses]);
+
   return (
-    <ul className={styles.textList}>
+    <div
+      className={styles.textList}
+      style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+    >
       {responses.map(r => (
-        <li key={r.id} className={styles.textItem}>{r.answer?.value ?? JSON.stringify(r.answer)}</li>
+        <div key={r.id} className={styles.textItem}>{r.answer?.value ?? JSON.stringify(r.answer)}</div>
       ))}
-    </ul>
+    </div>
   );
 }
 

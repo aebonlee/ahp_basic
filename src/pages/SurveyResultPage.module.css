@@ -671,20 +671,21 @@
 }
 
 .textList {
-  list-style: none;
+  display: grid;
+  gap: 6px;
   padding: 0;
   margin: 0;
 }
 
 .textItem {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 6px 10px;
   font-size: 0.95rem;
   color: var(--color-text);
-}
-
-.textItem:last-child {
-  border-bottom: none;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-light);
+  white-space: normal;
+  word-break: break-word;
 }
 
 .statsGrid {
@@ -757,6 +758,10 @@
   .detailPanel {
     position: static;
   }
+
+  .textList {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
 }
 
 @media (max-width: 600px) {
@@ -779,5 +784,9 @@
   .summary {
     flex-direction: column;
     text-align: center;
+  }
+
+  .textList {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
   }
 }
