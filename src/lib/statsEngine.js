@@ -2,7 +2,7 @@
  * 통계분석 엔진 — 10개 분석 함수
  * 각 함수는 { summary, details, chartData } 형태로 반환
  */
-import { tCDF, fCDF, chiSquaredCDF } from './statsDistributions';
+import { tCDF, tCritical, fCDF, chiSquaredCDF } from './statsDistributions';
 
 /* ── 유틸리티 (빈 배열 안전) ── */
 function mean(arr) {
@@ -107,14 +107,24 @@ function cohensLabel(d) {
   return '미미한 효과';
 }
 
-/** 사분위수 계산 */
+/** 백분위수 — 선형보간법 (R type 7, Excel/SPSS 호환) */
+function percentile(sorted, p) {
+  const n = sorted.length;
+  if (n === 0) return 0;
+  if (n === 1) return sorted[0];
+  const pos = p * (n - 1);
+  const lo = Math.floor(pos);
+  const hi = Math.min(lo + 1, n - 1);
+  const frac = pos - lo;
+  return sorted[lo] + frac * (sorted[hi] - sorted[lo]);
+}
+
+/** 사분위수 계산 — 선형보간법 (SPSS/Excel 호환) */
 function quartiles(arr) {
   if (!arr || arr.length < 4) return { q1: 0, q3: 0, iqr: 0 };
   const sorted = [...arr].sort((a, b) => a - b);
-  const q1Idx = Math.floor(sorted.length * 0.25);
-  const q3Idx = Math.floor(sorted.length * 0.75);
-  const q1 = sorted[q1Idx];
-  const q3 = sorted[q3Idx];
+  const q1 = percentile(sorted, 0.25);
+  const q3 = percentile(sorted, 0.75);
   return { q1: round(q1), q3: round(q3), iqr: round(q3 - q1) };
 }
 
@@ -122,10 +132,8 @@ function quartiles(arr) {
 function detectOutliers(arr) {
   if (!arr || arr.length < 4) return { count: 0, indices: [], lower: 0, upper: 0 };
   const sorted = [...arr].sort((a, b) => a - b);
-  const q1Idx = Math.floor(sorted.length * 0.25);
-  const q3Idx = Math.floor(sorted.length * 0.75);
-  const q1 = sorted[q1Idx];
-  const q3 = sorted[q3Idx];
+  const q1 = percentile(sorted, 0.25);
+  const q3 = percentile(sorted, 0.75);
   const iqr = q3 - q1;
   const lower = q1 - 1.5 * iqr;
   const upper = q3 + 1.5 * iqr;
@@ -200,9 +208,14 @@ export function descriptiveStats(values) {
   const outliers = detectOutliers(values);
   const q = quartiles(values);
   const se = n > 1 ? round(s / Math.sqrt(n)) : 0;
-  const tCrit = n >= 30 ? 1.96 : 2.045; // approximate t for 95% CI
-  const ciLower = round(m - tCrit * (s / Math.sqrt(n)));
-  const ciUpper = round(m + tCrit * (s / Math.sqrt(n)));
+  const df = n - 1;
+  const tc = n > 1 ? tCritical(0.05, df) : 1.96;
+  const ciLower = round(m - tc * (s / Math.sqrt(n)));
+  const ciUpper = round(m + tc * (s / Math.sqrt(n)));
+
+  // Jarque-Bera 정규성 검정 (H₀: 정규분포)
+  const jbStat = n >= 8 ? (n / 6) * (sk * sk + (ku * ku) / 4) : 0;
+  const jbP = n >= 8 ? chiSquaredCDF(jbStat, 2) : 1;
 
   return {
     summary: {
@@ -215,12 +228,16 @@ export function descriptiveStats(values) {
       SE: se,
       Q1: q.q1, Q3: q.q3, IQR: q.iqr,
       CI95_lower: ciLower, CI95_upper: ciUpper,
+      tCritical: round(tc, 4),
     },
     normality: {
       skewnessOk: Math.abs(sk) <= 2,
       kurtosisOk: Math.abs(ku) <= 7,
       skewnessLabel: Math.abs(sk) <= 2 ? '정상 범위 (|왜도| ≤ 2)' : '정규성 위반 가능 (|왜도| > 2)',
       kurtosisLabel: Math.abs(ku) <= 7 ? '정상 범위 (|첨도| ≤ 7)' : '정규성 위반 가능 (|첨도| > 7)',
+      jbStat: n >= 8 ? round(jbStat) : null,
+      jbP: n >= 8 ? round(jbP, 6) : null,
+      jbLabel: n < 8 ? '표본 부족 (N ≥ 8 필요)' : jbP < 0.05 ? '정규성 기각 (p < .05) — 비모수 검정 권장' : '정규성 충족 (p ≥ .05)',
     },
     details: [],
     chartData: histogram,
@@ -254,7 +271,7 @@ export function independentTTest(group1, group2) {
   const cohensD = pooledSD > 0 ? Math.abs(m1 - m2) / pooledSD : 0;
 
   // 95% CI for mean difference
-  const tCrit = df >= 30 ? 1.96 : 2.045;
+  const tCrit = tCritical(0.05, df);
   const ciLower = round((m1 - m2) - tCrit * se);
   const ciUpper = round((m1 - m2) + tCrit * se);
 
@@ -312,7 +329,7 @@ export function pairedTTest(values1, values2) {
   const cohensD = sD > 0 ? Math.abs(mD) / sD : 0;
 
   // 95% CI for mean difference
-  const tCrit = df >= 30 ? 1.96 : 2.045;
+  const tCrit = tCritical(0.05, df);
   const ciLower = round(mD - tCrit * se);
   const ciUpper = round(mD + tCrit * se);
 

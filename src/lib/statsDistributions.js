@@ -177,6 +177,22 @@ export function chiSquaredCDF(x, k) {
 }
 
 /**
+ * t분포 역함수 (양측 α → 임계값)
+ * 이진탐색으로 tCDF(t, df) ≈ α 가 되는 t를 찾음
+ * 95% CI에는 tCritical(0.05, df) 사용
+ */
+export function tCritical(alpha, df) {
+  if (df <= 0 || alpha <= 0 || alpha >= 1) return 1.96;
+  let lo = 0, hi = 50;
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    if (tCDF(mid, df) > alpha) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/**
  * 표준정규분포 CDF Φ(z)
  * Horner 형식의 유리 근사법 (Abramowitz & Stegun 26.2.17, 오차 < 7.5e-8)
  */
