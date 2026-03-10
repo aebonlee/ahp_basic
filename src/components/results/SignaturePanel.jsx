@@ -28,10 +28,12 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
 
   const percent = totalCells > 0 ? Math.round((completedCells / totalCells) * 100) : 0;
 
+  const canComplete = allComplete && allConsistent;
+
   const handleSign = async () => {
+    if (!canComplete) return;
+
     let msg = '평가를 완료하시겠습니까?';
-    if (!allComplete) msg = `아직 미완료 항목이 있습니다 (${completedCells}/${totalCells}). 그래도 완료하시겠습니까?`;
-    else if (!allConsistent) msg = '비일관성비율이 높은 항목이 있습니다. 그래도 완료하시겠습니까?';
     if (hasSurveyResponses) msg += '\n\n설문 응답을 확인하셨습니까? "설문 응답" 탭에서 본인의 응답을 확인할 수 있습니다.';
 
     if (!(await confirm({ title: '평가 완료', message: msg, variant: 'warning' }))) return;
@@ -75,8 +77,11 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
             data-complete={percent === 100 ? '' : undefined}
           />
         </div>
+        {!allComplete && (
+          <span className={styles.sigWarn}>미완료 항목이 있습니다 ({completedCells}/{totalCells})</span>
+        )}
         {!allConsistent && (
-          <span className={styles.sigWarn}>비일관성 기준 초과 항목이 있습니다</span>
+          <span className={styles.sigWarn}>비일관성비율(CR) 초과 항목이 있습니다 — 수정 후 완료해주세요</span>
         )}
       </div>
 
@@ -92,8 +97,9 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
             variant="success"
             loading={loading}
             onClick={handleSign}
+            disabled={!canComplete}
           >
-            평가 완료
+            {canComplete ? '평가 완료' : !allComplete ? '미완료 항목 있음' : 'CR 초과 — 수정 필요'}
           </Button>
         )}
       </div>
