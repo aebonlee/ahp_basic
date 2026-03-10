@@ -512,8 +512,9 @@
 
 .answerRow {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
   padding: 5px 0;
   border-bottom: 1px solid var(--color-border-light);
 }
@@ -525,15 +526,16 @@
 .answerLabel {
   font-size: 0.875rem;
   color: var(--color-text-muted);
-  flex-shrink: 0;
-  min-width: 0;
+  text-align: left;
 }
 
 .answerVal {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text);
+  text-align: right;
   word-break: break-word;
+  margin-left: auto;
 }
 
 .answerNone {
