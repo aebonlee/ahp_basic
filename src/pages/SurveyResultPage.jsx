@@ -4,12 +4,15 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { supabase } from '../lib/supabaseClient';
 import { useSurveyQuestions, useSurveyResponses } from '../hooks/useSurvey';
 import { useEvaluators } from '../hooks/useEvaluators';
+import { useEvaluatorGroups } from '../hooks/useEvaluatorGroups';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { useProject } from '../hooks/useProjects';
+import { useToast } from '../contexts/ToastContext';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import { aggregateComparisons } from '../lib/ahpAggregation';
 import { aggregateDirectInputs } from '../lib/directInputEngine';
+import { computeResultsForEvaluators, exportToExcel } from '../lib/exportUtils';
 import { EVAL_METHOD, CR_THRESHOLD } from '../lib/constants';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -32,18 +35,102 @@ const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed'
 
 export default function SurveyResultPage() {
   const { id } = useParams();
+  const toast = useToast();
   const { questions, loading: qLoading } = useSurveyQuestions(id);
   const { responses, loading: rLoading, getResponsesByQuestion, getResponsesByEvaluator } = useSurveyResponses(id);
   const { evaluators } = useEvaluators(id);
+  const { groups, saveGroup, deleteGroup } = useEvaluatorGroups(id);
   const { criteria } = useCriteria(id);
   const { alternatives } = useAlternatives(id);
   const { currentProject } = useProject(id);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
+  const [smsForChecked, setSmsForChecked] = useState(false);
   const [selectedEval, setSelectedEval] = useState(null);
   const [rawCompData, setRawCompData] = useState([]);
   const [rawDirectData, setRawDirectData] = useState([]);
 
+  // 체크박스 관련 state
+  const [checkedIds, setCheckedIds] = useState(new Set());
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [groupName, setGroupName] = useState('');
+
   const isDirectInput = currentProject?.eval_method === EVAL_METHOD.DIRECT_INPUT;
+
+  const toggleCheck = useCallback((evId) => {
+    setCheckedIds(prev => {
+      const next = new Set(prev);
+      next.has(evId) ? next.delete(evId) : next.add(evId);
+      return next;
+    });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    if (checkedIds.size === evaluators.length) {
+      setCheckedIds(new Set());
+    } else {
+      setCheckedIds(new Set(evaluators.map(e => e.id)));
+    }
+  }, [checkedIds.size, evaluators]);
+
+  // 그룹 불러오기
+  const loadGroup = useCallback((groupId) => {
+    if (!groupId) return;
+    const group = groups.find(g => g.id === groupId);
+    if (group) {
+      const validIds = new Set(evaluators.map(e => e.id));
+      setCheckedIds(new Set(group.evaluator_ids.filter(eid => validIds.has(eid))));
+    }
+  }, [groups, evaluators]);
+
+  // 그룹 저장
+  const handleSaveGroup = useCallback(async () => {
+    const name = groupName.trim();
+    if (!name) return;
+    try {
+      await saveGroup(name, [...checkedIds]);
+      toast.success(`그룹 "${name}" 저장 완료`);
+      setGroupModalOpen(false);
+      setGroupName('');
+    } catch (err) {
+      toast.error('그룹 저장 실패: ' + err.message);
+    }
+  }, [groupName, checkedIds, saveGroup, toast]);
+
+  // 그룹 삭제
+  const handleDeleteGroup = useCallback(async (groupId) => {
+    try {
+      await deleteGroup(groupId);
+      toast.success('그룹 삭제 완료');
+    } catch (err) {
+      toast.error('그룹 삭제 실패: ' + err.message);
+    }
+  }, [deleteGroup, toast]);
+
+  // 선택 평가자 결과 내보내기
+  const handleExportChecked = useCallback(async () => {
+    const ids = [...checkedIds];
+    if (ids.length === 0) return;
+    try {
+      const results = computeResultsForEvaluators(
+        ids, compByEvaluator, directByEvaluator,
+        criteria, alternatives, id, currentProject,
+      );
+      if (!results) {
+        toast.warning('선택된 평가자의 평가 데이터가 없습니다');
+        return;
+      }
+      await exportToExcel(criteria, alternatives, results, `${currentProject?.name || 'AHP'}_선택${ids.length}명`);
+      toast.success(`${ids.length}명 결과 Excel 내보내기 완료`);
+    } catch (err) {
+      toast.error('내보내기 실패: ' + err.message);
+    }
+  }, [checkedIds, compByEvaluator, directByEvaluator, criteria, alternatives, id, currentProject, toast]);
+
+  // SMS 모달에 전달할 평가자
+  const smsEvaluators = useMemo(() => {
+    if (smsForChecked) return evaluators.filter(e => checkedIds.has(e.id));
+    return evaluators;
+  }, [evaluators, checkedIds, smsForChecked]);
 
   // value 포함해서 로드 (개인 결과 계산용)
   const loadCompData = useCallback(async () => {
@@ -155,37 +242,121 @@ export default function SurveyResultPage() {
         <div className={styles.statusCard}>
           <div className={styles.statusHeader}>
             <h3 className={styles.statusTitle}>평가자별 현황</h3>
-            <button className={styles.smsBtn} onClick={() => setSmsModalOpen(true)}>SMS 발송</button>
+            <button className={styles.smsBtn} onClick={() => { setSmsForChecked(false); setSmsModalOpen(true); }}>SMS 발송</button>
           </div>
 
           <div className={styles.masterDetail}>
-            <div className={styles.masterList}>
-              {evaluators.map((ev, idx) => {
-                const hasSurvey = respondedIds.has(ev.id);
-                const count = evalProgress[ev.id] || 0;
-                const isDone = totalRequired > 0 && count >= totalRequired;
-                const isSelected = selectedEval === ev.id;
-                return (
-                  <div key={ev.id} className={`${styles.evalRow} ${isSelected ? styles.evalRowSelected : ''}`}>
-                    <span className={styles.evalIdx}>{idx + 1}</span>
-                    <span className={styles.evalName}>{ev.name || ev.email}</span>
-                    {questions.length > 0 && (
-                      <span className={hasSurvey ? styles.badgeDone : styles.badgePending}>
-                        {hasSurvey ? '설문완료' : '미응답'}
-                      </span>
-                    )}
-                    <span className={isDone ? styles.badgeDone : count > 0 ? styles.badgeProgress : styles.badgePending}>
-                      {isDone ? '평가완료' : count > 0 ? `${count}/${totalRequired}` : '미시작'}
-                    </span>
-                    <button
-                      className={`${styles.detailBtn} ${isSelected ? styles.detailBtnActive : ''}`}
-                      onClick={() => setSelectedEval(isSelected ? null : ev.id)}
+            <div>
+              {/* 마스터 리스트 헤더: 전체선택 + 그룹 불러오기 */}
+              <div className={styles.masterListHeader}>
+                <label>
+                  <input
+                    type="checkbox"
+                    className={styles.evalCheck}
+                    checked={checkedIds.size === evaluators.length && evaluators.length > 0}
+                    onChange={toggleAll}
+                  />
+                  전체선택
+                </label>
+                {groups.length > 0 && (
+                  <>
+                    <select
+                      className={styles.groupSelect}
+                      defaultValue=""
+                      onChange={(e) => { loadGroup(e.target.value); e.target.value = ''; }}
                     >
-                      세부내역
+                      <option value="">그룹 불러오기</option>
+                      {groups.map(g => (
+                        <option key={g.id} value={g.id}>{g.name} ({g.evaluator_ids.length}명)</option>
+                      ))}
+                    </select>
+                    <button
+                      className={styles.groupDeleteBtn}
+                      onClick={() => {
+                        const sel = document.querySelector(`.${styles.groupSelect}`);
+                        if (sel?.value) handleDeleteGroup(sel.value);
+                      }}
+                      title="선택된 그룹 삭제"
+                    >
+                      삭제
                     </button>
+                  </>
+                )}
+              </div>
+
+              {/* 평가자 목록 */}
+              <div className={styles.masterList}>
+                {evaluators.map((ev, idx) => {
+                  const hasSurvey = respondedIds.has(ev.id);
+                  const count = evalProgress[ev.id] || 0;
+                  const isDone = totalRequired > 0 && count >= totalRequired;
+                  const isSelected = selectedEval === ev.id;
+                  return (
+                    <div key={ev.id} className={`${styles.evalRow} ${isSelected ? styles.evalRowSelected : ''}`}>
+                      <input
+                        type="checkbox"
+                        className={styles.evalCheck}
+                        checked={checkedIds.has(ev.id)}
+                        onChange={() => toggleCheck(ev.id)}
+                        aria-label={`${ev.name || ev.email} 선택`}
+                      />
+                      <span className={styles.evalIdx}>{idx + 1}</span>
+                      <span className={styles.evalName}>{ev.name || ev.email}</span>
+                      {questions.length > 0 && (
+                        <span className={hasSurvey ? styles.badgeDone : styles.badgePending}>
+                          {hasSurvey ? '설문완료' : '미응답'}
+                        </span>
+                      )}
+                      <span className={isDone ? styles.badgeDone : count > 0 ? styles.badgeProgress : styles.badgePending}>
+                        {isDone ? '평가완료' : count > 0 ? `${count}/${totalRequired}` : '미시작'}
+                      </span>
+                      <button
+                        className={`${styles.detailBtn} ${isSelected ? styles.detailBtnActive : ''}`}
+                        onClick={() => setSelectedEval(isSelected ? null : ev.id)}
+                      >
+                        세부내역
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 액션 툴바 (1명 이상 체크 시 표시) */}
+              {checkedIds.size > 0 && (
+                <div className={styles.floatingToolbar}>
+                  <span className={styles.toolbarCount}>{checkedIds.size}명 선택</span>
+                  <button className={styles.toolbarBtn} onClick={() => { setSmsForChecked(true); setSmsModalOpen(true); }}>
+                    선택 SMS
+                  </button>
+                  <button className={styles.toolbarBtn} onClick={handleExportChecked}>
+                    결과 내보내기
+                  </button>
+                  <button className={styles.toolbarBtn} onClick={() => { setGroupModalOpen(true); setGroupName(''); }}>
+                    그룹 저장
+                  </button>
+                  <button className={`${styles.toolbarBtn} ${styles.toolbarBtnDanger}`} onClick={() => setCheckedIds(new Set())}>
+                    선택해제
+                  </button>
+                </div>
+              )}
+
+              {/* 그룹 저장 인라인 모달 */}
+              {groupModalOpen && (
+                <div className={styles.groupForm}>
+                  <input
+                    className={styles.groupInput}
+                    placeholder="그룹 이름 입력"
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSaveGroup()}
+                    autoFocus
+                  />
+                  <div className={styles.groupActions}>
+                    <button className={styles.toolbarBtn} onClick={handleSaveGroup}>저장</button>
+                    <button className={`${styles.toolbarBtn} ${styles.toolbarBtnDanger}`} onClick={() => setGroupModalOpen(false)}>취소</button>
                   </div>
-                );
-              })}
+                </div>
+              )}
             </div>
 
             <div className={styles.detailPanel}>
@@ -219,7 +390,7 @@ export default function SurveyResultPage() {
       <SmsModal
         isOpen={smsModalOpen}
         onClose={() => setSmsModalOpen(false)}
-        evaluators={evaluators}
+        evaluators={smsEvaluators}
         projectId={id}
         respondedIds={respondedIds}
         projectName={currentProject?.name}

@@ -1,4 +1,7 @@
-import { CR_THRESHOLD } from './constants';
+import { CR_THRESHOLD, EVAL_METHOD } from './constants';
+import { aggregateComparisons } from './ahpAggregation';
+import { aggregateDirectInputs } from './directInputEngine';
+import { buildPageSequence } from './pairwiseUtils';
 
 /** 파일명에 사용할 수 없는 문자 치환 */
 function safeName(name) {
@@ -103,6 +106,68 @@ export async function exportToExcel(criteria, alternatives, results, projectName
   const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([wbout], { type: 'application/octet-stream' });
   saveAs(blob, `${safeName(projectName)}_${todayStr()}.xlsx`);
+}
+
+/**
+ * 선택된 평가자만으로 AHP 결과를 재집계
+ * @param {string[]} evaluatorIds - 선택된 평가자 ID 배열
+ * @param {Object} compByEvaluator - { evalId: { "critId:rowId:colId": value } }
+ * @param {Object} directByEvaluator - { evalId: { critId: { itemId: value } } }
+ * @param {Array} criteria
+ * @param {Array} alternatives
+ * @param {string} projectId
+ * @param {Object} currentProject
+ */
+export function computeResultsForEvaluators(evaluatorIds, compByEvaluator, directByEvaluator, criteria, alternatives, projectId, currentProject) {
+  if (criteria.length === 0 || evaluatorIds.length === 0) return null;
+
+  const isDirectInput = currentProject?.eval_method === EVAL_METHOD.DIRECT_INPUT;
+  const pageSequence = buildPageSequence(criteria, alternatives, projectId);
+  const pageResults = {};
+  let allConsistent = true;
+
+  for (const page of pageSequence) {
+    const itemIds = page.items.map(i => i.id);
+
+    if (isDirectInput) {
+      const evalValues = evaluatorIds
+        .filter(eid => directByEvaluator[eid])
+        .map(eid => ({
+          values: directByEvaluator[eid][page.parentId] || {},
+          weight: 1,
+        }));
+      if (evalValues.length === 0) {
+        pageResults[page.parentId] = { ...page, priorities: itemIds.map(() => 0), cr: 0 };
+        continue;
+      }
+      pageResults[page.parentId] = { ...page, ...aggregateDirectInputs(itemIds, evalValues) };
+    } else {
+      const evalValues = evaluatorIds
+        .filter(eid => compByEvaluator[eid])
+        .map(eid => {
+          const comps = compByEvaluator[eid];
+          const values = {};
+          for (let i = 0; i < itemIds.length; i++) {
+            for (let j = i + 1; j < itemIds.length; j++) {
+              const key = `${page.parentId}:${itemIds[i]}:${itemIds[j]}`;
+              if (comps[key] !== undefined) {
+                values[`${itemIds[i]}:${itemIds[j]}`] = comps[key] === 0 ? 1 : comps[key];
+              }
+            }
+          }
+          return { values, weight: 1 };
+        });
+      if (evalValues.length === 0) {
+        pageResults[page.parentId] = { ...page, priorities: itemIds.map(() => 0), cr: 0 };
+        continue;
+      }
+      const agg = aggregateComparisons(itemIds, evalValues);
+      pageResults[page.parentId] = { ...page, ...agg };
+      if (agg.cr > CR_THRESHOLD) allConsistent = false;
+    }
+  }
+
+  return { goalId: projectId, pageResults, pageSequence, allConsistent };
 }
 
 export function getCriteriaGlobal(criteria, criterionId, results) {
