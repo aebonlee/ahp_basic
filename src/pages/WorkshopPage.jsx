@@ -6,6 +6,7 @@ import { useEvaluators } from '../hooks/useEvaluators';
 import { useCriteria } from '../hooks/useCriteria';
 import { useAlternatives } from '../hooks/useAlternatives';
 import { buildPageSequence } from '../lib/pairwiseUtils';
+import { EVAL_METHOD } from '../lib/constants';
 import { useToast } from '../contexts/ToastContext';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import ProgressBar from '../components/common/ProgressBar';
@@ -20,62 +21,87 @@ export default function WorkshopPage() {
   const { evaluators, loading: evalLoading } = useEvaluators(id);
   const { criteria, loading: critLoading } = useCriteria(id);
   const { alternatives, loading: altLoading } = useAlternatives(id);
-  const [rawComparisons, setRawComparisons] = useState([]);
+  const [rawData, setRawData] = useState([]);
   const toast = useToast();
 
-  const loadComparisons = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('pairwise_comparisons')
-      .select('evaluator_id, criterion_id, row_id, col_id')
-      .eq('project_id', id);
-    if (error) { toast.error('비교 데이터 로딩 실패'); }
-    setRawComparisons(data || []);
-  }, [id, toast]);
+  const isDirectInput = currentProject?.eval_method === EVAL_METHOD.DIRECT_INPUT;
+
+  const loadData = useCallback(async () => {
+    if (isDirectInput) {
+      const { data, error } = await supabase
+        .from('direct_input_values')
+        .select('evaluator_id, criterion_id, item_id')
+        .eq('project_id', id);
+      if (error) { toast.error('평가 데이터 로딩 실패'); }
+      setRawData(data || []);
+    } else {
+      const { data, error } = await supabase
+        .from('pairwise_comparisons')
+        .select('evaluator_id, criterion_id, row_id, col_id')
+        .eq('project_id', id);
+      if (error) { toast.error('비교 데이터 로딩 실패'); }
+      setRawData(data || []);
+    }
+  }, [id, isDirectInput, toast]);
 
   useEffect(() => {
+    const table = isDirectInput ? 'direct_input_values' : 'pairwise_comparisons';
     const channel = supabase
       .channel(`workshop-${id}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'pairwise_comparisons',
+        table,
         filter: `project_id=eq.${id}`,
       }, () => {
-        loadComparisons();
+        loadData();
       })
       .subscribe();
 
-    loadComparisons();
+    loadData();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [id, loadComparisons]);
+  }, [id, isDirectInput, loadData]);
 
-  // Build page sequence and valid pair keys
+  // Build page sequence and valid keys
   const { totalRequired, validKeys } = useMemo(() => {
     if (criteria.length === 0) return { totalRequired: 0, validKeys: new Set() };
     const pages = buildPageSequence(criteria, alternatives, id);
     const keys = new Set();
-    for (const page of pages) {
-      for (const pair of page.pairs) {
-        keys.add(`${page.parentId}:${pair.left.id}:${pair.right.id}`);
+
+    if (isDirectInput) {
+      // Direct input: each item per page is one entry
+      for (const page of pages) {
+        for (const item of page.items) {
+          keys.add(`${page.parentId}:${item.id}`);
+        }
+      }
+    } else {
+      // Pairwise: each pair per page is one entry
+      for (const page of pages) {
+        for (const pair of page.pairs) {
+          keys.add(`${page.parentId}:${pair.left.id}:${pair.right.id}`);
+        }
       }
     }
     return { totalRequired: keys.size, validKeys: keys };
-  }, [criteria, alternatives, id]);
+  }, [criteria, alternatives, id, isDirectInput]);
 
-  // Count only valid comparisons per evaluator (exclude orphaned DB rows)
+  // Count only valid entries per evaluator (exclude orphaned DB rows)
   const progress = useMemo(() => {
     const counts = {};
-    for (const row of rawComparisons) {
-      const key = `${row.criterion_id}:${row.row_id}:${row.col_id}`;
+    for (const row of rawData) {
+      const key = isDirectInput
+        ? `${row.criterion_id}:${row.item_id}`
+        : `${row.criterion_id}:${row.row_id}:${row.col_id}`;
       if (validKeys.has(key)) {
         counts[row.evaluator_id] = (counts[row.evaluator_id] || 0) + 1;
       }
     }
     return counts;
-  }, [rawComparisons, validKeys]);
+  }, [rawData, validKeys, isDirectInput]);
 
   if (projLoading || critLoading || altLoading || evalLoading) {
     return <ProjectLayout><LoadingSpinner /></ProjectLayout>;
