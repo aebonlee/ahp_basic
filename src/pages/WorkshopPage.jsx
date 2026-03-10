@@ -124,18 +124,19 @@ export default function WorkshopPage() {
           <div className={styles.evalList}>
             {evaluators.map(ev => {
               const count = progress[ev.id] || 0;
+              const isDone = totalRequired > 0 && count >= totalRequired;
               return (
                 <div key={ev.id}>
                   <div className={styles.evalRow}>
                     <span className={styles.evalName}>{ev.name}</span>
-                    <span className={ev.completed ? styles.evalStatusDone : styles.evalStatusPending}>
-                      {count} / {totalRequired}{ev.completed ? ' (완료)' : ''}
+                    <span className={isDone ? styles.evalStatusDone : styles.evalStatusPending}>
+                      {count} / {totalRequired}{isDone ? ' (완료)' : ''}
                     </span>
                   </div>
                   <ProgressBar
                     value={count}
                     max={totalRequired || 1}
-                    color={ev.completed ? 'var(--color-success)' : 'var(--color-primary)'}
+                    color={isDone ? 'var(--color-success)' : 'var(--color-primary)'}
                   />
                 </div>
               );
