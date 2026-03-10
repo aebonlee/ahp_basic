@@ -191,12 +191,16 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
     setProgress({ current: 0, total: recipients.length });
     setResults(null);
 
-    const res = await sendSmsBulk(recipients, message, (current, total) => {
-      setProgress({ current, total });
-    });
-
-    setResults(res);
-    setSending(false);
+    try {
+      const res = await sendSmsBulk(recipients, message, (current, total) => {
+        setProgress({ current, total });
+      });
+      setResults(res);
+    } catch (err) {
+      setResults(recipients.map((r) => ({ ...r, success: false, error: err.message })));
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleClose = () => {

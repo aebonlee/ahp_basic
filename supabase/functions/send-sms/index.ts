@@ -11,6 +11,19 @@ const corsHeaders = {
 };
 
 /**
+ * Escape special characters for safe embedding inside a JSON string literal.
+ * Must run BEFORE encodeKorean so that \uXXXX sequences are not double-escaped.
+ */
+function escapeForJson(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+}
+
+/**
  * Korean characters → \uXXXX escape (replicating Java SMSComponent.encode)
  * This is required because the icodekorea TCP server expects this encoding.
  */
@@ -73,9 +86,9 @@ function buildRequestJson(
   const byteLen = eucKrByteLength(cleanMsg);
   const title = byteLen <= 90 ? "" : "LMS";
 
-  // Encode Korean characters in msg/title to \uXXXX (matching Java encode())
-  const encodedMsg = encodeKorean(cleanMsg);
-  const encodedTitle = encodeKorean(title);
+  // Escape JSON special chars first, then encode Korean to \uXXXX
+  const encodedMsg = encodeKorean(escapeForJson(cleanMsg));
+  const encodedTitle = encodeKorean(escapeForJson(title));
 
   // JSON matching Java SMSComponent exactly:
   // key=token, tel=receiver, cb=sender(callback), date="" for immediate

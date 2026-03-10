@@ -13,6 +13,7 @@ export async function sendSms({ receiver, message }) {
 
 /**
  * 다수 수신자에게 순차 발송
+ * - {이름} 플레이스홀더를 수신자별 이름으로 치환
  * @param {Array<{name: string, phone: string}>} recipients
  * @param {string} message
  * @param {(current: number, total: number) => void} onProgress
@@ -22,7 +23,9 @@ export async function sendSmsBulk(recipients, message, onProgress) {
   const results = [];
   for (let i = 0; i < recipients.length; i++) {
     try {
-      const result = await sendSms({ receiver: recipients[i].phone, message });
+      // {이름} 플레이스홀더를 수신자 이름으로 치환
+      const personalizedMsg = message.replace(/\{이름\}/g, recipients[i].name || '');
+      const result = await sendSms({ receiver: recipients[i].phone, message: personalizedMsg });
       results.push({ ...recipients[i], success: result?.success ?? true, result });
     } catch (err) {
       results.push({ ...recipients[i], success: false, error: err.message });
