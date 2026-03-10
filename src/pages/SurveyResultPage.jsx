@@ -138,48 +138,59 @@ export default function SurveyResultPage() {
               SMS 발송
             </button>
           </div>
-          <div className={styles.statusTableWrap}>
-            <table className={styles.statusTable}>
-              <thead>
-                <tr>
-                  <th className={styles.thNum}>#</th>
-                  <th className={styles.thName}>이름</th>
-                  {questions.length > 0 && <th className={styles.thBadge}>설문</th>}
-                  <th className={styles.thProgress}>평가 진행</th>
-                </tr>
-              </thead>
-              <tbody>
-                {evaluators.map((ev, idx) => {
-                  const count = evalProgress[ev.id] || 0;
-                  const isDone = totalRequired > 0 && count >= totalRequired;
-                  return (
-                    <tr key={ev.id}>
-                      <td className={styles.tdNum}>{idx + 1}</td>
-                      <td className={styles.tdName}>{ev.name || ev.email}</td>
-                      {questions.length > 0 && (
-                        <td className={styles.tdBadge}>
-                          <span className={respondedIds.has(ev.id) ? styles.statusDone : styles.statusPending}>
-                            {respondedIds.has(ev.id) ? '완료' : '미응답'}
-                          </span>
-                        </td>
-                      )}
-                      <td className={styles.tdProgress}>
-                        <div className={styles.progressRow}>
-                          <span className={isDone ? styles.statusDone : styles.statusPending}>
-                            {count} / {totalRequired}{isDone ? ' (완료)' : ''}
-                          </span>
-                        </div>
-                        <ProgressBar
-                          value={count}
-                          max={totalRequired || 1}
-                          color={isDone ? 'var(--color-success)' : 'var(--color-primary)'}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className={styles.statusTwoCol}>
+            {[0, 1].map(col => {
+              const half = Math.ceil(evaluators.length / 2);
+              const slice = col === 0
+                ? evaluators.slice(0, half)
+                : evaluators.slice(half);
+              const offset = col === 0 ? 0 : half;
+              return (
+                <div key={col} className={styles.statusTableWrap}>
+                  <table className={styles.statusTable}>
+                    <thead>
+                      <tr>
+                        <th className={styles.thNum}>#</th>
+                        <th className={styles.thName}>이름</th>
+                        {questions.length > 0 && <th className={styles.thBadge}>설문</th>}
+                        <th className={styles.thProgress}>평가 진행</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {slice.map((ev, idx) => {
+                        const count = evalProgress[ev.id] || 0;
+                        const isDone = totalRequired > 0 && count >= totalRequired;
+                        return (
+                          <tr key={ev.id}>
+                            <td className={styles.tdNum}>{offset + idx + 1}</td>
+                            <td className={styles.tdName}>{ev.name || ev.email}</td>
+                            {questions.length > 0 && (
+                              <td className={styles.tdBadge}>
+                                <span className={respondedIds.has(ev.id) ? styles.statusDone : styles.statusPending}>
+                                  {respondedIds.has(ev.id) ? '완료' : '미응답'}
+                                </span>
+                              </td>
+                            )}
+                            <td className={styles.tdProgress}>
+                              <div className={styles.progressRow}>
+                                <span className={isDone ? styles.statusDone : styles.statusPending}>
+                                  {count} / {totalRequired}{isDone ? ' (완료)' : ''}
+                                </span>
+                              </div>
+                              <ProgressBar
+                                value={count}
+                                max={totalRequired || 1}
+                                color={isDone ? 'var(--color-success)' : 'var(--color-primary)'}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

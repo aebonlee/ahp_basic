@@ -151,7 +151,13 @@
   background: var(--color-primary-dark, #4f46e5);
 }
 
-/* 평가자 상태 테이블 */
+/* 2열 레이아웃 */
+.statusTwoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
 .statusTableWrap {
   overflow-x: auto;
 }
@@ -241,6 +247,12 @@
   color: var(--color-text-muted);
   padding: var(--spacing-xl);
   font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .statusTwoCol {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
