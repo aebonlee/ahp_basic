@@ -34,6 +34,138 @@ const ANALYSIS_CARDS = [
 
 const VALID_TYPES = new Set([...ANALYSIS_CARDS.map(c => c.key), 'guide']);
 
+/* ── 분석 방법별 상세 가이드 (왼쪽 패널) ── */
+const METHOD_GUIDE = {
+  descriptive: {
+    title: '기술통계',
+    what: '하나의 수치 변수에 대해 평균, 중앙값, 표준편차, 왜도, 첨도 등 기본 통계량을 산출합니다. 히스토그램과 이상치도 함께 확인합니다.',
+    when: '데이터 분포를 파악하고 싶을 때, 다른 분석에 앞서 기초 현황을 파악할 때',
+    variables: [{ label: '분석 변수', desc: '수치형(숫자/리커트) 1개' }],
+    assumptions: '없음 (탐색적 분석)',
+    output: ['평균, 중앙값, 최빈값', '표준편차, 왜도, 첨도', '95% 신뢰구간 (CI)', 'Jarque-Bera 정규성 검정', '이상치 목록 (IQR 기준)'],
+    report: 'M = X.XX, SD = X.XX, N = XX',
+    example: '"연령"의 평균, 분포 확인 → 정규성 여부에 따라 모수/비모수 검정 선택',
+    tip: '먼저 기술통계로 데이터 분포를 확인한 후, 적절한 분석 방법을 선택하세요.',
+  },
+  independentT: {
+    title: '독립표본 T검정',
+    what: '서로 다른 두 집단(예: 남성 vs 여성)의 평균이 통계적으로 유의한 차이가 있는지 검정합니다. Welch 보정이 자동 적용됩니다.',
+    when: '두 독립된 집단의 평균을 비교할 때 (집단이 3개 이상이면 ANOVA 사용)',
+    variables: [
+      { label: '그룹 변수', desc: '범주형 (2개 범주, 예: 성별)' },
+      { label: '검정 변수', desc: '수치형 (비교할 연속 변수)' },
+    ],
+    assumptions: '정규성 (N ≥ 30이면 완화), 등분산 (Welch로 자동 보정)',
+    output: ['t값, 자유도(df), p값', "Cohen's d (효과크기)", '95% 신뢰구간', '그룹별 평균/표준편차'],
+    report: "t(df) = X.XX, p = .XXX, Cohen's d = X.XX",
+    example: '"성별(남/여)"에 따라 "만족도" 점수의 평균에 차이가 있는가?',
+    tip: '그룹 변수에 범주가 2개여야 합니다. 3개 이상이면 ANOVA를 사용하세요.',
+  },
+  pairedT: {
+    title: '대응표본 T검정',
+    what: '동일한 대상에서 측정한 두 시점/조건의 평균이 유의하게 다른지 검정합니다 (사전-사후, 조건A-조건B).',
+    when: '같은 대상의 사전-사후 비교, 또는 두 가지 조건의 반복 측정 비교',
+    variables: [
+      { label: '변수 1', desc: '수치형 (사전/조건A)' },
+      { label: '변수 2', desc: '수치형 (사후/조건B)' },
+    ],
+    assumptions: '차이값(d = X1 - X2)의 정규성',
+    output: ['차이 평균, 차이 표준편차', 't값, 자유도(df), p값', "Cohen's d", '95% 신뢰구간'],
+    report: "t(df) = X.XX, p = .XXX, Cohen's d = X.XX",
+    example: '교육 프로그램 전/후 "역량 점수"가 유의하게 향상되었는가?',
+    tip: '두 변수의 응답자(행)가 동일인이어야 합니다. 서로 다른 집단이면 독립표본 T검정을 사용하세요.',
+  },
+  anova: {
+    title: '일원분산분석 (ANOVA)',
+    what: '3개 이상 집단의 평균이 모두 같은지 검정합니다. 유의하면 Bonferroni 사후검정으로 어떤 쌍이 다른지 확인합니다.',
+    when: '3개 이상 독립 집단의 평균 차이를 동시에 비교할 때',
+    variables: [
+      { label: '그룹 변수', desc: '범주형 (3개 이상 범주)' },
+      { label: '검정 변수', desc: '수치형 (비교할 연속 변수)' },
+    ],
+    assumptions: '정규성, 등분산',
+    output: ['F값, 자유도, p값', '\u03B7\u00B2 (에타제곱, 효과크기)', '그룹별 기술통계', 'Bonferroni 사후검정 (유의할 때)'],
+    report: 'F(df1, df2) = X.XX, p = .XXX, \u03B7\u00B2 = .XX',
+    example: '"직급(사원/대리/과장/부장)"에 따라 "업무 만족도"에 차이가 있는가?',
+    tip: 'F검정이 유의할 때만 사후검정 결과가 표시됩니다. 2집단이면 T검정이 더 적합합니다.',
+  },
+  chiSquare: {
+    title: '카이제곱 검정',
+    what: '두 범주형 변수 간에 통계적으로 유의한 연관성(독립성)이 있는지 검정합니다.',
+    when: '두 범주형 변수의 관련성을 알고 싶을 때 (예: 성별과 선호도의 관계)',
+    variables: [
+      { label: '변수 1', desc: '범주형 (행)' },
+      { label: '변수 2', desc: '범주형 (열)' },
+    ],
+    assumptions: '기대빈도 ≥ 5인 셀이 80% 이상',
+    output: ['\u03C7\u00B2 통계량, 자유도, p값', "Cram\u00E9r's V (연관성 크기)", '교차표 (관측빈도)'],
+    report: "\u03C7\u00B2(df) = X.XX, p = .XXX, Cram\u00E9r's V = .XX",
+    example: '"성별"과 "구매 여부(예/아니오)"가 서로 관련이 있는가?',
+    tip: '기대빈도 < 5인 셀이 많으면 경고가 표시됩니다. 상세 분석은 교차분석을 사용하세요.',
+  },
+  correlation: {
+    title: '상관분석 (Pearson)',
+    what: '두 개 이상의 수치 변수 간에 선형 관계의 방향(양/음)과 강도를 측정합니다.',
+    when: '변수 간 관련성의 방향과 크기를 알고 싶을 때 (인과관계가 아닌 상관관계)',
+    variables: [{ label: '분석 변수', desc: '수치형 2개 이상 (체크박스)' }],
+    assumptions: '정규성, 선형 관계',
+    output: ['상관계수 행렬 (r)', 'p값 행렬', 'r\u00B2 (결정계수)', '다중공선성 경고 (r > 0.9)', '산점도 (처음 2변수)'],
+    report: 'r(N) = .XX, p = .XXX',
+    example: '"학습시간"과 "시험점수" 간에 양의 상관관계가 있는가?',
+    tip: '비정규 데이터이면 Spearman 순위상관을 사용하세요. 상관 ≠ 인과입니다.',
+  },
+  spearman: {
+    title: 'Spearman 순위상관',
+    what: '순위 기반 비모수 상관분석입니다. 데이터를 순위로 변환한 뒤 Pearson 상관을 적용합니다.',
+    when: '비정규 데이터, 순서형 데이터(리커트 5점 등), 또는 비선형 단조 관계가 예상될 때',
+    variables: [{ label: '분석 변수', desc: '수치형 2개 이상 (체크박스)' }],
+    assumptions: '단조 관계 (선형이 아니어도 됨)',
+    output: ['순위 상관계수 행렬 (\u03C1)', 'p값 행렬', '\u03C1\u00B2 (결정계수)', '산점도 (처음 2변수)'],
+    report: '\u03C1(N) = .XX, p = .XXX',
+    example: '"리커트 5점 만족도"와 "추천의향" 간 순위 상관이 있는가?',
+    tip: 'Pearson은 선형 관계만 감지하지만, Spearman은 단조 관계도 감지합니다.',
+  },
+  regression: {
+    title: '단순선형회귀',
+    what: '독립변수(X)로 종속변수(Y)를 예측하는 회귀식 y = \u03B2\u2080 + \u03B2\u2081x 를 구합니다.',
+    when: '하나의 변수로 다른 변수를 예측하고 싶을 때, 두 변수 간 인과적 방향이 있을 때',
+    variables: [
+      { label: '독립변수 (X)', desc: '수치형 (예측에 사용)' },
+      { label: '종속변수 (Y)', desc: '수치형 (예측 대상)' },
+    ],
+    assumptions: '선형성, 독립성, 등분산성, 잔차 정규성',
+    output: ['R\u00B2, Adjusted R\u00B2', '회귀식 (절편, 기울기)', 'F통계량, t값, p값', 'Durbin-Watson (자기상관)', '잔차 산점도'],
+    report: 'R\u00B2 = .XX, F(1, N-2) = X.XX, p = .XXX, \u03B2 = X.XX',
+    example: '"교육시간(X)"이 "업무성과(Y)"를 얼마나 예측하는가?',
+    tip: 'R\u00B2가 1에 가까울수록 예측력이 높습니다. Durbin-Watson이 1.5~2.5면 양호합니다.',
+  },
+  cronbach: {
+    title: '크론바흐 알파',
+    what: '같은 구성개념을 측정하는 리커트 문항들의 내적 일관성(신뢰도)을 분석합니다.',
+    when: '설문지의 하위 척도가 일관되게 측정하는지 확인할 때 (문항 3개 이상 필요)',
+    variables: [{ label: '리커트 문항', desc: '수치형 2개 이상 (같은 척도)' }],
+    assumptions: '동일 구성개념 측정, 등간/비율 척도',
+    output: ["Cronbach's \u03B1 (신뢰도)", '항목-총점 상관', '삭제 시 \u03B1 (문항 제거 효과)', '제거 후보 항목 안내'],
+    report: "Cronbach's \u03B1 = .XX (k = 항목수, N = 응답자수)",
+    example: '"업무 만족도" 5문항이 하나의 척도로 일관되게 측정되고 있는가?',
+    tip: '\u03B1 ≥ 0.7이면 양호. "삭제 시 \u03B1"이 현재보다 높은 문항은 제거를 검토하세요.',
+  },
+  crossTab: {
+    title: '교차분석',
+    what: '두 범주형 변수의 빈도표, 행/열 비율, 기대빈도, 잔차를 상세히 분석합니다. 카이제곱 검정도 포함됩니다.',
+    when: '두 범주형 변수의 분포를 상세히 비교하고 싶을 때 (카이제곱보다 풍부한 정보)',
+    variables: [
+      { label: '행 변수', desc: '범주형' },
+      { label: '열 변수', desc: '범주형' },
+    ],
+    assumptions: '기대빈도 ≥ 5인 셀이 80% 이상',
+    output: ['빈도표, 행비율표, 열비율표', '기대빈도표, 잔차표', '조정 표준화 잔차 (유의한 셀 감지)', '\u03C7\u00B2, p값, Cram\u00E9r\'s V'],
+    report: "\u03C7\u00B2(df) = X.XX, p = .XXX, Cram\u00E9r's V = .XX",
+    example: '"지역"과 "선호 브랜드"의 조합별 빈도/비율을 상세히 파악',
+    tip: '조정 표준화 잔차의 절대값 > 1.96인 셀이 통계적으로 유의한 조합입니다.',
+  },
+};
+
 const GUIDE_SECTIONS = [
   {
     title: '1. 어떤 분석을 선택해야 할까?',
@@ -174,6 +306,68 @@ const GUIDE_SECTIONS = [
     ],
   },
 ];
+
+function MethodGuideBox({ analysisType, onOpenGuide }) {
+  const guide = METHOD_GUIDE[analysisType];
+  if (!guide) return null;
+
+  return (
+    <div className={styles.methodGuide}>
+      <h3 className={styles.mgTitle}>{guide.title}</h3>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>이 분석은?</h4>
+        <p className={styles.mgText}>{guide.what}</p>
+      </div>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>언제 사용하나요?</h4>
+        <p className={styles.mgText}>{guide.when}</p>
+      </div>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>필요한 변수</h4>
+        <ul className={styles.mgVarList}>
+          {guide.variables.map((v, i) => (
+            <li key={i}><strong>{v.label}</strong> &mdash; {v.desc}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>가정 사항</h4>
+        <p className={styles.mgText}>{guide.assumptions}</p>
+      </div>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>분석 결과 항목</h4>
+        <ul className={styles.mgOutputList}>
+          {guide.output.map((o, i) => (
+            <li key={i}>{o}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>논문 보고 형식</h4>
+        <code className={styles.mgCode}>{guide.report}</code>
+      </div>
+
+      <div className={styles.mgSection}>
+        <h4 className={styles.mgLabel}>예시</h4>
+        <p className={styles.mgText}>{guide.example}</p>
+      </div>
+
+      <div className={styles.mgTip}>
+        <strong>TIP</strong> {guide.tip}
+      </div>
+
+      <button className={styles.mgGuideLink} onClick={onOpenGuide}>
+        {'\u{1F4D6}'} 전체 통계 가이드 보기
+      </button>
+    </div>
+  );
+}
 
 function StatsGuide({ onBack, onSelect }) {
   return (
@@ -465,15 +659,21 @@ export default function StatisticalAnalysisPage() {
         </div>
       )}
 
-      {/* Step 2: 변수 설정 (가이드가 아닌 경우) */}
+      {/* Step 2: 변수 설정 (가이드가 아닌 경우) — 왼쪽 가이드 + 오른쪽 변수 선택 */}
       {step === 'config' && analysisType !== 'guide' && (
-        <VariableSelector
-          analysisType={analysisType}
-          variables={variables}
-          onRun={handleRun}
-          onBack={handleBack}
-          responseCounts={responseCounts}
-        />
+        <div className={styles.configLayout}>
+          <MethodGuideBox
+            analysisType={analysisType}
+            onOpenGuide={() => handleSelectAnalysis('guide')}
+          />
+          <VariableSelector
+            analysisType={analysisType}
+            variables={variables}
+            onRun={handleRun}
+            onBack={handleBack}
+            responseCounts={responseCounts}
+          />
+        </div>
       )}
 
       {/* 통계 가이드 */}
