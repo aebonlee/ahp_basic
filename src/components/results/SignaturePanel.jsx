@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../contexts/ToastContext';
 import { useConfirm } from '../../hooks/useConfirm';
@@ -12,6 +12,20 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
   const toast = useToast();
   const { confirm, confirmDialogProps } = useConfirm();
 
+  // 기존 서명 존재 여부 확인 (페이지 재진입 시 버튼 숨김)
+  useEffect(() => {
+    if (!projectId || !evaluatorId) return;
+    supabase
+      .from('evaluation_signatures')
+      .select('id')
+      .eq('project_id', projectId)
+      .eq('evaluator_id', evaluatorId)
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) setSigned(true);
+      });
+  }, [projectId, evaluatorId]);
+
   const percent = totalCells > 0 ? Math.round((completedCells / totalCells) * 100) : 0;
 
   const handleSign = async () => {
@@ -24,18 +38,20 @@ export default function SignaturePanel({ projectId, evaluatorId, allComplete, al
 
     setLoading(true);
     try {
-      await supabase.from('evaluation_signatures').insert({
-        project_id: projectId,
-        evaluator_id: evaluatorId,
-        signed_at: new Date().toISOString(),
-      });
-      await supabase.from('evaluators')
-        .update({ completed: true })
-        .eq('id', evaluatorId);
+      // 서명 삽입 (DB 트리거가 evaluators.completed = true 자동 설정)
+      const { error } = await supabase
+        .from('evaluation_signatures')
+        .upsert({
+          project_id: projectId,
+          evaluator_id: evaluatorId,
+          signed_at: new Date().toISOString(),
+        }, { onConflict: 'project_id,evaluator_id' })
+        .select();
+      if (error) throw error;
       setSigned(true);
       toast.success('평가가 완료되었습니다.');
     } catch (err) {
-      toast.error('완료 처리 실패: ' + err.message);
+      toast.error('완료 처리 실패: ' + (err.message || '알 수 없는 오류'));
     } finally {
       setLoading(false);
     }

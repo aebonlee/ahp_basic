@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import { useEvaluation } from '../contexts/EvaluationContext';
 import { useAuth } from '../hooks/useAuth';
 import { useProject } from '../hooks/useProjects';
@@ -33,16 +34,31 @@ export default function EvalResultPage() {
   const { responses: surveyResponses } = useSurveyResponses(id);
   const [activeTab, setActiveTab] = useState('summary');
 
-  // 평가 완료(잠금) 여부
-  const isCompleted = useMemo(() => {
-    if (!evaluatorId || evaluators.length === 0) return false;
-    const ev = evaluators.find(e => e.id === evaluatorId);
-    return !!ev?.completed;
-  }, [evaluatorId, evaluators]);
-
   const evaluatorId = useMemo(() => {
     return findEvaluatorId(evaluators, user, id);
   }, [evaluators, user?.id, id]);
+
+  // 평가 완료(잠금) 여부: evaluators.completed 또는 evaluation_signatures 존재
+  const [hasSigned, setHasSigned] = useState(false);
+  useEffect(() => {
+    if (!evaluatorId || !id) return;
+    supabase
+      .from('evaluation_signatures')
+      .select('id')
+      .eq('project_id', id)
+      .eq('evaluator_id', evaluatorId)
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) setHasSigned(true);
+      });
+  }, [id, evaluatorId]);
+
+  const isCompleted = useMemo(() => {
+    if (hasSigned) return true;
+    if (!evaluatorId || evaluators.length === 0) return false;
+    const ev = evaluators.find(e => e.id === evaluatorId);
+    return !!ev?.completed;
+  }, [evaluatorId, evaluators, hasSigned]);
 
   useEffect(() => {
     if (evaluatorId) {
