@@ -130,7 +130,8 @@ export function useSurveyResponses(projectId) {
     }));
     const { error } = await supabase
       .from('survey_responses')
-      .upsert(rows, { onConflict: 'project_id,evaluator_id,question_id' });
+      .upsert(rows, { onConflict: 'project_id,evaluator_id,question_id' })
+      .select();
     if (error) throw error;
     await fetchResponses();
   }, [projectId, fetchResponses]);
@@ -175,7 +176,8 @@ export function useSurveyConfig(projectId) {
     const { error } = await supabase
       .from('projects')
       .update(updates)
-      .eq('id', projectId);
+      .eq('id', projectId)
+      .select();
     if (error) throw error;
     setConfig(prev => ({ ...prev, ...updates }));
   }, [projectId]);
@@ -211,7 +213,8 @@ export function useConsentRecords(projectId) {
         evaluator_id: evaluatorId,
         agreed: true,
         agreed_at: new Date().toISOString(),
-      }, { onConflict: 'project_id,evaluator_id' });
+      }, { onConflict: 'project_id,evaluator_id' })
+      .select();
     if (error) throw error;
     await fetchRecords();
   }, [projectId, fetchRecords]);
