@@ -275,11 +275,11 @@ export default function SurveyResultPage() {
       {/* 질문별 응답률 */}
       {questionStats.length > 0 && (
         <div className={styles.dashQGrid}>
-          {questionStats.map(qs => {
+          {questionStats.map((qs, idx) => {
             const pct = qs.total > 0 ? ((qs.count / qs.total) * 100).toFixed(0) : '0';
             return (
               <div key={qs.id} className={styles.dashCardSm}>
-                <div className={styles.dashSmLabel}>{qs.text}</div>
+                <div className={styles.dashSmLabel}>Q{idx + 1}. {qs.text}</div>
                 <div className={styles.dashSmVal}>
                   {qs.count}<span className={styles.dashSub}> / {qs.total}</span>
                   <span className={styles.dashSmPct}>{pct}%</span>
