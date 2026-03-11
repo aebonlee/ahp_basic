@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useEvaluation } from '../contexts/EvaluationContext';
@@ -20,6 +20,9 @@ import SignaturePanel from '../components/results/SignaturePanel';
 import ExportButtons from '../components/results/ExportButtons';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
+import { useConfirm } from '../hooks/useConfirm';
+import ConfirmDialog from '../components/common/ConfirmDialog';
+import { useToast } from '../contexts/ToastContext';
 import styles from './EvalResultPage.module.css';
 
 
@@ -33,6 +36,8 @@ export default function EvalResultPage() {
   const { questions: surveyQuestions } = useSurveyQuestions(id);
   const { responses: surveyResponses } = useSurveyResponses(id);
   const [activeTab, setActiveTab] = useState('summary');
+  const toast = useToast();
+  const { confirm, confirmDialogProps } = useConfirm();
 
   const evaluatorId = useMemo(() => {
     return findEvaluatorId(evaluators, user, id);
@@ -70,6 +75,25 @@ export default function EvalResultPage() {
     if (!evaluatorId || surveyQuestions.length === 0) return false;
     return surveyResponses.some(r => r.evaluator_id === evaluatorId);
   }, [evaluatorId, surveyQuestions, surveyResponses]);
+
+  // 재평가: 서명 삭제 + completed 해제
+  const handleUnlock = useCallback(async () => {
+    if (!evaluatorId || !id) return;
+    const ok = await confirm({
+      title: '재평가하기',
+      message: '평가 완료를 취소하고 평가/설문을 수정할 수 있습니다.\n계속하시겠습니까?',
+      variant: 'warning',
+    });
+    if (!ok) return;
+    try {
+      await supabase.from('evaluation_signatures').delete().eq('project_id', id).eq('evaluator_id', evaluatorId);
+      await supabase.from('evaluators').update({ completed: false }).eq('id', evaluatorId);
+      setHasSigned(false);
+      toast.success('잠금이 해제되었습니다. 평가를 수정할 수 있습니다.');
+    } catch (err) {
+      toast.error('잠금 해제 실패: ' + (err.message || ''));
+    }
+  }, [evaluatorId, id, confirm, toast]);
 
   // Calculate all results
   const results = useMemo(() => {
@@ -154,12 +178,22 @@ export default function EvalResultPage() {
     <PageLayout>
       {/* 상단 네비게이션 */}
       <div className={styles.navBar}>
-        {!isCompleted && (
-          <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}`)}>
-            &larr; 평가로 돌아가기
+        {!isCompleted ? (
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}`)}>
+              &larr; 평가로 돌아가기
+            </Button>
+            {surveyQuestions.length > 0 && (
+              <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}/pre-survey?edit=1`)}>
+                설문 수정
+              </Button>
+            )}
+          </div>
+        ) : (
+          <Button variant="secondary" onClick={handleUnlock}>
+            재평가하기
           </Button>
         )}
-        {isCompleted && <div />}
         <div className={styles.navRight}>
           <Button variant="secondary" onClick={() => navigate('/evaluator')}>
             평가 목록
@@ -287,6 +321,7 @@ export default function EvalResultPage() {
         totalCells={results.totalCells}
         hasSurveyResponses={hasSurveyResponses}
       />
+      <ConfirmDialog {...confirmDialogProps} />
     </PageLayout>
   );
 }

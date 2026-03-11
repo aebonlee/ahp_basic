@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { useEvaluators } from '../hooks/useEvaluators';
@@ -17,6 +17,8 @@ const STEP_LABELS = ['연구 소개', '동의서', '설문 응답'];
 export default function EvalPreSurveyPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isEditMode = searchParams.get('edit') === '1';
   const { user } = useAuth();
   const { evaluators } = useEvaluators(id);
   const { questions, loading: qLoading } = useSurveyQuestions(id);
@@ -43,24 +45,33 @@ export default function EvalPreSurveyPage() {
       .then(({ data }) => { if (data) setEvalMethod(data.eval_method); });
   }, [id]);
 
-  // 이미 설문 완료한 경우 스킵
+  // 이미 설문 완료한 경우 스킵 (수정 모드에서는 기존 답변 로드)
   useEffect(() => {
     if (!evaluatorId || qLoading) return;
 
     const checkCompleted = async () => {
       const { data } = await supabase
         .from('survey_responses')
-        .select('id')
+        .select('id, question_id, answer')
         .eq('project_id', id)
-        .eq('evaluator_id', evaluatorId)
-        .limit(1);
+        .eq('evaluator_id', evaluatorId);
 
       if (data && data.length > 0) {
-        navigateToEval();
+        if (isEditMode) {
+          // 수정 모드: 기존 답변 로드 후 설문 단계로 이동
+          const restored = {};
+          for (const r of data) {
+            restored[r.question_id] = r.answer?.value ?? r.answer;
+          }
+          setAnswers(restored);
+          setStep(2);
+        } else {
+          navigateToEval();
+        }
       }
     };
     checkCompleted();
-  }, [evaluatorId, qLoading, id]);
+  }, [evaluatorId, qLoading, id, isEditMode]);
 
   const navigateToEval = useCallback(() => {
     if (evalMethod === EVAL_METHOD.DIRECT_INPUT) {
@@ -107,6 +118,10 @@ export default function EvalPreSurveyPage() {
     setSubmitting(true);
     try {
       await submitResponses(evaluatorId, answers);
+      if (isEditMode) {
+        navigate(`/eval/project/${id}/result`, { replace: true });
+        return;
+      }
       navigateToEval();
     } catch (e) {
       toast.error('설문 제출 실패: ' + e.message);
@@ -233,16 +248,20 @@ export default function EvalPreSurveyPage() {
             ))}
 
             <div className={styles.actions}>
-              {(hasConsent || hasIntro) && (
+              {isEditMode ? (
+                <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}/result`)}>
+                  취소
+                </Button>
+              ) : (hasConsent || hasIntro) ? (
                 <Button variant="secondary" onClick={() => {
                   const prev = [...effectiveSteps].reverse().find(s => s < 2);
                   if (prev !== undefined) setStep(prev);
                 }}>
                   이전
                 </Button>
-              )}
+              ) : null}
               <Button onClick={handleSubmitSurvey} loading={submitting}>
-                제출 후 평가 시작
+                {isEditMode ? '설문 수정 완료' : '제출 후 평가 시작'}
               </Button>
             </div>
           </>
