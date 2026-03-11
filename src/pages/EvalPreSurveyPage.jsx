@@ -19,6 +19,7 @@ export default function EvalPreSurveyPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isEditMode = searchParams.get('edit') === '1';
+  const nextDest = searchParams.get('next'); // 'eval' → 설문 수정 후 평가 페이지로
   const { user } = useAuth();
   const { evaluators } = useEvaluators(id);
   const { questions, loading: qLoading } = useSurveyQuestions(id);
@@ -130,10 +131,12 @@ export default function EvalPreSurveyPage() {
     setSubmitting(true);
     try {
       await submitResponses(evaluatorId, answers);
-      if (isEditMode) {
+      if (isEditMode && nextDest !== 'eval') {
+        // 결과 페이지에서 '설문 수정'으로 들어온 경우 → 결과로 복귀
         navigate(`/eval/project/${id}/result`, { replace: true });
         return;
       }
+      // 재평가 플로우(next=eval) 또는 최초 설문 → 평가 페이지로 이동
       navigateToEval();
     } catch (e) {
       toast.error('설문 제출 실패: ' + e.message);
@@ -269,8 +272,15 @@ export default function EvalPreSurveyPage() {
 
             <div className={styles.actions}>
               {isEditMode ? (
-                <Button variant="secondary" onClick={() => navigate(`/eval/project/${id}/result`)}>
-                  취소
+                <Button variant="secondary" onClick={() => {
+                  if (nextDest === 'eval') {
+                    // 재평가 플로우: 설문 건너뛰고 바로 평가 페이지로
+                    navigateToEval();
+                  } else {
+                    navigate(`/eval/project/${id}/result`);
+                  }
+                }}>
+                  {nextDest === 'eval' ? '설문 수정 건너뛰기' : '취소'}
                 </Button>
               ) : (hasConsent || hasIntro) ? (
                 <Button variant="secondary" onClick={() => {
@@ -281,7 +291,9 @@ export default function EvalPreSurveyPage() {
                 </Button>
               ) : null}
               <Button onClick={handleSubmitSurvey} loading={submitting}>
-                {isEditMode ? '설문 수정 완료' : '제출 후 평가 시작'}
+                {isEditMode
+                  ? (nextDest === 'eval' ? '설문 수정 후 평가하기' : '설문 수정 완료')
+                  : '제출 후 평가 시작'}
               </Button>
             </div>
           </>
