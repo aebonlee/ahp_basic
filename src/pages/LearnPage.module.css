@@ -72,6 +72,8 @@
 .tabBar {
   display: flex;
   gap: 0;
+  max-width: 1400px;
+  margin: 0 auto;
   background: #fff;
   border-bottom: 2px solid #e2e8f0;
   overflow-x: auto;
