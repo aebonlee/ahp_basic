@@ -1,26 +1,15 @@
 import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabaseClient';
-import {
-  PLAN_TYPES,
-  PLAN_LIMITS,
-  FEATURE_MIN_PLAN,
-  SUPER_ADMIN_EMAILS,
-} from '../lib/subscriptionPlans';
+import { PLAN_TYPES, SUPER_ADMIN_EMAILS } from '../lib/subscriptionPlans';
 
 export const SubscriptionContext = createContext(null);
 
-// 플랜 순서 비교용
-const PLAN_ORDER = { [PLAN_TYPES.FREE]: 0, [PLAN_TYPES.BASIC]: 1, [PLAN_TYPES.PRO]: 2 };
-
 export function SubscriptionProvider({ children }) {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
-  const [planType, setPlanType] = useState(PLAN_TYPES.FREE);
-  const [planExpiresAt, setPlanExpiresAt] = useState(null);
-  const [trialExpiresAt, setTrialExpiresAt] = useState(null);
-  const [daysRemaining, setDaysRemaining] = useState(0);
-  const [isTrialing, setIsTrialing] = useState(false);
+  const [userPlans, setUserPlans] = useState([]);
+  const [currentProjectPlan, setCurrentProjectPlan] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   const isSuperAdmin = useMemo(
@@ -28,114 +17,112 @@ export function SubscriptionProvider({ children }) {
     [user?.email],
   );
 
-  // ─── RPC: 만료 확인 + 다운그레이드 ───
-  const checkPlan = useCallback(async () => {
+  // ─── 사용자의 전체 플랜 목록 조회 ───
+  const fetchUserPlans = useCallback(async () => {
     if (!user?.id) return;
-    const { data } = await supabase.rpc('check_plan_expiry', {
+    const { data } = await supabase.rpc('get_user_plans', {
       p_user_id: user.id,
     }).then(
       (res) => res,
       () => ({ data: null }),
     );
-    if (data) {
-      setPlanType(data.plan_type || PLAN_TYPES.FREE);
-      setDaysRemaining(data.days_remaining ?? 0);
-      setIsTrialing(!!data.is_trialing);
-      setPlanExpiresAt(data.plan_expires_at || null);
-      setTrialExpiresAt(data.trial_expires_at || null);
-    }
+    setUserPlans(data || []);
     setLoaded(true);
   }, [user?.id]);
 
-  // ─── 첫 로그인: 체험 부여 ───
-  const grantTrialIfNeeded = useCallback(async () => {
-    if (!user?.id || !profile) return;
-    if (isSuperAdmin) return;
-    // plan_type이 free이고 trial_started_at이 없으면 체험 부여
-    if (profile.plan_type === 'free' && !profile.trial_started_at) {
-      await supabase.rpc('grant_trial', {
-        p_user_id: user.id,
-        p_days: 7,
-      }).then(null, () => {});
-      // 체험 부여 후 플랜 다시 확인
-      await checkPlan();
+  // ─── 프로젝트별 플랜 조회 ───
+  const fetchProjectPlan = useCallback(async (projectId) => {
+    if (!projectId) {
+      setCurrentProjectPlan(null);
+      return null;
     }
-  }, [user?.id, profile, isSuperAdmin, checkPlan]);
+    const { data } = await supabase.rpc('get_project_plan', {
+      p_project_id: projectId,
+    }).then(
+      (res) => res,
+      () => ({ data: null }),
+    );
+    setCurrentProjectPlan(data || null);
+    return data || null;
+  }, []);
 
-  // 로그인 시 플랜 확인
-  useEffect(() => {
-    if (user?.id) {
-      checkPlan();
-    } else {
-      setPlanType(PLAN_TYPES.FREE);
-      setDaysRemaining(0);
-      setIsTrialing(false);
-      setPlanExpiresAt(null);
-      setTrialExpiresAt(null);
-      setLoaded(false);
-    }
-  }, [user?.id, checkPlan]);
-
-  // 프로필 로드 후 체험 부여 체크
-  useEffect(() => {
-    if (profile && loaded) {
-      grantTrialIfNeeded();
-    }
-  }, [profile, loaded, grantTrialIfNeeded]);
-
-  // ─── 기능 접근 체크 ───
-  const canAccess = useCallback(
-    (feature) => {
-      if (isSuperAdmin) return true;
-      const minPlan = FEATURE_MIN_PLAN[feature];
-      if (!minPlan) return true; // 매핑 없으면 제한 없음
-      return PLAN_ORDER[planType] >= PLAN_ORDER[minPlan];
-    },
-    [planType, isSuperAdmin],
-  );
-
-  // ─── 프로젝트 생성 가능 여부 ───
-  const canCreateProject = useCallback(
-    (currentCount) => {
-      if (isSuperAdmin) return true;
-      const limit = PLAN_LIMITS[planType]?.maxProjects ?? 1;
-      return currentCount < limit;
-    },
-    [planType, isSuperAdmin],
-  );
+  // ─── 이용권 할당 ───
+  const assignPlan = useCallback(async (planId, projectId) => {
+    const { error } = await supabase.rpc('assign_plan_to_project', {
+      p_plan_id: planId,
+      p_project_id: projectId,
+    }).then(
+      (res) => res,
+      (err) => ({ error: err }),
+    );
+    if (error) throw error;
+    await fetchUserPlans();
+    await fetchProjectPlan(projectId);
+  }, [fetchUserPlans, fetchProjectPlan]);
 
   // ─── 평가자 추가 가능 여부 ───
   const canAddEvaluator = useCallback(
-    (currentCount) => {
+    (currentCount, projectPlan) => {
       if (isSuperAdmin) return true;
-      const limit = PLAN_LIMITS[planType]?.maxEvaluators ?? 5;
-      return currentCount < limit;
+      const plan = projectPlan || currentProjectPlan;
+      if (!plan) return false;
+      return currentCount < plan.max_evaluators;
     },
-    [planType, isSuperAdmin],
+    [currentProjectPlan, isSuperAdmin],
   );
 
-  // ─── 구독 새로고침 ───
-  const refreshSubscription = useCallback(async () => {
-    await checkPlan();
-  }, [checkPlan]);
+  // ─── 미할당 이용권 목록 ───
+  const getUnassignedPlans = useCallback(() => {
+    return userPlans.filter(p => p.status === 'unassigned');
+  }, [userPlans]);
+
+  // ─── 무료 플랜 부여 ───
+  const grantFreePlan = useCallback(async () => {
+    if (!user?.id) return;
+    await supabase.rpc('grant_free_plan', {
+      p_user_id: user.id,
+    }).then(null, () => {});
+    await fetchUserPlans();
+  }, [user?.id, fetchUserPlans]);
+
+  // ─── 재조회 ───
+  const refreshPlans = useCallback(async () => {
+    await fetchUserPlans();
+  }, [fetchUserPlans]);
+
+  // 로그인 시 플랜 조회 + 무료 플랜 자동 부여
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserPlans().then(() => {
+        // 무료 플랜 자동 부여는 fetchUserPlans 완료 후
+        if (!isSuperAdmin) {
+          supabase.rpc('grant_free_plan', {
+            p_user_id: user.id,
+          }).then(null, () => {});
+        }
+      });
+    } else {
+      setUserPlans([]);
+      setCurrentProjectPlan(null);
+      setLoaded(false);
+    }
+  }, [user?.id, fetchUserPlans, isSuperAdmin]);
 
   const value = useMemo(
     () => ({
-      planType,
-      planExpiresAt,
-      trialExpiresAt,
-      daysRemaining,
-      isTrialing,
+      userPlans,
+      currentProjectPlan,
       isSuperAdmin,
       loaded,
-      canAccess,
-      canCreateProject,
+      fetchUserPlans,
+      fetchProjectPlan,
+      assignPlan,
       canAddEvaluator,
-      refreshSubscription,
-      maxProjects: isSuperAdmin ? Infinity : (PLAN_LIMITS[planType]?.maxProjects ?? 1),
-      maxEvaluators: isSuperAdmin ? Infinity : (PLAN_LIMITS[planType]?.maxEvaluators ?? 5),
+      getUnassignedPlans,
+      grantFreePlan,
+      refreshPlans,
     }),
-    [planType, planExpiresAt, trialExpiresAt, daysRemaining, isTrialing, isSuperAdmin, loaded, canAccess, canCreateProject, canAddEvaluator, refreshSubscription],
+    [userPlans, currentProjectPlan, isSuperAdmin, loaded, fetchUserPlans, fetchProjectPlan, assignPlan, canAddEvaluator, getUnassignedPlans, grantFreePlan, refreshPlans],
   );
 
   return (

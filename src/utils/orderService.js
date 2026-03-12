@@ -26,13 +26,17 @@ export async function createOrder(orderData) {
     const { error: itemsError } = await supabase
       .from('order_items')
       .insert(
-        orderData.items.map(item => ({
-          order_id: order.id,
-          product_title: item.product_title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          subtotal: item.subtotal,
-        }))
+        orderData.items.map(item => {
+          const row = {
+            order_id: order.id,
+            product_title: item.product_title,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            subtotal: item.subtotal,
+          };
+          if (item.plan_type) row.plan_type = item.plan_type;
+          return row;
+        })
       );
     if (itemsError) throw itemsError;
   }

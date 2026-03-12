@@ -67,5 +67,15 @@ export async function sendSmsBulk(recipients, message, onProgress, options = {})
 
     onProgress?.(i + 1, recipients.length);
   }
+
+  // 발송 성공 건수만큼 프로젝트 SMS 사용량 증가
+  const successCount = results.filter(r => r.success).length;
+  if (successCount > 0 && projectId) {
+    await supabase.rpc('increment_sms_used', {
+      p_project_id: projectId,
+      p_count: successCount,
+    }).then(null, () => {});
+  }
+
   return results;
 }

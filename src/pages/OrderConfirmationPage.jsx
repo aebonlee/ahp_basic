@@ -170,14 +170,27 @@ export default function OrderConfirmationPage() {
               </div>
             )}
 
+            {user && (
+              <div className="order-info-box" style={{ marginTop: '16px', background: '#f0f9ff', borderColor: '#bae6fd' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#0369a1' }}>
+                  대시보드에서 이용권을 프로젝트에 할당하세요.
+                </p>
+              </div>
+            )}
+
             <div className="order-actions">
               {user && (
-                <Link to="/order-history" className="btn btn-primary">
-                  주문 이력
-                </Link>
+                <>
+                  <Link to="/admin" className="btn btn-primary">
+                    대시보드로 이동
+                  </Link>
+                  <Link to="/order-history" className="btn btn-secondary">
+                    주문 이력
+                  </Link>
+                </>
               )}
               <Link to="/pricing" className={user ? 'btn btn-secondary' : 'btn btn-primary'}>
-                요금제 보기
+                이용권 보기
               </Link>
               <Link to="/" className="btn btn-secondary">홈으로</Link>
             </div>

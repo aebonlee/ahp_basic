@@ -6,98 +6,121 @@ import { useCart } from '../contexts/CartContext';
 import PublicLayout from '../components/layout/PublicLayout';
 import styles from './PricingPage.module.css';
 
-/* ─── 요금제 데이터 ─── */
+/* --- 요금제 데이터 --- */
 const PLANS = [
   {
     key: 'free',
-    name: 'Free',
+    name: 'Free (학습용)',
+    planType: 'free',
     price: 0,
     priceLabel: '무료',
-    desc: '개인 학습 및 소규모 테스트에 적합합니다.',
+    desc: 'AHP 분석을 학습하고 체험할 수 있습니다.',
     features: [
-      { text: '프로젝트 1개', ok: true },
-      { text: '평가자 5명', ok: true },
-      { text: '기본 통계 분석', ok: true },
-      { text: 'SMS 발송', ok: false },
-      { text: '결과 내보내기', ok: false },
-      { text: '민감도 분석', ok: false },
-      { text: 'AI 분석', ok: false },
+      { text: '평가자 1명' },
+      { text: 'SMS 1건' },
+      { text: '기간 무제한' },
+      { text: '전체 기능 사용 가능' },
+      { text: '민감도/AI/통계 분석' },
+      { text: 'Excel + PDF 내보내기' },
     ],
     btnLabel: '시작하기',
     btnStyle: 'default',
     popular: false,
   },
   {
-    key: 'basic',
-    name: 'Basic',
-    price: 29000,
-    priceLabel: '₩29,000',
-    desc: '팀 프로젝트와 실무 활용에 최적화된 요금제입니다.',
+    key: 'plan_30',
+    name: '30명',
+    planType: 'plan_30',
+    price: 30000,
+    priceLabel: '₩30,000',
+    desc: '소규모 연구 프로젝트에 적합합니다.',
     features: [
-      { text: '프로젝트 5개', ok: true },
-      { text: '평가자 20명', ok: true },
-      { text: '전체 통계 분석', ok: true },
-      { text: 'SMS 50건/월', ok: true },
-      { text: 'Excel 내보내기', ok: true },
-      { text: '민감도 분석', ok: true },
-      { text: 'AI 분석', ok: false },
+      { text: '평가자 30명' },
+      { text: 'SMS 60건' },
+      { text: '결제 후 30일' },
+      { text: '전체 기능 사용 가능' },
+      { text: '민감도/AI/통계 분석' },
+      { text: 'Excel + PDF 내보내기' },
     ],
-    btnLabel: '장바구니 담기',
+    btnLabel: '이용권 구매',
     btnStyle: 'outline',
     popular: false,
   },
   {
-    key: 'pro',
-    name: 'Pro',
-    price: 59000,
-    priceLabel: '₩59,000',
-    desc: '대규모 의사결정과 AI 기반 분석이 필요한 조직을 위한 요금제입니다.',
+    key: 'plan_50',
+    name: '50명',
+    planType: 'plan_50',
+    price: 40000,
+    priceLabel: '₩40,000',
+    desc: '중규모 연구 및 팀 프로젝트에 최적입니다.',
     features: [
-      { text: '프로젝트 무제한', ok: true },
-      { text: '평가자 무제한', ok: true },
-      { text: '전체 + AI 통계 분석', ok: true },
-      { text: 'SMS 200건/월', ok: true },
-      { text: 'Excel + PDF 내보내기', ok: true },
-      { text: '민감도 분석', ok: true },
-      { text: 'AI 분석', ok: true },
+      { text: '평가자 50명' },
+      { text: 'SMS 100건' },
+      { text: '결제 후 30일' },
+      { text: '전체 기능 사용 가능' },
+      { text: '민감도/AI/통계 분석' },
+      { text: 'Excel + PDF 내보내기' },
     ],
-    btnLabel: '장바구니 담기',
+    btnLabel: '이용권 구매',
     btnStyle: 'primary',
     popular: true,
+  },
+  {
+    key: 'plan_100',
+    name: '100명',
+    planType: 'plan_100',
+    price: 50000,
+    priceLabel: '₩50,000',
+    desc: '대규모 의사결정 및 연구 프로젝트를 위한 이용권입니다.',
+    features: [
+      { text: '평가자 100명' },
+      { text: 'SMS 200건' },
+      { text: '결제 후 30일' },
+      { text: '전체 기능 사용 가능' },
+      { text: '민감도/AI/통계 분석' },
+      { text: 'Excel + PDF 내보내기' },
+    ],
+    btnLabel: '이용권 구매',
+    btnStyle: 'outline',
+    popular: false,
   },
 ];
 
 const COMPARE_ROWS = [
-  { label: '월 가격', free: '무료', basic: '₩29,000', pro: '₩59,000' },
-  { label: '프로젝트 수', free: '1개', basic: '5개', pro: '무제한' },
-  { label: '평가자 수', free: '5명', basic: '20명', pro: '무제한' },
-  { label: '통계 분석', free: '기본', basic: '전체', pro: '전체 + AI' },
-  { label: 'SMS 발송', free: '—', basic: '50건/월', pro: '200건/월' },
-  { label: '결과 내보내기', free: '—', basic: 'Excel', pro: 'Excel + PDF' },
-  { label: '민감도 분석', free: '—', basic: '✓', pro: '✓', basicCheck: true, proCheck: true },
-  { label: 'AI 분석', free: '—', basic: '—', pro: '✓', proCheck: true },
+  { label: '가격', free: '무료', plan_30: '₩30,000', plan_50: '₩40,000', plan_100: '₩50,000' },
+  { label: '평가자 수', free: '1명', plan_30: '30명', plan_50: '50명', plan_100: '100명' },
+  { label: 'SMS 건수', free: '1건', plan_30: '60건', plan_50: '100건', plan_100: '200건' },
+  { label: '사용 기간', free: '무제한', plan_30: '30일', plan_50: '30일', plan_100: '30일' },
+  { label: '통계 분석', vals: ['전체', '전체', '전체', '전체'] },
+  { label: 'AI 분석', vals: ['✓', '✓', '✓', '✓'], allCheck: true },
+  { label: '민감도 분석', vals: ['✓', '✓', '✓', '✓'], allCheck: true },
+  { label: 'Excel + PDF', vals: ['✓', '✓', '✓', '✓'], allCheck: true },
 ];
 
 const FAQ_ITEMS = [
   {
-    q: '무료 요금제에서 유료로 언제든 업그레이드할 수 있나요?',
-    a: '네, 언제든지 가능합니다. 대시보드에서 요금제를 변경하시면 즉시 적용됩니다. 기존 프로젝트와 데이터는 모두 유지됩니다.',
+    q: '프로젝트 이용권은 어떻게 사용하나요?',
+    a: '이용권을 구매하면 대시보드에서 프로젝트에 할당할 수 있습니다. 할당 시점부터 30일간 해당 프로젝트에서 이용권의 평가자 수와 SMS 할당량을 사용할 수 있습니다.',
+  },
+  {
+    q: '무료 이용권으로 무엇을 할 수 있나요?',
+    a: '모든 기능을 제한 없이 사용할 수 있습니다. 평가자 1명, SMS 1건으로 AHP 분석의 전체 과정을 학습하고 체험할 수 있습니다.',
   },
   {
     q: '결제 수단은 어떤 것을 지원하나요?',
     a: '신용카드 및 체크카드 결제를 지원합니다. PortOne 결제 시스템을 통해 안전하게 처리됩니다.',
   },
   {
-    q: '구독을 취소하면 데이터는 어떻게 되나요?',
-    a: '구독을 취소해도 기존 데이터는 30일간 보관됩니다. 이 기간 내에 다시 구독하시면 모든 데이터를 복구할 수 있습니다.',
+    q: '이용 기간이 만료되면 데이터는 어떻게 되나요?',
+    a: '이용 기간이 만료되어도 기존 데이터는 보관됩니다. 새 이용권을 구매하여 프로젝트에 할당하면 다시 사용할 수 있습니다.',
   },
   {
-    q: 'SMS 발송 건수를 초과하면 어떻게 되나요?',
-    a: '월 할당량을 초과하면 추가 발송이 일시 중단됩니다. 상위 요금제로 업그레이드하시거나 다음 월까지 기다리시면 됩니다.',
+    q: 'SMS 할당량을 초과하면 어떻게 되나요?',
+    a: '프로젝트별 SMS 할당량을 초과하면 해당 프로젝트에서 추가 발송이 중단됩니다. 더 많은 SMS가 필요하면 상위 이용권을 구매하세요.',
   },
   {
-    q: '팀원 여러 명이 하나의 계정을 사용할 수 있나요?',
-    a: '각 팀원은 개별 계정을 사용해야 합니다. 프로젝트 관리자가 평가자를 초대하여 협업할 수 있습니다.',
+    q: '이용 기간 연장이 가능한가요?',
+    a: '30일 이후에도 계속 사용이 필요하시면 고객센터로 문의해 주세요. 상담을 통해 연장이 가능합니다.',
   },
   {
     q: '환불 정책은 어떻게 되나요?',
@@ -105,18 +128,11 @@ const FAQ_ITEMS = [
   },
 ];
 
-/* ─── Icons ─── */
+/* --- Icons --- */
 const CheckIcon = () => (
   <svg className={styles.checkIcon} viewBox="0 0 18 18" fill="none" aria-hidden="true">
     <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
     <path d="M5.5 9.5l2 2 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const XIcon = () => (
-  <svg className={styles.xIcon} viewBox="0 0 18 18" fill="none" aria-hidden="true">
-    <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M6.5 6.5l5 5M11.5 6.5l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -136,7 +152,7 @@ export default function PricingPage() {
 
   const toggleFaq = (idx) => setOpenFaq((prev) => (prev === idx ? null : idx));
 
-  /* ─── CTA 클릭 핸들러: 장바구니에 담기 ─── */
+  /* --- CTA 클릭 핸들러: 장바구니에 담기 --- */
   const handlePlanClick = (plan) => {
     if (plan.key === 'free') {
       navigate('/register');
@@ -151,16 +167,17 @@ export default function PricingPage() {
     // 이미 장바구니에 있는지 확인
     const alreadyInCart = cartItems.some(item => item.id === plan.key);
     if (alreadyInCart) {
-      toast.info(`${plan.name} 요금제가 이미 장바구니에 있습니다.`);
+      toast.info(`${plan.name} 이용권이 이미 장바구니에 있습니다.`);
       navigate('/cart');
       return;
     }
     addItem({
       id: plan.key,
-      title: `AHP Basic ${plan.name} 월간 구독`,
+      planType: plan.planType,
+      title: `AHP Basic 이용권 (${plan.name})`,
       price: plan.price,
     });
-    toast.success(`${plan.name} 요금제를 장바구니에 담았습니다.`);
+    toast.success(`${plan.name} 이용권을 장바구니에 담았습니다.`);
     navigate('/cart');
   };
 
@@ -169,10 +186,10 @@ export default function PricingPage() {
       {/* Hero */}
       <section className={styles.hero}>
         <span className={styles.heroTag}>PRICING</span>
-        <h1 className={styles.heroTitle}>사용요금 안내</h1>
+        <h1 className={styles.heroTitle}>프로젝트 이용권 안내</h1>
         <p className={styles.heroDesc}>
-          프로젝트 규모와 필요에 맞는 요금제를 선택하세요.
-          무료로 시작하고 언제든 업그레이드할 수 있습니다.
+          프로젝트 규모에 맞는 이용권을 선택하세요.
+          모든 기능을 제한 없이 사용할 수 있습니다.
         </p>
       </section>
 
@@ -188,13 +205,13 @@ export default function PricingPage() {
               <h3 className={styles.planName}>{plan.name}</h3>
               <div className={styles.planPrice}>
                 <span className={styles.priceAmount}>{plan.priceLabel}</span>
-                {plan.price > 0 && <span className={styles.pricePeriod}>/월</span>}
+                {plan.price > 0 && <span className={styles.pricePeriod}>/프로젝트</span>}
               </div>
               <p className={styles.planDesc}>{plan.desc}</p>
               <ul className={styles.planFeatures}>
                 {plan.features.map((f, i) => (
                   <li key={i}>
-                    {f.ok ? <CheckIcon /> : <XIcon />}
+                    <CheckIcon />
                     {f.text}
                   </li>
                 ))}
@@ -216,35 +233,37 @@ export default function PricingPage() {
 
       {/* Comparison Table */}
       <section className={styles.compareSection}>
-        <h2 className={styles.sectionTitle}>기능 비교</h2>
-        <p className={styles.sectionDesc}>요금제별 제공 기능을 한눈에 비교해 보세요.</p>
+        <h2 className={styles.sectionTitle}>이용권 비교</h2>
+        <p className={styles.sectionDesc}>이용권별 제공 내용을 한눈에 비교해 보세요.</p>
         <div className={styles.tableWrap}>
           <table className={styles.compareTable}>
             <thead>
               <tr>
-                <th>기능</th>
+                <th>항목</th>
                 <th>Free</th>
-                <th>Basic</th>
-                <th className={styles.popularCol}>Pro</th>
+                <th>30명</th>
+                <th className={styles.popularCol}>50명</th>
+                <th>100명</th>
               </tr>
             </thead>
             <tbody>
               {COMPARE_ROWS.map((row, i) => (
                 <tr key={i}>
                   <td>{row.label}</td>
-                  <td>{row.free === '—' ? <span className={styles.tableX}>—</span> : row.free}</td>
-                  <td>
-                    {row.basicCheck
-                      ? <span className={styles.tableCheck}>✓</span>
-                      : row.basic === '—'
-                        ? <span className={styles.tableX}>—</span>
-                        : row.basic}
-                  </td>
-                  <td className={styles.popularCol}>
-                    {row.proCheck
-                      ? <span className={styles.tableCheck}>✓</span>
-                      : row.pro}
-                  </td>
+                  {row.vals ? (
+                    row.vals.map((v, j) => (
+                      <td key={j} className={j === 2 ? styles.popularCol : undefined}>
+                        {row.allCheck ? <span className={styles.tableCheck}>{v}</span> : v}
+                      </td>
+                    ))
+                  ) : (
+                    <>
+                      <td>{row.free}</td>
+                      <td>{row.plan_30}</td>
+                      <td className={styles.popularCol}>{row.plan_50}</td>
+                      <td>{row.plan_100}</td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -256,7 +275,7 @@ export default function PricingPage() {
       <section className={styles.faqSection}>
         <div className={styles.faqInner}>
         <h2 className={styles.sectionTitle}>자주 묻는 질문</h2>
-        <p className={styles.sectionDesc}>요금제와 결제에 대한 궁금증을 해결해 드립니다.</p>
+        <p className={styles.sectionDesc}>이용권과 결제에 대한 궁금증을 해결해 드립니다.</p>
         <div className={styles.faqList}>
           {FAQ_ITEMS.map((item, i) => (
             <div key={i} className={`${styles.faqItem} ${openFaq === i ? styles.faqOpen : ''}`}>
@@ -273,9 +292,9 @@ export default function PricingPage() {
 
       {/* CTA */}
       <section className={styles.ctaSection}>
-        <h2 className={styles.ctaTitle}>지금 시작하세요</h2>
+        <h2 className={styles.ctaTitle}>프로젝트 이용권을 구매하세요</h2>
         <p className={styles.ctaDesc}>
-          무료로 AHP 분석을 체험하고, 필요에 맞는 요금제로 업그레이드하세요.
+          무료로 AHP 분석을 체험하고, 프로젝트 규모에 맞는 이용권을 선택하세요.
         </p>
         <button className={styles.ctaBtn} onClick={() => navigate('/register')}>
           무료로 시작하기

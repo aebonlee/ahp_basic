@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../contexts/ProjectContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useConfirm } from '../../hooks/useConfirm';
 import { useSubscription } from '../../hooks/useSubscription';
+import { supabase } from '../../lib/supabaseClient';
 import ProjectForm from './ProjectForm';
 import ProjectCard from './ProjectCard';
+import ProjectPlanBadge from './ProjectPlanBadge';
+import PlanAssignmentModal from './PlanAssignmentModal';
 import Button from '../common/Button';
 import ConfirmDialog from '../common/ConfirmDialog';
 import LoadingSpinner from '../common/LoadingSpinner';
 import HelpButton from '../common/HelpButton';
-import UpgradeModal from '../common/UpgradeModal';
+import PlanRequiredModal from '../common/PlanRequiredModal';
 import styles from './ProjectPanel.module.css';
 
 export default function ProjectPanel({ projects, loading, selectedProjectId, onSelect }) {
@@ -18,11 +21,32 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
   const { deleteProject, cloneProject } = useProjects();
   const toast = useToast();
   const { confirm, confirmDialogProps } = useConfirm();
-  const { canCreateProject, maxProjects, isSuperAdmin } = useSubscription();
+  const { getUnassignedPlans, isSuperAdmin, userPlans } = useSubscription();
   const [showForm, setShowForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [planRequiredOpen, setPlanRequiredOpen] = useState(false);
+  const [assignModal, setAssignModal] = useState({ open: false, projectId: null, projectName: '' });
+  const [projectPlans, setProjectPlans] = useState({});
+
+  const unassignedPlans = getUnassignedPlans();
+
+  // 프로젝트별 플랜 로드
+  const loadProjectPlans = useCallback(async () => {
+    if (!projects.length) return;
+    const plans = {};
+    for (const p of projects) {
+      const { data } = await supabase.rpc('get_project_plan', {
+        p_project_id: p.id,
+      }).then(res => res, () => ({ data: null }));
+      if (data) plans[p.id] = data;
+    }
+    setProjectPlans(plans);
+  }, [projects]);
+
+  useEffect(() => {
+    loadProjectPlans();
+  }, [loadProjectPlans]);
 
   const filteredProjects = filter === 'all'
     ? projects
@@ -57,21 +81,22 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
     }
   };
 
+  // 무료 프로젝트 개수 확인 (free 플랜 할당된 프로젝트)
+  const freeProjectCount = userPlans.filter(p => p.plan_type === 'free' && p.project_id).length;
+
   const handleNewProject = () => {
-    if (!canCreateProject(projects.length)) {
-      setUpgradeOpen(true);
+    if (!isSuperAdmin && freeProjectCount >= 1 && unassignedPlans.length === 0) {
+      setPlanRequiredOpen(true);
       return;
     }
     setEditProject(null);
     setShowForm(true);
   };
 
-  const limitDisplay = maxProjects === Infinity ? '' : ` (${projects.length}/${maxProjects})`;
-
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <h2 className={styles.title}>프로젝트{limitDisplay}</h2>
+        <h2 className={styles.title}>프로젝트</h2>
         <span className={styles.headerActions}>
           <Button size="sm" onClick={handleNewProject}>
             + 시작하기
@@ -79,6 +104,13 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
           <HelpButton helpKey="projectStart" />
         </span>
       </div>
+
+      {/* 미할당 이용권 배너 */}
+      {unassignedPlans.length > 0 && (
+        <div className={styles.unassignedBanner}>
+          미할당 이용권 {unassignedPlans.length}개가 있습니다. 프로젝트에 할당하세요.
+        </div>
+      )}
 
       <div className={styles.filters}>
         {[
@@ -112,25 +144,43 @@ export default function ProjectPanel({ projects, loading, selectedProjectId, onS
           <p className={styles.empty}>프로젝트가 없습니다.</p>
         ) : (
           filteredProjects.map(project => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              selected={project.id === selectedProjectId}
-              onSelect={() => onSelect(project.id)}
-              onEdit={() => handleEdit(project)}
-              onDelete={() => handleDelete(project.id)}
-              onClone={() => handleClone(project.id)}
-              onManage={() => handleManage(project.id)}
-            />
+            <div key={project.id} className={styles.cardWrap}>
+              <ProjectCard
+                project={project}
+                selected={project.id === selectedProjectId}
+                onSelect={() => onSelect(project.id)}
+                onEdit={() => handleEdit(project)}
+                onDelete={() => handleDelete(project.id)}
+                onClone={() => handleClone(project.id)}
+                onManage={() => handleManage(project.id)}
+              />
+              <div className={styles.cardBadgeRow}>
+                <ProjectPlanBadge plan={projectPlans[project.id]} />
+                {!projectPlans[project.id] && (
+                  <button
+                    className={styles.assignBtn}
+                    onClick={() => setAssignModal({ open: true, projectId: project.id, projectName: project.name })}
+                  >
+                    이용권 할당
+                  </button>
+                )}
+              </div>
+            </div>
           ))
         )}
       </div>
 
       <ConfirmDialog {...confirmDialogProps} />
-      <UpgradeModal
-        isOpen={upgradeOpen}
-        onClose={() => setUpgradeOpen(false)}
-        feature="project_limit"
+      <PlanRequiredModal
+        isOpen={planRequiredOpen}
+        onClose={() => setPlanRequiredOpen(false)}
+        reason="project"
+      />
+      <PlanAssignmentModal
+        isOpen={assignModal.open}
+        onClose={() => { setAssignModal({ open: false, projectId: null, projectName: '' }); loadProjectPlans(); }}
+        projectId={assignModal.projectId}
+        projectName={assignModal.projectName}
       />
     </div>
   );

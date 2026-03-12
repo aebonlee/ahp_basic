@@ -30,7 +30,7 @@ export default function CartPage() {
               </svg>
               <p>장바구니가 비어 있습니다.</p>
               <Link to="/pricing" className="cart-checkout-btn" style={{ maxWidth: 240, margin: '0 auto' }}>
-                요금제 보기
+                이용권 보기
               </Link>
             </div>
           ) : (
@@ -42,7 +42,7 @@ export default function CartPage() {
                       <h4>{item.title}</h4>
                       <span className="cart-item-price">
                         {formatPrice(item.price)}
-                        <span className="cart-item-period">/월</span>
+                        <span className="cart-item-period">/프로젝트</span>
                       </span>
                     </div>
                     <div className="cart-item-actions">
@@ -88,7 +88,7 @@ export default function CartPage() {
                   결제하기
                 </Link>
                 <Link to="/pricing" className="cart-continue-link">
-                  요금제 더 보기
+                  이용권 더 보기
                 </Link>
               </div>
             </div>

@@ -1,64 +1,76 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSubscription } from '../../hooks/useSubscription';
-import { PLAN_LIMITS } from '../../lib/subscriptionPlans';
+import { useProjectPlan } from '../../hooks/useProjectPlan';
 import styles from './PlanExpiryBanner.module.css';
 
 export default function PlanExpiryBanner() {
   const navigate = useNavigate();
-  const { planType, daysRemaining, isTrialing, isSuperAdmin, loaded } = useSubscription();
+  const { id: projectId } = useParams();
+  const { isSuperAdmin, loaded } = useSubscription();
+  const plan = useProjectPlan(projectId);
 
-  if (!loaded || isSuperAdmin) return null;
+  if (!loaded || isSuperAdmin || !projectId) return null;
 
-  // 체험 중
-  if (isTrialing) {
-    return (
-      <div className={`${styles.banner} ${styles.trial}`}>
-        <span>
-          {PLAN_LIMITS[planType]?.label || 'Basic'} 체험판을 사용 중입니다 ({daysRemaining}일 남음)
-        </span>
-        <button className={styles.action} onClick={() => navigate('/pricing')}>
-          요금제 보기
-        </button>
-      </div>
-    );
-  }
-
-  // 유료 구독 만료됨
-  if (planType === 'free' && daysRemaining === 0) {
-    return null; // Free 사용자에게는 배너 표시 안 함
-  }
-
-  // 만료됨 (유료 → free 다운그레이드 직후는 checkPlan이 처리)
-  if (daysRemaining <= 0 && planType !== 'free') {
+  // 플랜 없음
+  if (!plan) {
     return (
       <div className={`${styles.banner} ${styles.expired}`}>
-        <span>구독이 만료되었습니다.</span>
+        <span>이 프로젝트에 할당된 이용권이 없습니다.</span>
         <button className={styles.action} onClick={() => navigate('/pricing')}>
-          갱신하기
+          이용권 구매
         </button>
       </div>
     );
   }
 
+  // Free 플랜 (학습용)
+  if (plan.plan_type === 'free') {
+    return (
+      <div className={`${styles.banner} ${styles.trial}`}>
+        <span>학습용 (Free) 이용권 사용 중 — 평가자 1명, SMS 1건</span>
+        <button className={styles.action} onClick={() => navigate('/pricing')}>
+          이용권 구매
+        </button>
+      </div>
+    );
+  }
+
+  // 만료됨
+  if (plan.status === 'expired') {
+    return (
+      <div className={`${styles.banner} ${styles.expired}`}>
+        <span>이용권이 만료되었습니다.</span>
+        <button className={styles.action} onClick={() => navigate('/pricing')}>
+          새 이용권 구매
+        </button>
+      </div>
+    );
+  }
+
+  // 남은 일수 계산
+  const daysLeft = plan.expires_at
+    ? Math.max(0, Math.ceil((new Date(plan.expires_at) - new Date()) / (1000 * 60 * 60 * 24)))
+    : null;
+
   // 만료 3일 이하
-  if (daysRemaining > 0 && daysRemaining <= 3) {
+  if (daysLeft !== null && daysLeft <= 3) {
     return (
       <div className={`${styles.banner} ${styles.urgent}`}>
-        <span>구독 만료까지 {daysRemaining}일 남았습니다!</span>
+        <span>이용권 만료까지 {daysLeft}일 남았습니다!</span>
         <button className={styles.action} onClick={() => navigate('/pricing')}>
-          갱신하기
+          연장 문의
         </button>
       </div>
     );
   }
 
   // 만료 7일 이하
-  if (daysRemaining > 3 && daysRemaining <= 7) {
+  if (daysLeft !== null && daysLeft <= 7) {
     return (
       <div className={`${styles.banner} ${styles.warning}`}>
-        <span>구독 만료까지 {daysRemaining}일 남았습니다.</span>
+        <span>이용권 만료까지 {daysLeft}일 남았습니다.</span>
         <button className={styles.action} onClick={() => navigate('/pricing')}>
-          갱신하기
+          연장 문의
         </button>
       </div>
     );

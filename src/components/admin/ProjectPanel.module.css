@@ -65,3 +65,43 @@
   align-items: center;
   gap: 4px;
 }
+
+.unassignedBanner {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  padding: 8px 14px;
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm, 8px);
+}
+
+.cardWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardBadgeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.assignBtn {
+  background: none;
+  border: 1px dashed #94a3b8;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.assignBtn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}

@@ -56,7 +56,7 @@ const FILTERS = [
   { key: 'no_phone', label: '번호 없음' },
 ];
 
-export default function SmsModal({ isOpen, onClose, evaluators, projectId, respondedIds, projectName }) {
+export default function SmsModal({ isOpen, onClose, evaluators, projectId, respondedIds, projectName, projectPlan }) {
   const { user } = useAuth();
   const [message, setMessage] = useState('');
   const [selected, setSelected] = useState(new Set());
@@ -449,6 +449,16 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
             </div>
           </div>
 
+          {/* SMS 할당량 */}
+          {projectPlan && (
+            <div className={styles.quotaBar}>
+              <span>SMS {projectPlan.sms_used}/{projectPlan.sms_quota}건 사용</span>
+              {projectPlan.sms_used + selectedCount > projectPlan.sms_quota && selectedCount > 0 && (
+                <span className={styles.quotaWarn}>할당량 초과 ({selectedCount}명 발송 불가)</span>
+              )}
+            </div>
+          )}
+
           {/* 발송 */}
           <div className={styles.actions}>
             {sending && (
@@ -462,7 +472,8 @@ export default function SmsModal({ isOpen, onClose, evaluators, projectId, respo
               disabled={
                 selectedCount === 0 ||
                 !message.trim() ||
-                byteInfo.type === 'OVER'
+                byteInfo.type === 'OVER' ||
+                (projectPlan && (projectPlan.sms_used + selectedCount) > projectPlan.sms_quota)
               }
             >
               {sending

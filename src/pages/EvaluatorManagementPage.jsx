@@ -9,6 +9,7 @@ import { useProjects } from '../contexts/ProjectContext';
 import { useToast } from '../contexts/ToastContext';
 import { useConfirm } from '../hooks/useConfirm';
 import { useSubscription } from '../hooks/useSubscription';
+import { useProjectPlan } from '../hooks/useProjectPlan';
 import { PROJECT_STATUS, EVAL_METHOD } from '../lib/constants';
 import { buildPageSequence } from '../lib/pairwiseUtils';
 import ProjectLayout from '../components/layout/ProjectLayout';
@@ -16,7 +17,7 @@ import ParticipantForm from '../components/admin/ParticipantForm';
 import Button from '../components/common/Button';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import UpgradeModal from '../components/common/UpgradeModal';
+import PlanRequiredModal from '../components/common/PlanRequiredModal';
 import { formatPhone } from '../lib/evaluatorUtils';
 import SmsModal from '../components/admin/SmsModal';
 import common from '../styles/common.module.css';
@@ -36,8 +37,10 @@ export default function EvaluatorManagementPage() {
   const [starting, setStarting] = useState(false);
   const [comparisonCounts, setComparisonCounts] = useState({});
   const [smsModalOpen, setSmsModalOpen] = useState(false);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
-  const { canAddEvaluator, maxEvaluators } = useSubscription();
+  const [planRequiredOpen, setPlanRequiredOpen] = useState(false);
+  const { canAddEvaluator, isSuperAdmin } = useSubscription();
+  const projectPlan = useProjectPlan(id);
+  const maxEvaluators = isSuperAdmin ? Infinity : (projectPlan?.max_evaluators ?? 1);
 
   const isDirectInput = currentProject?.eval_method === EVAL_METHOD.DIRECT_INPUT;
 
@@ -124,8 +127,8 @@ export default function EvaluatorManagementPage() {
               <Button size="sm" variant="secondary" onClick={() => setSmsModalOpen(true)}>SMS 발송</Button>
             )}
             <Button size="sm" onClick={() => {
-              if (!canAddEvaluator(evaluators.length)) {
-                setUpgradeOpen(true);
+              if (!canAddEvaluator(evaluators.length, projectPlan)) {
+                setPlanRequiredOpen(true);
                 return;
               }
               setShowForm(true);
@@ -211,12 +214,14 @@ export default function EvaluatorManagementPage() {
         evaluators={evaluators}
         projectId={id}
         projectName={currentProject?.name}
+        projectPlan={projectPlan}
       />
 
-      <UpgradeModal
-        isOpen={upgradeOpen}
-        onClose={() => setUpgradeOpen(false)}
-        feature="evaluator_limit"
+      <PlanRequiredModal
+        isOpen={planRequiredOpen}
+        onClose={() => setPlanRequiredOpen(false)}
+        reason="evaluator"
+        maxEvaluators={maxEvaluators}
       />
     </ProjectLayout>
   );

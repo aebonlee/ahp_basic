@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
+import { PLAN_TYPES } from '../lib/subscriptionPlans';
 import { useToast } from '../contexts/ToastContext';
 import { supabase } from '../lib/supabaseClient';
 import { createOrder, verifyPayment, updateOrderStatus } from '../utils/orderService';
@@ -15,7 +16,7 @@ const formatPrice = (price) => `₩${price.toLocaleString()}`;
 export default function CheckoutPage() {
   const { cartItems, cartTotal, cartCount, clearCart } = useCart();
   const { user, profile } = useAuth();
-  const { refreshSubscription } = useSubscription();
+  const { refreshPlans } = useSubscription();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -92,6 +93,7 @@ export default function CheckoutPage() {
           quantity: item.quantity,
           unit_price: item.price,
           subtotal: item.price * item.quantity,
+          plan_type: item.planType || null,
         })),
       };
 
@@ -99,7 +101,7 @@ export default function CheckoutPage() {
       const orderId = order?.id || orderNumber;
 
       // 2. PortOne 결제 요청
-      const orderName = `AHP Basic 구독 ${cartCount}건`;
+      const orderName = `AHP Basic 이용권 ${cartCount}건`;
 
       const paymentResult = await requestPayment({
         orderId,
@@ -131,14 +133,20 @@ export default function CheckoutPage() {
         }
       }
 
-      // 4. 결제 성공 → 구독 활성화
-      const planItem = cartItems.find(i => i.id === 'basic' || i.id === 'pro');
-      if (planItem && user?.id) {
-        await supabase.rpc('activate_subscription', {
-          p_user_id: user.id,
-          p_plan_type: planItem.id,
-        }).then(null, () => {});
-        await refreshSubscription();
+      // 4. 결제 성공 → 프로젝트 이용권 생성
+      if (user?.id) {
+        for (const item of cartItems) {
+          if (item.planType && item.planType !== PLAN_TYPES.FREE) {
+            for (let q = 0; q < item.quantity; q++) {
+              await supabase.rpc('activate_project_plan', {
+                p_user_id: user.id,
+                p_plan_type: item.planType,
+                p_order_id: orderId,
+              }).then(null, () => {});
+            }
+          }
+        }
+        await refreshPlans();
       }
 
       // 5. 장바구니 비우고 확인 페이지로 이동
