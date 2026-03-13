@@ -68,6 +68,8 @@ export default function InviteLandingPage() {
         if (!evalData.user_id) {
           await supabase.from('evaluators').update({ user_id: user.id }).eq('id', evalData.id);
         }
+        // sessionStorage에도 저장 (EvaluatorGuard/findEvaluatorId 폴백용)
+        sessionStorage.setItem(`evaluator_${token}`, evalData.id);
         setEvaluator(evalData);
         setStatus('ready');
       } else if (data.public_access_enabled) {

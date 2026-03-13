@@ -18,7 +18,11 @@ export function useSurveyQuestions(projectId) {
       .select('*')
       .eq('project_id', projectId)
       .order('sort_order');
-    if (!error) setQuestions(data || []);
+    if (error) {
+      console.error('[useSurveyQuestions] fetch error:', error.message);
+    } else {
+      setQuestions(data || []);
+    }
     setLoading(false);
   }, [projectId]);
 
@@ -106,7 +110,11 @@ export function useSurveyResponses(projectId) {
       .from('survey_responses')
       .select('*')
       .eq('project_id', projectId);
-    if (!error) setResponses(data || []);
+    if (error) {
+      console.error('[useSurveyResponses] fetch error:', error.message);
+    } else {
+      setResponses(data || []);
+    }
     setLoading(false);
   }, [projectId]);
 
@@ -159,7 +167,9 @@ export function useSurveyConfig(projectId) {
       .select('research_description, consent_text, access_code, public_access_enabled')
       .eq('id', projectId)
       .single();
-    if (!error && data) {
+    if (error) {
+      console.error('[useSurveyConfig] fetch error:', error.message);
+    } else if (data) {
       setConfig({
         research_description: data.research_description || '',
         consent_text: data.consent_text || '',
@@ -199,7 +209,11 @@ export function useConsentRecords(projectId) {
       .from('consent_records')
       .select('*')
       .eq('project_id', projectId);
-    if (!error) setRecords(data || []);
+    if (error) {
+      console.error('[useConsentRecords] fetch error:', error.message);
+    } else {
+      setRecords(data || []);
+    }
     setLoading(false);
   }, [projectId]);
 

@@ -32,9 +32,9 @@ describe('formatPhone', () => {
 
 describe('findEvaluatorId', () => {
   const evaluators = [
-    { id: 'ev1', user_id: 'u1' },
-    { id: 'ev2', user_id: 'u2' },
-    { id: 'ev3', user_id: null },
+    { id: 'ev1', user_id: 'u1', email: 'a@test.com' },
+    { id: 'ev2', user_id: 'u2', email: 'b@test.com' },
+    { id: 'ev3', user_id: null, email: 'c@test.com' },
   ];
 
   beforeEach(() => {
@@ -68,5 +68,21 @@ describe('findEvaluatorId', () => {
 
   it('빈 evaluators → null', () => {
     expect(findEvaluatorId([], { id: 'u1' }, 'proj1')).toBeNull();
+  });
+
+  it('이메일 매칭 (user_id 미연결 평가자)', () => {
+    const user = { id: 'u999', email: 'c@test.com' };
+    expect(findEvaluatorId(evaluators, user, 'proj1')).toBe('ev3');
+  });
+
+  it('user_id 우선, 이메일은 폴백', () => {
+    const user = { id: 'u1', email: 'c@test.com' };
+    // user_id 매칭이 먼저 → ev1 (email로 ev3가 아님)
+    expect(findEvaluatorId(evaluators, user, 'proj1')).toBe('ev1');
+  });
+
+  it('이메일 매칭 안 됨 → null', () => {
+    const user = { id: 'u999', email: 'unknown@test.com' };
+    expect(findEvaluatorId(evaluators, user, 'proj1')).toBeNull();
   });
 });
