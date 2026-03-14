@@ -34,7 +34,9 @@ export default function PublicFooter() {
               <li><Link to="/survey-stats">설문 및 통계</Link></li>
               <li><Link to="/management">관리 기능</Link></li>
               <li><Link to="/guide">이용 가이드</Link></li>
+              <li><Link to="/learn">학습 가이드</Link></li>
               <li><Link to="/manual">사용설명서</Link></li>
+              <li><Link to="/pricing">사용요금</Link></li>
               <li><Link to="/login">로그인</Link></li>
             </ul>
           </div>
