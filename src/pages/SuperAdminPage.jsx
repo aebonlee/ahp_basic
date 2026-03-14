@@ -21,15 +21,59 @@ const DOMAIN_FILTERS = [
   { value: 'other', label: '기타 사이트' },
 ];
 
+const PAGE_SIZE = 10;
+
+function Pagination({ currentPage, totalPages, onPageChange }) {
+  if (totalPages <= 1) return null;
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  return (
+    <div className={styles.pagination}>
+      <button
+        className={styles.pageBtn}
+        disabled={currentPage === 1}
+        onClick={() => onPageChange(currentPage - 1)}
+      >
+        &laquo;
+      </button>
+      {pages.map(p => (
+        <button
+          key={p}
+          className={`${styles.pageBtn} ${p === currentPage ? styles.pageBtnActive : ''}`}
+          onClick={() => onPageChange(p)}
+        >
+          {p}
+        </button>
+      ))}
+      <button
+        className={styles.pageBtn}
+        disabled={currentPage === totalPages}
+        onClick={() => onPageChange(currentPage + 1)}
+      >
+        &raquo;
+      </button>
+    </div>
+  );
+}
+
 function UsersTab({ toast }) {
   const { users, loading, updateRole } = useSuperAdminUsers();
   const [domainFilter, setDomainFilter] = useState('ahp-basic.dreamitbiz.com');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredUsers = users.filter(u => {
     if (domainFilter === 'all') return true;
     if (domainFilter === 'other') return u.signup_domain && u.signup_domain !== 'ahp-basic.dreamitbiz.com';
     return u.signup_domain === domainFilter;
   });
+
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  const safePage = Math.min(currentPage, totalPages || 1);
+  const pagedUsers = filteredUsers.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const handleFilterChange = (value) => {
+    setDomainFilter(value);
+    setCurrentPage(1);
+  };
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -61,7 +105,7 @@ function UsersTab({ toast }) {
           <button
             key={f.value}
             className={`${styles.filterBtn} ${domainFilter === f.value ? styles.filterBtnActive : ''}`}
-            onClick={() => setDomainFilter(f.value)}
+            onClick={() => handleFilterChange(f.value)}
           >
             {f.label}
           </button>
@@ -79,7 +123,7 @@ function UsersTab({ toast }) {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map(u => (
+            {pagedUsers.map(u => (
               <tr key={u.id}>
                 <td>{u.email}</td>
                 <td>{u.display_name || '-'}</td>
@@ -104,12 +148,18 @@ function UsersTab({ toast }) {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </>
   );
 }
 
 function ProjectsTab({ toast, confirm }) {
   const { projects, loading, deleteProject } = useSuperAdminProjects();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(projects.length / PAGE_SIZE);
+  const safePage = Math.min(currentPage, totalPages || 1);
+  const pagedProjects = projects.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const handleDelete = async (project) => {
     const ok = await confirm({
@@ -148,7 +198,7 @@ function ProjectsTab({ toast, confirm }) {
             </tr>
           </thead>
           <tbody>
-            {projects.map(p => (
+            {pagedProjects.map(p => (
               <tr key={p.id}>
                 <td>{p.name}</td>
                 <td>{p.owner_email || '-'}</td>
@@ -174,6 +224,7 @@ function ProjectsTab({ toast, confirm }) {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </>
   );
 }
@@ -399,7 +450,7 @@ export default function SuperAdminPage() {
   ];
 
   return (
-    <div>
+    <div className={styles.pageWrap}>
       <Navbar />
       <div className={styles.page}>
         <h1 className={styles.title}>Super Admin</h1>
