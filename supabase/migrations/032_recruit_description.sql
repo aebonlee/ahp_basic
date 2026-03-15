@@ -7,7 +7,9 @@ ALTER TABLE public.projects
   ADD COLUMN IF NOT EXISTS recruit_description TEXT;
 
 -- 2) get_marketplace_projects() RPC 수정: recruit_description 반환 추가
-CREATE OR REPLACE FUNCTION public.get_marketplace_projects()
+--    반환 타입 변경이므로 DROP 후 재생성 필요
+DROP FUNCTION IF EXISTS public.get_marketplace_projects();
+CREATE FUNCTION public.get_marketplace_projects()
 RETURNS TABLE(
   id UUID,
   name TEXT,

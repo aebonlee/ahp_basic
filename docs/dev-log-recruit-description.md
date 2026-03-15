@@ -55,6 +55,14 @@
 - **CSS custom property**: `.evalCard`에 `--eval-color`, `--eval-bg` 인라인 변수로 카드별 색상 분리
 - **마켓 프로젝트 fetch**: `useEffect` 내 `supabase.rpc()` 직접 호출 (비로그인도 가능)
 
+## 트러블슈팅
+
+### PostgreSQL 반환 타입 변경 오류
+- **증상**: `CREATE OR REPLACE FUNCTION get_marketplace_projects()` 실행 시 `cannot change return type of existing function` 오류
+- **원인**: `recruit_description` 컬럼을 RETURNS TABLE에 추가하면 기존 함수의 OUT 파라미터와 달라짐 → PostgreSQL은 `CREATE OR REPLACE`로 반환 타입 변경 불가
+- **해결**: `DROP FUNCTION IF EXISTS` 후 `CREATE FUNCTION`으로 재생성
+- **교훈**: RPC 함수의 RETURNS TABLE 컬럼을 추가/삭제할 때는 반드시 DROP 먼저 실행
+
 ## 배포 절차
 
 1. Supabase SQL Editor에서 `032_recruit_description.sql` 실행
