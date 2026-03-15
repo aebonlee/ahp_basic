@@ -178,7 +178,6 @@ export default function LearnPage() {
             <button
               key={tab.id}
               className={`${styles.tabBtn} ${activeTab === tab.id ? styles.tabBtnActive : ''}`}
-              style={activeTab === tab.id ? { '--tab-color': tab.color } : undefined}
               onClick={() => handleTabChange(tab.id)}
             >
               <span className={styles.tabIcon}><i className={tab.icon} /></span>

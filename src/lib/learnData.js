@@ -4,11 +4,11 @@
  */
 
 export const GUIDE_TABS = [
-  { id: 'methodology', label: 'AHP 방법론', icon: 'fa-solid fa-book-open', color: '#3b82f6' },
-  { id: 'researcher', label: '연구자 가이드', icon: 'fa-solid fa-graduation-cap', color: '#8b5cf6' },
-  { id: 'evaluator', label: '평가자 가이드', icon: 'fa-solid fa-user', color: '#10b981' },
-  { id: 'ai', label: 'AI 활용 가이드', icon: 'fa-solid fa-robot', color: '#f59e0b' },
-  { id: 'fuzzy', label: 'Fuzzy AHP', icon: 'fa-solid fa-globe', color: '#ef4444' },
+  { id: 'methodology', label: 'AHP 방법론', icon: 'fa-solid fa-book-open' },
+  { id: 'researcher', label: '연구자 가이드', icon: 'fa-solid fa-graduation-cap' },
+  { id: 'evaluator', label: '평가자 가이드', icon: 'fa-solid fa-user' },
+  { id: 'ai', label: 'AI 활용 가이드', icon: 'fa-solid fa-robot' },
+  { id: 'fuzzy', label: 'Fuzzy AHP', icon: 'fa-solid fa-globe' },
 ];
 
 export const GUIDE_DATA = {

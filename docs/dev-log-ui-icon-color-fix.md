@@ -1,4 +1,4 @@
-# 개발일지: UI 아이콘/컬러 개선 — 워크플로우 통일 + 학습가이드 Font Awesome
+# 개발일지: UI 아이콘/컬러 개선 — 워크플로우 통일 + 학습가이드 Font Awesome + 탭 밑줄 통일
 
 **작성일**: 2026-03-15
 **상태**: 완료
@@ -8,6 +8,7 @@
 ## 개요
 1. ManagementPage 11단계 워크플로우 스텝 번호 컬러를 브랜드 블루 단일 색상으로 통일
 2. LearnPage(학습 가이드) 이모지 아이콘을 Font Awesome 6 Free 아이콘으로 전면 교체
+3. LearnPage 5개 탭 밑줄 컬러를 브랜드 블루 단일 색상으로 통일
 
 ---
 
@@ -93,7 +94,32 @@
 
 ---
 
+## 3. 학습 가이드 탭 밑줄 컬러 통일
+
+### 문제
+`GUIDE_TABS` 배열의 5개 탭마다 개별 `color` 속성으로 탭 밑줄 색상 지정:
+- 방법론: #3b82f6 (파랑)
+- 연구자: #8b5cf6 (보라)
+- 평가자: #10b981 (초록)
+- AI 활용: #f59e0b (주황)
+- Fuzzy: #ef4444 (빨강)
+
+→ `LearnPage.jsx`에서 `style={{ '--tab-color': tab.color }}`로 CSS 변수 주입 → 활성 탭 밑줄 색상이 탭마다 달라 시각적 일관성 부족
+
+### 해결
+- `GUIDE_TABS` 5개 항목에서 `color` 속성 제거
+- `LearnPage.jsx` 탭 버튼의 `style` prop 제거
+- CSS의 `border-bottom-color: var(--tab-color, var(--color-brand))` fallback이 자동으로 `--color-brand` 사용
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|------|-----------|
+| `src/lib/learnData.js` | `GUIDE_TABS` 5개 항목에서 `color` 속성 제거 |
+| `src/pages/LearnPage.jsx` | 탭 버튼 `style={{ '--tab-color': tab.color }}` 제거 |
+
+---
+
 ## 빌드 검증
 ```bash
-npx vite build  # ✓ 1145 modules, 9.62s
+npx vite build  # ✓ 1145 modules, 9.13s
 ```
