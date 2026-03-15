@@ -105,6 +105,84 @@
   transform: translateY(-1px);
 }
 
+/* ─── Marketplace (평가자 모집 탭) ─── */
+.marketSection {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.marketTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 16px;
+}
+
+.marketGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.marketCard {
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  transition: box-shadow 0.2s ease;
+}
+
+.marketCard:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.marketCardName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.marketCardDesc {
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+  line-height: 1.6;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-line;
+}
+
+.marketCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--color-text-light);
+}
+
+.marketCardReward {
+  color: var(--color-brand, #2563eb);
+  font-weight: 700;
+}
+
+.marketEmpty {
+  text-align: center;
+  padding: 24px 0;
+  color: var(--color-text-light);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .marketGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ─── Post list ─── */
 .loading,
 .empty {

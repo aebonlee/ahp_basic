@@ -1,8 +1,11 @@
-import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { useCommunityPosts, createPost, deletePost, incrementViews } from '../hooks/useCommunity';
 import { useToast } from '../contexts/ToastContext';
+import { EVAL_METHOD_LABELS } from '../lib/constants';
+import { formatPoints } from '../utils/formatters';
 import PublicLayout from '../components/layout/PublicLayout';
 import styles from './CommunityPage.module.css';
 
@@ -24,9 +27,27 @@ function formatDate(dateStr) {
 export default function CommunityPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'notice';
+  const navigate = useNavigate();
   const { user, isLoggedIn, profile } = useAuth();
   const toast = useToast();
   const isSuperAdmin = profile?.role === 'superadmin';
+
+  // 마켓플레이스 프로젝트 (평가자 모집 탭)
+  const [marketProjects, setMarketProjects] = useState([]);
+  const [marketLoading, setMarketLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== 'recruit-evaluator') return;
+    setMarketLoading(true);
+    supabase.rpc('get_marketplace_projects').then(
+      ({ data, error }) => {
+        if (error) console.error('[Marketplace RPC]', error);
+        setMarketProjects(data || []);
+        setMarketLoading(false);
+      },
+      () => { setMarketLoading(false); }
+    );
+  }, [activeTab]);
 
   const { posts, loading, page, setPage, hasMore, refresh } = useCommunityPosts(activeTab);
 
@@ -115,6 +136,36 @@ export default function CommunityPage() {
               </button>
             ))}
           </div>
+
+          {/* 마켓플레이스 프로젝트 (평가자 모집 탭) */}
+          {activeTab === 'recruit-evaluator' && (
+            <div className={styles.marketSection}>
+              <h3 className={styles.marketTitle}>현재 모집 중인 프로젝트</h3>
+              {marketLoading ? (
+                <p className={styles.marketEmpty}>프로젝트를 불러오는 중...</p>
+              ) : marketProjects.length === 0 ? (
+                <p className={styles.marketEmpty}>현재 모집 중인 프로젝트가 없습니다.</p>
+              ) : (
+                <div className={styles.marketGrid}>
+                  {marketProjects.map(p => (
+                    <div key={p.id} className={styles.marketCard}>
+                      <div className={styles.marketCardName}>{p.name}</div>
+                      {p.recruit_description && (
+                        <p className={styles.marketCardDesc}>{p.recruit_description}</p>
+                      )}
+                      <div className={styles.marketCardMeta}>
+                        <span>{EVAL_METHOD_LABELS[p.eval_method] || '평가'}</span>
+                        {p.reward_points > 0 && (
+                          <span className={styles.marketCardReward}>{formatPoints(p.reward_points)}</span>
+                        )}
+                        <span>{p.evaluator_count}명 참여</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Header with write button */}
           <div className={styles.listHeader}>

@@ -1,7 +1,7 @@
 # 평가자 모집 설정 — 저장 버튼 CRUD & 마켓플레이스 버그 수정
 
 **날짜:** 2026-03-15
-**파일:** `src/pages/EvaluatorManagementPage.jsx`, `src/pages/EvaluatorManagementPage.module.css`, `src/pages/EvaluatorInfoPage.jsx`, `src/pages/HomePage.jsx`, `src/hooks/usePoints.js`, `supabase/migrations/032_recruit_description.sql`
+**파일:** `src/pages/EvaluatorManagementPage.jsx`, `src/pages/EvaluatorManagementPage.module.css`, `src/pages/EvaluatorInfoPage.jsx`, `src/pages/HomePage.jsx`, `src/hooks/usePoints.js`, `src/pages/CommunityPage.jsx`, `src/pages/CommunityPage.module.css`, `supabase/migrations/032_recruit_description.sql`
 
 ---
 
@@ -84,6 +84,21 @@ Supabase SQL Editor에서 `DROP FUNCTION` 후 재생성 필요:
 DROP FUNCTION IF EXISTS public.get_marketplace_projects();
 -- 이후 수정된 CREATE FUNCTION 실행
 ```
+
+---
+
+## 3. 커뮤니티 "평가자 모집" 탭에 마켓플레이스 프로젝트 표시
+
+### 문제
+
+커뮤니티 페이지(`/community?tab=recruit-evaluator`)의 "평가자 모집" 탭은 커뮤니티 게시글만 표시하고, `get_marketplace_projects()` RPC 데이터를 연동하지 않음.
+
+### 수정 (CommunityPage.jsx, CommunityPage.module.css)
+
+- `recruit-evaluator` 탭 진입 시 `get_marketplace_projects()` RPC 호출
+- 게시글 목록 상단에 "현재 모집 중인 프로젝트" 카드 그리드 표시
+- 카드에 프로젝트명, 모집 공고(3줄 클램프), 평가 방법, 보상 포인트, 참여자 수 표시
+- 반응형: 데스크톱 2열, 모바일 1열
 
 ---
 
