@@ -76,16 +76,18 @@
   letter-spacing: -0.02em;
 }
 
+/* ─── Desktop nav ─── */
 .navLinks {
   display: none;
   align-items: center;
-  gap: 0;
+  gap: 2px;
 }
 
 @media (min-width: 1024px) {
   .navLinks { display: flex; }
 }
 
+/* Single link (no dropdown) */
 .navLink {
   display: block;
   padding: 12px 14px;
@@ -134,6 +136,109 @@
   transform: scaleX(1);
 }
 
+/* ─── Dropdown group (desktop) ─── */
+.navGroup {
+  position: relative;
+}
+
+.navGroupLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 14px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.navGroupLabel::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 14px;
+  right: 14px;
+  height: 3px;
+  background: var(--color-brand);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.navGroupLabel:hover {
+  color: var(--color-brand);
+}
+
+.navGroupLabel:hover::after {
+  transform: scaleX(1);
+}
+
+.navGroupLabel.active {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.navGroupLabel.active::after {
+  transform: scaleX(1);
+}
+
+.navGroupLabel svg {
+  transition: transform 0.2s ease;
+}
+
+.navGroup:hover .navGroupLabel svg {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 180px;
+  padding: 6px 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 110;
+  animation: dropdownIn 0.15s ease;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownItem {
+  display: block;
+  padding: 9px 16px;
+  color: var(--color-text);
+  font-size: 13.5px;
+  font-weight: 450;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.dropdownItem:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-brand);
+  text-decoration: none;
+}
+
+.dropdownItem.active {
+  color: var(--color-brand);
+  font-weight: 600;
+  background: rgba(0, 70, 200, 0.04);
+}
+
+/* ─── Cart, palette, actions (unchanged) ─── */
 .cartIconLink {
   position: relative;
   display: flex;
@@ -269,8 +374,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
   border-radius: 8px;
   background: transparent;
   border: none;
@@ -280,8 +383,6 @@
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 7px 18px;
-  width: auto;
-  height: auto;
 }
 
 .navBtnGhost:hover {
@@ -309,7 +410,7 @@
   display: none;
 }
 
-/* ─── Responsive ─── */
+/* ─── Mobile responsive ─── */
 @media (max-width: 1023px) {
   .navActions { display: none; }
 
@@ -319,24 +420,32 @@
     top: 72px;
     left: 0;
     right: 0;
+    bottom: 0;
     background: #fff;
     border-top: 1px solid var(--color-border);
     padding: 12px 0;
     flex-direction: column;
     z-index: 99;
+    overflow-y: auto;
   }
 
   .mobileMenu.open {
     display: flex;
   }
 
+  /* Single link in mobile */
   .mobileLink {
     display: block;
+    width: 100%;
     padding: 12px 24px;
     color: var(--color-text);
     font-size: 15px;
     font-weight: 500;
     text-decoration: none;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
     transition: all 0.2s ease;
   }
 
@@ -344,6 +453,76 @@
   .mobileLink.active {
     background: rgba(0, 70, 200, 0.04);
     color: var(--color-brand);
+  }
+
+  /* Mobile group (accordion) */
+  .mobileGroup {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobileGroup:last-of-type {
+    border-bottom: none;
+  }
+
+  .mobileGroupLabel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 24px;
+    color: var(--color-text);
+    font-size: 15px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+  }
+
+  .mobileGroupLabel:hover,
+  .mobileGroupLabel.active {
+    color: var(--color-brand);
+  }
+
+  .mobileChevron {
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .mobileChevronOpen {
+    transform: rotate(180deg);
+  }
+
+  .mobileSubMenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    background: rgba(0, 0, 0, 0.015);
+  }
+
+  .mobileSubMenuOpen {
+    max-height: 300px;
+  }
+
+  .mobileSubLink {
+    display: block;
+    width: 100%;
+    padding: 11px 24px 11px 40px;
+    color: var(--color-text-light);
+    font-size: 14px;
+    font-weight: 450;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobileSubLink:hover,
+  .mobileSubLink.active {
+    color: var(--color-brand);
+    background: rgba(0, 70, 200, 0.04);
   }
 
   .mobileDivider {

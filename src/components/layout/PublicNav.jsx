@@ -5,15 +5,35 @@ import { useCart } from '../../contexts/CartContext';
 import styles from './PublicNav.module.css';
 import '../../styles/shop.css';
 
-const NAV_LINKS = [
-  { to: '/about', label: 'AHP 소개' },
-  { to: '/features', label: '주요 기능' },
-  { to: '/survey-stats', label: '설문 및 통계' },
-  { to: '/management', label: '관리 기능' },
-  { to: '/guide', label: '이용 가이드' },
-  { to: '/learn', label: '학습 가이드' },
-  { to: '/manual', label: '사용설명서' },
-  { to: '/pricing', label: '사용요금' },
+const NAV_GROUPS = [
+  {
+    label: '소개',
+    children: [
+      { to: '/about', label: 'AHP 소개' },
+      { to: '/features', label: '주요 기능' },
+      { to: '/survey-stats', label: '설문 및 통계' },
+      { to: '/management', label: '관리 기능' },
+    ],
+  },
+  {
+    label: '가이드',
+    children: [
+      { to: '/guide', label: '이용 가이드' },
+      { to: '/learn', label: '학습 가이드' },
+      { to: '/manual', label: '사용설명서' },
+    ],
+  },
+  {
+    label: '커뮤니티',
+    children: [
+      { to: '/community?tab=notice', label: '공지사항' },
+      { to: '/community?tab=qna', label: 'Q&A' },
+      { to: '/community?tab=recruit-team', label: '연구팀원 모집' },
+      { to: '/community?tab=recruit-evaluator', label: '평가자 모집' },
+    ],
+  },
+  { label: '평가자', to: '/evaluator-info' },
+  { label: '사용요금', to: '/pricing' },
 ];
 
 const COLOR_SCHEMES = [
@@ -33,6 +53,12 @@ function applyColorScheme(key) {
   localStorage.setItem('color-scheme', key);
 }
 
+const ChevronDown = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 4.5L6 7.5L9 4.5" />
+  </svg>
+);
+
 export default function PublicNav() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,7 +67,10 @@ export default function PublicNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [activeScheme, setActiveScheme] = useState('blue');
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [mobileExpandedGroup, setMobileExpandedGroup] = useState(null);
   const paletteRef = useRef(null);
+  const dropdownTimeoutRef = useRef(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('color-scheme');
@@ -62,13 +91,56 @@ export default function PublicNav() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [paletteOpen]);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+    setMobileExpandedGroup(null);
+  }, [location]);
+
   const handleSchemeChange = (key) => {
     setActiveScheme(key);
     applyColorScheme(key);
     setPaletteOpen(false);
   };
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    if (path.includes('?')) {
+      const [pathname, search] = path.split('?');
+      return location.pathname === pathname && location.search === `?${search}`;
+    }
+    return location.pathname === path;
+  };
+
+  const isGroupActive = (group) => {
+    if (group.to) return isActive(group.to);
+    return group.children?.some((child) => isActive(child.to));
+  };
+
+  // Desktop dropdown handlers
+  const handleMouseEnter = (label) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    setOpenDropdown(label);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 150);
+  };
+
+  // Mobile accordion handler
+  const toggleMobileGroup = (label) => {
+    setMobileExpandedGroup((prev) => (prev === label ? null : label));
+  };
+
+  const handleNavClick = (to) => {
+    navigate(to);
+    setMobileOpen(false);
+    setMobileExpandedGroup(null);
+  };
 
   return (
     <>
@@ -80,17 +152,50 @@ export default function PublicNav() {
             <span className={styles.logoText}>Basic</span>
           </Link>
 
+          {/* Desktop nav */}
           <nav className={styles.navLinks}>
-            {NAV_LINKS.map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                className={`${styles.navLink} ${isActive(to) ? styles.active : ''}`}
-                aria-current={isActive(to) ? 'page' : undefined}
-              >
-                {label}
-              </Link>
-            ))}
+            {NAV_GROUPS.map((group) =>
+              group.children ? (
+                <div
+                  key={group.label}
+                  className={styles.navGroup}
+                  onMouseEnter={() => handleMouseEnter(group.label)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button
+                    className={`${styles.navGroupLabel} ${isGroupActive(group) ? styles.active : ''}`}
+                    aria-expanded={openDropdown === group.label}
+                    aria-haspopup="true"
+                  >
+                    {group.label}
+                    <ChevronDown />
+                  </button>
+                  {openDropdown === group.label && (
+                    <div className={styles.dropdownMenu}>
+                      {group.children.map((child) => (
+                        <Link
+                          key={child.to}
+                          to={child.to}
+                          className={`${styles.dropdownItem} ${isActive(child.to) ? styles.active : ''}`}
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={group.to}
+                  to={group.to}
+                  className={`${styles.navLink} ${isActive(group.to) ? styles.active : ''}`}
+                  aria-current={isActive(group.to) ? 'page' : undefined}
+                >
+                  {group.label}
+                </Link>
+              )
+            )}
           </nav>
 
           <div className={styles.navActions}>
@@ -163,18 +268,46 @@ export default function PublicNav() {
         </div>
       </header>
 
+      {/* Mobile menu */}
       <div className={`${styles.mobileMenu} ${mobileOpen ? styles.open : ''}`} aria-hidden={!mobileOpen}>
-        {NAV_LINKS.map(({ to, label }) => (
-          <Link
-            key={to}
-            to={to}
-            className={`${styles.mobileLink} ${isActive(to) ? styles.active : ''}`}
-            onClick={() => setMobileOpen(false)}
-            aria-current={isActive(to) ? 'page' : undefined}
-          >
-            {label}
-          </Link>
-        ))}
+        {NAV_GROUPS.map((group) =>
+          group.children ? (
+            <div key={group.label} className={styles.mobileGroup}>
+              <button
+                className={`${styles.mobileGroupLabel} ${isGroupActive(group) ? styles.active : ''}`}
+                onClick={() => toggleMobileGroup(group.label)}
+                aria-expanded={mobileExpandedGroup === group.label}
+              >
+                <span>{group.label}</span>
+                <svg
+                  className={`${styles.mobileChevron} ${mobileExpandedGroup === group.label ? styles.mobileChevronOpen : ''}`}
+                  width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                >
+                  <path d="M4 6L8 10L12 6" />
+                </svg>
+              </button>
+              <div className={`${styles.mobileSubMenu} ${mobileExpandedGroup === group.label ? styles.mobileSubMenuOpen : ''}`}>
+                {group.children.map((child) => (
+                  <button
+                    key={child.to}
+                    className={`${styles.mobileSubLink} ${isActive(child.to) ? styles.active : ''}`}
+                    onClick={() => handleNavClick(child.to)}
+                  >
+                    {child.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <button
+              key={group.to}
+              className={`${styles.mobileLink} ${isActive(group.to) ? styles.active : ''}`}
+              onClick={() => handleNavClick(group.to)}
+            >
+              {group.label}
+            </button>
+          )
+        )}
         <Link
           to="/cart"
           className={styles.mobileCartLink}

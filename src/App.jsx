@@ -65,6 +65,8 @@ const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'));
 const OrderHistoryPage = lazy(() => import('./pages/OrderHistoryPage'));
 const SharedResultPage = lazy(() => import('./pages/SharedResultPage'));
+const EvaluatorInfoPage = lazy(() => import('./pages/EvaluatorInfoPage'));
+const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 export default function App() {
@@ -96,6 +98,8 @@ export default function App() {
               <Route path="/survey-stats" element={<ErrorBoundary><SurveyStatsPage /></ErrorBoundary>} />
               <Route path="/management" element={<ErrorBoundary><ManagementPage /></ErrorBoundary>} />
               <Route path="/pricing" element={<ErrorBoundary><PricingPage /></ErrorBoundary>} />
+              <Route path="/evaluator-info" element={<ErrorBoundary><EvaluatorInfoPage /></ErrorBoundary>} />
+              <Route path="/community" element={<ErrorBoundary><CommunityPage /></ErrorBoundary>} />
               <Route path="/cart" element={<ErrorBoundary><CartPage /></ErrorBoundary>} />
               <Route path="/checkout" element={<ErrorBoundary><CheckoutPage /></ErrorBoundary>} />
               <Route path="/order-confirmation" element={<ErrorBoundary><OrderConfirmationPage /></ErrorBoundary>} />
