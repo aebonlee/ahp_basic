@@ -2,10 +2,10 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import styles from './PageLayout.module.css';
 
-export default function PageLayout({ children, wide }) {
+export default function PageLayout({ children, wide, projectName }) {
   return (
     <div className={styles.layout}>
-      <Navbar />
+      <Navbar projectName={projectName} />
       <main className={`${styles.content} ${wide ? styles.wide : ''}`}>
         {children}
       </main>

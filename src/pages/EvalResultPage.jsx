@@ -170,7 +170,7 @@ export default function EvalResultPage() {
   }, [id, criteria, alternatives, comparisons]);
 
   if (loading || !results) {
-    return <PageLayout><LoadingSpinner message="결과 계산 중..." /></PageLayout>;
+    return <PageLayout projectName={currentProject?.name}><LoadingSpinner message="결과 계산 중..." /></PageLayout>;
   }
 
   const tabs = [
@@ -181,7 +181,7 @@ export default function EvalResultPage() {
   ];
 
   return (
-    <PageLayout>
+    <PageLayout projectName={currentProject?.name}>
       {/* 상단 네비게이션 */}
       <div className={styles.navBar}>
         {!isCompleted ? (

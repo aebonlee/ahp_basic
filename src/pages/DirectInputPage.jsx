@@ -21,6 +21,13 @@ export default function DirectInputPage() {
   const { evaluators } = useEvaluators(id);
   const { criteria, alternatives, loading, loadProjectData, directInputValues } = useEvaluation();
   const [validations, setValidations] = useState({});
+  const [projectName, setProjectName] = useState('');
+
+  useEffect(() => {
+    if (!id) return;
+    supabase.from('projects').select('name').eq('id', id).single()
+      .then(({ data }) => { if (data) setProjectName(data.name); });
+  }, [id]);
 
   const evaluatorId = useMemo(() => {
     return findEvaluatorId(evaluators, user, id);
@@ -73,10 +80,10 @@ export default function DirectInputPage() {
     return result;
   }, [pages, directInputValues]);
 
-  if (loading) return <PageLayout><LoadingSpinner /></PageLayout>;
+  if (loading) return <PageLayout projectName={projectName}><LoadingSpinner /></PageLayout>;
 
   return (
-    <PageLayout>
+    <PageLayout projectName={projectName}>
       <h1 className={common.pageTitle}>직접입력 평가</h1>
       {pages.map(page => {
         const priorities = pagePriorities[page.parentId];

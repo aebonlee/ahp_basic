@@ -232,11 +232,11 @@ export default function SurveyResultPage() {
   );
 
   if (qLoading || rLoading) {
-    return <ProjectLayout><LoadingSpinner message="설문 집계 로딩 중..." /></ProjectLayout>;
+    return <ProjectLayout projectName={currentProject?.name}><LoadingSpinner message="설문 집계 로딩 중..." /></ProjectLayout>;
   }
 
   return (
-    <ProjectLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>설문 집계</h1>
 
       {/* ── 대시보드형 집계 ── */}

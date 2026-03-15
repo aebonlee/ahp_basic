@@ -9,6 +9,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import VariableSelector from '../components/statistics/VariableSelector';
 import ResultRenderer from '../components/statistics/ResultRenderers';
 import { useStatisticalAnalysis } from '../hooks/useStatisticalAnalysis';
+import { useProject } from '../hooks/useProjects';
 import { useToast } from '../contexts/ToastContext';
 import {
   descriptiveStats, independentTTest, pairedTTest, oneWayAnova,
@@ -531,6 +532,7 @@ function StatsGuide({ onBack, onSelect }) {
 
 export default function StatisticalAnalysisPage() {
   const { id } = useParams();
+  const { currentProject } = useProject(id);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const toast = useToast();
@@ -662,11 +664,11 @@ export default function StatisticalAnalysisPage() {
   };
 
   if (loading) {
-    return <ProjectLayout><LoadingSpinner message="데이터 로딩 중..." /></ProjectLayout>;
+    return <ProjectLayout projectName={currentProject?.name}><LoadingSpinner message="데이터 로딩 중..." /></ProjectLayout>;
   }
 
   return (
-    <ProjectLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>통계 분석</h1>
 
       {/* 응답 현황 */}

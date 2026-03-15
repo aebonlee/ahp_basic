@@ -38,12 +38,18 @@ export default function EvalPreSurveyPage() {
     return findEvaluatorId(evaluators, user, id);
   }, [evaluators, user?.id, id]);
 
-  // 프로젝트 eval_method 로드
+  // 프로젝트 정보 로드
   const [evalMethod, setEvalMethod] = useState(null);
+  const [projectName, setProjectName] = useState('');
   useEffect(() => {
     if (!id) return;
-    supabase.from('projects').select('eval_method').eq('id', id).single()
-      .then(({ data }) => { if (data) setEvalMethod(data.eval_method); });
+    supabase.from('projects').select('name, eval_method').eq('id', id).single()
+      .then(({ data }) => {
+        if (data) {
+          setEvalMethod(data.eval_method);
+          setProjectName(data.name);
+        }
+      });
   }, [id]);
 
   // 이미 설문 완료한 경우 스킵 (수정 모드에서는 기존 답변 로드)
@@ -145,13 +151,13 @@ export default function EvalPreSurveyPage() {
   };
 
   if (qLoading || cLoading) {
-    return <PageLayout><LoadingSpinner message="설문 로딩 중..." /></PageLayout>;
+    return <PageLayout projectName={projectName}><LoadingSpinner message="설문 로딩 중..." /></PageLayout>;
   }
 
   // 설문이 없으면 바로 스킵
   if (questions.length === 0 && !config.research_description && !config.consent_text) {
     navigateToEval();
-    return <PageLayout><LoadingSpinner message="평가 페이지로 이동 중..." /></PageLayout>;
+    return <PageLayout projectName={projectName}><LoadingSpinner message="평가 페이지로 이동 중..." /></PageLayout>;
   }
 
   // 동의서가 없으면 2단계 스킵
@@ -172,12 +178,12 @@ export default function EvalPreSurveyPage() {
     } else if (step > Math.max(...effectiveSteps, -1)) {
       // 모든 유효 단계를 지남 → 평가로 이동
       navigateToEval();
-      return <PageLayout><LoadingSpinner message="평가 페이지로 이동 중..." /></PageLayout>;
+      return <PageLayout projectName={projectName}><LoadingSpinner message="평가 페이지로 이동 중..." /></PageLayout>;
     }
   }
 
   return (
-    <PageLayout>
+    <PageLayout projectName={projectName}>
       <div className={styles.container}>
         {/* 스텝 인디케이터 */}
         <div className={styles.steps}>

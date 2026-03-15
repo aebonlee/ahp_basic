@@ -126,11 +126,11 @@ export default function PairwiseRatingPage() {
   const currentPageData = pageSequence[currentPage] || null;
   const comparison = usePairwiseComparison(currentPageData);
 
-  if (loading) return <PageLayout><LoadingSpinner message="평가 데이터 로딩 중..." /></PageLayout>;
+  if (loading) return <PageLayout projectName={projectName}><LoadingSpinner message="평가 데이터 로딩 중..." /></PageLayout>;
 
   if (showIntro) {
     return (
-      <PageLayout>
+      <PageLayout projectName={projectName}>
         <AhpIntroduction
           onStart={() => setShowIntro(false)}
           projectName={projectName}
@@ -142,11 +142,11 @@ export default function PairwiseRatingPage() {
   }
 
   if (pageSequence.length === 0) {
-    return <PageLayout><p>평가할 항목이 없습니다.</p></PageLayout>;
+    return <PageLayout projectName={projectName}><p>평가할 항목이 없습니다.</p></PageLayout>;
   }
 
   return (
-    <PageLayout wide>
+    <PageLayout wide projectName={projectName}>
       <EvaluationProgress
         current={currentPage + 1}
         total={pageSequence.length}

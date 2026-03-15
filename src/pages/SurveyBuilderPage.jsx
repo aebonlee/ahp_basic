@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { useSurveyQuestions, useSurveyConfig } from '../hooks/useSurvey';
+import { useProject } from '../hooks/useProjects';
 import { useToast } from '../contexts/ToastContext';
 import ProjectLayout from '../components/layout/ProjectLayout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -83,6 +84,7 @@ const CUSTOM_TEMPLATE = [
    ============================================ */
 export default function SurveyBuilderPage() {
   const { id } = useParams();
+  const { currentProject } = useProject(id);
   const { questions, loading: qLoading, addQuestion, updateQuestion, deleteQuestion, deleteQuestionsByCategory, reorderQuestions } = useSurveyQuestions(id);
   const { config, loading: cLoading, saveConfig } = useSurveyConfig(id);
   const toast = useToast();
@@ -191,11 +193,11 @@ export default function SurveyBuilderPage() {
   }, [saveConfig]);
 
   if (qLoading || cLoading) {
-    return <ProjectLayout><LoadingSpinner message="설문 설정 로딩 중..." /></ProjectLayout>;
+    return <ProjectLayout projectName={currentProject?.name}><LoadingSpinner message="설문 설정 로딩 중..." /></ProjectLayout>;
   }
 
   return (
-    <ProjectLayout>
+    <ProjectLayout projectName={currentProject?.name}>
       <h1 className={common.pageTitle}>설문 설계</h1>
 
       {/* ── 스텝 탭 ── */}
