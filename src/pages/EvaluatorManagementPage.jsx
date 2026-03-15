@@ -71,14 +71,6 @@ export default function EvaluatorManagementPage() {
     recruitOpen !== (currentProject?.recruit_evaluators ?? false) ||
     recruitDesc !== (currentProject?.recruit_description ?? '');
 
-  const completedCount = useMemo(() => {
-    return evaluators.filter(ev => {
-      const done = comparisonCounts[ev.id] || 0;
-      const pct = totalRequired > 0 ? Math.round((done / totalRequired) * 100) : 0;
-      return ev.completed || pct >= 100;
-    }).length;
-  }, [evaluators, comparisonCounts, totalRequired]);
-
   const handleSaveRecruit = async () => {
     setSaving(true);
     try {
@@ -104,6 +96,14 @@ export default function EvaluatorManagementPage() {
     }
     return pages.reduce((sum, p) => sum + p.pairs.length, 0);
   }, [criteria, alternatives, id, isDirectInput]);
+
+  const completedCount = useMemo(() => {
+    return evaluators.filter(ev => {
+      const done = comparisonCounts[ev.id] || 0;
+      const pct = totalRequired > 0 ? Math.round((done / totalRequired) * 100) : 0;
+      return ev.completed || pct >= 100;
+    }).length;
+  }, [evaluators, comparisonCounts, totalRequired]);
 
   // 평가자별 완료 비교 수 로드
   useEffect(() => {
