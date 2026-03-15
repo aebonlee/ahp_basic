@@ -36,7 +36,7 @@ function CardGridBlock({ block }) {
         return (
           <div key={i} className={`${styles.card} ${hlClass}`}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardIcon}>{card.icon}</span>
+              <span className={styles.cardIcon}><i className={card.icon} /></span>
               <span className={styles.cardTitle}>{card.title}</span>
             </div>
             <ul className={styles.cardList}>
@@ -181,7 +181,7 @@ export default function LearnPage() {
               style={activeTab === tab.id ? { '--tab-color': tab.color } : undefined}
               onClick={() => handleTabChange(tab.id)}
             >
-              <span className={styles.tabIcon}>{tab.icon}</span>
+              <span className={styles.tabIcon}><i className={tab.icon} /></span>
               {tab.label}
             </button>
           ))}
@@ -191,14 +191,14 @@ export default function LearnPage() {
         <div className={styles.body}>
           {/* Sidebar (desktop) */}
           <aside className={styles.sidebar}>
-            <div className={styles.sidebarTitle}>{currentTabMeta?.icon} {currentTabData.title}</div>
+            <div className={styles.sidebarTitle}><i className={currentTabMeta?.icon || ''} /> {currentTabData.title}</div>
             {currentTabData.sections.map((sec) => (
               <button
                 key={sec.id}
                 className={`${styles.sidebarItem} ${activeSection === sec.id ? styles.sidebarActive : ''}`}
                 onClick={() => setActiveSection(sec.id)}
               >
-                <span className={styles.sidebarIcon}>{sec.icon}</span>
+                <span className={styles.sidebarIcon}><i className={sec.icon} /></span>
                 {sec.title}
               </button>
             ))}
@@ -213,7 +213,7 @@ export default function LearnPage() {
             >
               {currentTabData.sections.map((sec) => (
                 <option key={sec.id} value={sec.id}>
-                  {sec.icon} {sec.title}
+                  {sec.title}
                 </option>
               ))}
             </select>

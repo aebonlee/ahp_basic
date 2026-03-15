@@ -144,18 +144,7 @@
   color: #334155;
 }
 
-/* Pipeline step colors */
-.pipeStep:nth-child(1) .pipeNum { background: var(--color-brand); }
-.pipeStep:nth-child(2) .pipeNum { background: #3b82f6; }
-.pipeStep:nth-child(3) .pipeNum { background: #7c3aed; }
-.pipeStep:nth-child(4) .pipeNum { background: #8b5cf6; }
-.pipeStep:nth-child(5) .pipeNum { background: #0891b2; }
-.pipeStep:nth-child(6) .pipeNum { background: #06b6d4; }
-.pipeStep:nth-child(7) .pipeNum { background: #059669; }
-.pipeStep:nth-child(8) .pipeNum { background: #10b981; }
-.pipeStep:nth-child(9) .pipeNum { background: #d97706; }
-.pipeStep:nth-child(10) .pipeNum { background: #ea580c; }
-.pipeStep:nth-child(11) .pipeNum { background: #dc2626; }
+/* Pipeline step colors — unified brand blue */
 
 /* ─── Core Features ─── */
 .coreSection {

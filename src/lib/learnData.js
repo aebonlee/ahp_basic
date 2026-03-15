@@ -4,11 +4,11 @@
  */
 
 export const GUIDE_TABS = [
-  { id: 'methodology', label: 'AHP 방법론', icon: '📖', color: '#3b82f6' },
-  { id: 'researcher', label: '연구자 가이드', icon: '🎓', color: '#8b5cf6' },
-  { id: 'evaluator', label: '평가자 가이드', icon: '👤', color: '#10b981' },
-  { id: 'ai', label: 'AI 활용 가이드', icon: '🤖', color: '#f59e0b' },
-  { id: 'fuzzy', label: 'Fuzzy AHP', icon: '🌐', color: '#ef4444' },
+  { id: 'methodology', label: 'AHP 방법론', icon: 'fa-solid fa-book-open', color: '#3b82f6' },
+  { id: 'researcher', label: '연구자 가이드', icon: 'fa-solid fa-graduation-cap', color: '#8b5cf6' },
+  { id: 'evaluator', label: '평가자 가이드', icon: 'fa-solid fa-user', color: '#10b981' },
+  { id: 'ai', label: 'AI 활용 가이드', icon: 'fa-solid fa-robot', color: '#f59e0b' },
+  { id: 'fuzzy', label: 'Fuzzy AHP', icon: 'fa-solid fa-globe', color: '#ef4444' },
 ];
 
 export const GUIDE_DATA = {
@@ -22,7 +22,7 @@ export const GUIDE_DATA = {
       {
         id: 'overview',
         title: '개요',
-        icon: '📋',
+        icon: 'fa-solid fa-clipboard-list',
         content: [
           {
             type: 'text',
@@ -35,7 +35,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '주요 목적',
-                icon: '🎯',
+                icon: 'fa-solid fa-bullseye',
                 items: [
                   '복잡한 의사결정 문제의 체계적 해결',
                   '주관적 판단의 객관화',
@@ -45,7 +45,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '핵심 특징',
-                icon: '🔧',
+                icon: 'fa-solid fa-wrench',
                 items: [
                   '계층적 구조화',
                   '쌍대비교 방식',
@@ -60,7 +60,7 @@ export const GUIDE_DATA = {
       {
         id: 'principles',
         title: '기본 원리',
-        icon: '⚖️',
+        icon: 'fa-solid fa-scale-balanced',
         content: [
           {
             type: 'text',
@@ -93,7 +93,7 @@ export const GUIDE_DATA = {
       {
         id: 'hierarchy',
         title: '계층 구조',
-        icon: '🏗️',
+        icon: 'fa-solid fa-sitemap',
         content: [
           {
             type: 'text',
@@ -106,7 +106,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '설계 원칙',
-                icon: '📐',
+                icon: 'fa-solid fa-compass-drafting',
                 items: [
                   '명확한 목표 정의: 구체적이고 측정 가능한 목표',
                   '상호 독립성: 각 기준은 서로 독립적이어야 함',
@@ -116,7 +116,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '구조화 단계',
-                icon: '🏗️',
+                icon: 'fa-solid fa-sitemap',
                 items: [
                   '1단계: 문제 정의 및 목표 설정',
                   '2단계: 주요 기준 식별',
@@ -136,7 +136,7 @@ export const GUIDE_DATA = {
       {
         id: 'pairwise',
         title: '쌍대비교',
-        icon: '🔄',
+        icon: 'fa-solid fa-arrows-rotate',
         content: [
           {
             type: 'text',
@@ -162,7 +162,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '비교 예시',
-                icon: '💡',
+                icon: 'fa-solid fa-lightbulb',
                 items: [
                   '질문: "경제성"이 "안전성"에 비해 얼마나 더 중요합니까?',
                   '답변: 척도 3 → 경제성이 안전성보다 약간 더 중요',
@@ -170,7 +170,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '상호비율성',
-                icon: '🔄',
+                icon: 'fa-solid fa-arrows-rotate',
                 items: [
                   '원리: A가 B보다 3배 중요하면, B는 A보다 1/3배 중요',
                   '수식: a(ji) = 1/a(ij)',
@@ -183,7 +183,7 @@ export const GUIDE_DATA = {
       {
         id: 'consistency',
         title: '일관성 검증',
-        icon: '✅',
+        icon: 'fa-solid fa-circle-check',
         content: [
           {
             type: 'text',
@@ -196,7 +196,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '계산 공식',
-                icon: '🧮',
+                icon: 'fa-solid fa-calculator',
                 items: [
                   'CR = CI / RI',
                   'CI = (λmax - n) / (n - 1)',
@@ -206,11 +206,11 @@ export const GUIDE_DATA = {
               },
               {
                 title: '판단 기준',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: [
-                  'CR ≤ 0.1: 일관성 있음 ✅',
-                  '0.1 < CR ≤ 0.2: 주의 필요 ⚠️',
-                  'CR > 0.2: 재평가 필요 ❌',
+                  'CR ≤ 0.1: 일관성 있음 (양호)',
+                  '0.1 < CR ≤ 0.2: 주의 필요',
+                  'CR > 0.2: 재평가 필요',
                 ],
               },
             ],
@@ -236,7 +236,7 @@ export const GUIDE_DATA = {
       {
         id: 'calculation',
         title: '가중치 계산',
-        icon: '🧮',
+        icon: 'fa-solid fa-calculator',
         content: [
           {
             type: 'text',
@@ -270,7 +270,7 @@ export const GUIDE_DATA = {
       {
         id: 'application',
         title: '적용 사례',
-        icon: '💼',
+        icon: 'fa-solid fa-briefcase',
         content: [
           {
             type: 'text',
@@ -283,7 +283,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '비즈니스 분야',
-                icon: '🏢',
+                icon: 'fa-solid fa-building',
                 items: [
                   '전략 기획: 사업 포트폴리오 선택',
                   '공급업체 선정: 다기준 벤더 평가',
@@ -294,7 +294,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '공공 분야',
-                icon: '🏛️',
+                icon: 'fa-solid fa-landmark',
                 items: [
                   '정책 수립: 공공정책 우선순위',
                   '도시 계획: 개발 지역 선정',
@@ -305,7 +305,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '연구 분야',
-                icon: '🔬',
+                icon: 'fa-solid fa-flask',
                 items: [
                   '기술 평가: R&D 프로젝트 선정',
                   '논문 연구: 연구 주제 우선순위',
@@ -316,7 +316,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '개인 의사결정',
-                icon: '👤',
+                icon: 'fa-solid fa-user',
                 items: [
                   '진로 선택: 직업/전공 결정',
                   '구매 결정: 자동차, 주택 선택',
@@ -331,7 +331,7 @@ export const GUIDE_DATA = {
       {
         id: 'advantages',
         title: '장단점',
-        icon: '📊',
+        icon: 'fa-solid fa-chart-column',
         content: [
           {
             type: 'text',
@@ -344,7 +344,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '장점',
-                icon: '✅',
+                icon: 'fa-solid fa-circle-check',
                 highlight: 'success',
                 items: [
                   '체계적 접근: 복잡한 문제를 단계적으로 분해하여 해결',
@@ -356,7 +356,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '단점 및 한계',
-                icon: '⚠️',
+                icon: 'fa-solid fa-triangle-exclamation',
                 highlight: 'warning',
                 items: [
                   '시간 소요: 많은 쌍대비교로 인한 시간과 노력 필요',
@@ -387,7 +387,7 @@ export const GUIDE_DATA = {
       {
         id: 'overview',
         title: '연구방법론 개요',
-        icon: '🎯',
+        icon: 'fa-solid fa-bullseye',
         content: [
           {
             type: 'text',
@@ -400,7 +400,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '연구 목표',
-                icon: '🔬',
+                icon: 'fa-solid fa-flask',
                 items: [
                   '체계적 의사결정 연구 설계',
                   '정량적 평가체계 구축',
@@ -410,7 +410,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '이론적 기반',
-                icon: '📚',
+                icon: 'fa-solid fa-book',
                 items: [
                   'Thomas L. Saaty의 AHP 이론',
                   '계층적 의사결정 모델',
@@ -420,7 +420,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '적용 분야',
-                icon: '🎓',
+                icon: 'fa-solid fa-graduation-cap',
                 items: [
                   '정책 우선순위 결정',
                   '기술 대안 평가',
@@ -435,7 +435,7 @@ export const GUIDE_DATA = {
       {
         id: 'methodology',
         title: '이론적 배경',
-        icon: '📚',
+        icon: 'fa-solid fa-book',
         content: [
           {
             type: 'text',
@@ -461,7 +461,7 @@ export const GUIDE_DATA = {
       {
         id: 'research-design',
         title: '연구 설계',
-        icon: '🔬',
+        icon: 'fa-solid fa-flask',
         content: [
           {
             type: 'text',
@@ -474,7 +474,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '1단계: 연구 문제 정의',
-                icon: '📋',
+                icon: 'fa-solid fa-clipboard-list',
                 items: [
                   '연구 목적 명확화',
                   '의사결정 문제 구체화',
@@ -484,7 +484,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '2단계: 문헌 조사',
-                icon: '📖',
+                icon: 'fa-solid fa-book-open',
                 items: [
                   '관련 연구 분석',
                   '이론적 배경 구축',
@@ -500,17 +500,17 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '참여자 선정',
-                icon: '👥',
+                icon: 'fa-solid fa-users',
                 items: ['전문가 그룹 구성', '5년 이상 경력자'],
               },
               {
                 title: '표본 크기',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: ['통계적 유의성 확보', '10-20명 권장'],
               },
               {
                 title: '연구 일정',
-                icon: '⏰',
+                icon: 'fa-solid fa-clock',
                 items: ['단계별 계획 수립', '마일스톤 설정'],
               },
             ],
@@ -520,7 +520,7 @@ export const GUIDE_DATA = {
       {
         id: 'hierarchy-design',
         title: '계층구조 설계',
-        icon: '🌲',
+        icon: 'fa-solid fa-sitemap',
         content: [
           {
             type: 'text',
@@ -533,7 +533,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '기본 원칙',
-                icon: '📐',
+                icon: 'fa-solid fa-compass-drafting',
                 items: [
                   '상호 배타성: 기준 간 중복 없음',
                   '완전성: 모든 중요 요소 포함',
@@ -543,7 +543,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '구조적 요구사항',
-                icon: '🏗️',
+                icon: 'fa-solid fa-sitemap',
                 items: [
                   '계층 수: 3-5단계 권장',
                   '기준 수: 계층당 5-9개 권장',
@@ -568,7 +568,7 @@ export const GUIDE_DATA = {
       {
         id: 'data-collection',
         title: '데이터 수집',
-        icon: '📊',
+        icon: 'fa-solid fa-chart-column',
         content: [
           {
             type: 'text',
@@ -581,7 +581,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '전문가 선정 기준',
-                icon: '👥',
+                icon: 'fa-solid fa-users',
                 items: [
                   '해당 분야 전문성 (5년 이상)',
                   '의사결정 경험 보유',
@@ -591,7 +591,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '패널 구성',
-                icon: '📋',
+                icon: 'fa-solid fa-clipboard-list',
                 items: [
                   '규모: 10-20명 권장',
                   '다양성: 배경의 다원화',
@@ -605,9 +605,9 @@ export const GUIDE_DATA = {
             type: 'card-grid',
             columns: 3,
             cards: [
-              { title: '설문지 설계', icon: '📋', items: ['명확한 질문 구성', '척도 설명 포함'] },
-              { title: '파일럿 테스트', icon: '🎯', items: ['사전 검증 수행', '피드백 반영'] },
-              { title: '데이터 수집', icon: '📬', items: ['체계적 수행', '회수율 관리'] },
+              { title: '설문지 설계', icon: 'fa-solid fa-clipboard-list', items: ['명확한 질문 구성', '척도 설명 포함'] },
+              { title: '파일럿 테스트', icon: 'fa-solid fa-bullseye', items: ['사전 검증 수행', '피드백 반영'] },
+              { title: '데이터 수집', icon: 'fa-solid fa-envelope', items: ['체계적 수행', '회수율 관리'] },
             ],
           },
         ],
@@ -615,7 +615,7 @@ export const GUIDE_DATA = {
       {
         id: 'analysis-methods',
         title: '분석 방법',
-        icon: '📈',
+        icon: 'fa-solid fa-chart-line',
         content: [
           {
             type: 'text',
@@ -628,7 +628,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '개별 분석',
-                icon: '🧮',
+                icon: 'fa-solid fa-calculator',
                 items: [
                   '쌍대비교 매트릭스 구성',
                   '고유벡터 계산',
@@ -638,7 +638,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '집단 분석',
-                icon: '👥',
+                icon: 'fa-solid fa-users',
                 items: [
                   '기하평균법 적용',
                   '집단 일관성 검증',
@@ -652,10 +652,10 @@ export const GUIDE_DATA = {
             type: 'card-grid',
             columns: 4,
             cards: [
-              { title: 'AHP Platform', icon: '🌐', items: ['웹기반 도구'] },
-              { title: 'Expert Choice', icon: '📊', items: ['전문 소프트웨어'] },
-              { title: 'SPSS / R', icon: '📈', items: ['통계 패키지'] },
-              { title: 'Excel', icon: '📋', items: ['기본 분석'] },
+              { title: 'AHP Platform', icon: 'fa-solid fa-globe', items: ['웹기반 도구'] },
+              { title: 'Expert Choice', icon: 'fa-solid fa-chart-column', items: ['전문 소프트웨어'] },
+              { title: 'SPSS / R', icon: 'fa-solid fa-chart-line', items: ['통계 패키지'] },
+              { title: 'Excel', icon: 'fa-solid fa-clipboard-list', items: ['기본 분석'] },
             ],
           },
         ],
@@ -663,7 +663,7 @@ export const GUIDE_DATA = {
       {
         id: 'validation',
         title: '타당성 검증',
-        icon: '✅',
+        icon: 'fa-solid fa-circle-check',
         content: [
           {
             type: 'text',
@@ -674,9 +674,9 @@ export const GUIDE_DATA = {
             type: 'card-grid',
             columns: 3,
             cards: [
-              { title: '일관성 비율', icon: '✅', items: ['CR < 0.1 기준 충족', '개별/집단 검증'] },
-              { title: '내용 타당성', icon: '🎯', items: ['전문가 검토', '문헌 기반 확인'] },
-              { title: '구성 타당성', icon: '🔄', items: ['요인 분석 수행', '구조 적합성 확인'] },
+              { title: '일관성 비율', icon: 'fa-solid fa-circle-check', items: ['CR < 0.1 기준 충족', '개별/집단 검증'] },
+              { title: '내용 타당성', icon: 'fa-solid fa-bullseye', items: ['전문가 검토', '문헌 기반 확인'] },
+              { title: '구성 타당성', icon: 'fa-solid fa-arrows-rotate', items: ['요인 분석 수행', '구조 적합성 확인'] },
             ],
           },
           {
@@ -693,7 +693,7 @@ export const GUIDE_DATA = {
       {
         id: 'reporting',
         title: '보고서 작성',
-        icon: '📋',
+        icon: 'fa-solid fa-clipboard-list',
         content: [
           {
             type: 'text',
@@ -706,7 +706,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '필수 섹션',
-                icon: '📝',
+                icon: 'fa-solid fa-pen-to-square',
                 items: [
                   '서론: 연구 배경 및 목적',
                   '문헌고찰: 이론적 배경',
@@ -717,7 +717,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: 'AHP 특화 내용',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: [
                   '계층구조 모델 제시',
                   '전문가 패널 구성 설명',
@@ -732,9 +732,9 @@ export const GUIDE_DATA = {
             type: 'card-grid',
             columns: 3,
             cards: [
-              { title: '가중치 표', icon: '📈', items: ['수치 결과 제시'] },
-              { title: '계층구조도', icon: '🌲', items: ['시각적 표현'] },
-              { title: '민감도 그래프', icon: '📊', items: ['안정성 검증'] },
+              { title: '가중치 표', icon: 'fa-solid fa-chart-line', items: ['수치 결과 제시'] },
+              { title: '계층구조도', icon: 'fa-solid fa-sitemap', items: ['시각적 표현'] },
+              { title: '민감도 그래프', icon: 'fa-solid fa-chart-column', items: ['안정성 검증'] },
             ],
           },
           {
@@ -756,7 +756,7 @@ export const GUIDE_DATA = {
       {
         id: 'overview',
         title: '평가자 가이드 개요',
-        icon: '👤',
+        icon: 'fa-solid fa-user',
         content: [
           {
             type: 'text',
@@ -769,7 +769,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '평가 목표',
-                icon: '🎯',
+                icon: 'fa-solid fa-bullseye',
                 items: [
                   '정확한 쌍대비교 평가 수행',
                   '일관성 있는 판단 유지',
@@ -779,7 +779,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '평가 과정',
-                icon: '⏱️',
+                icon: 'fa-solid fa-stopwatch',
                 items: [
                   '평가 방법 이해: 5-10분',
                   '실제 평가 수행: 15-30분',
@@ -789,7 +789,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '평가 요령',
-                icon: '💡',
+                icon: 'fa-solid fa-lightbulb',
                 items: [
                   '직관적 판단보다 논리적 사고',
                   '상대적 중요도에 집중',
@@ -804,7 +804,7 @@ export const GUIDE_DATA = {
       {
         id: 'getting-started',
         title: '평가 시작하기',
-        icon: '🚀',
+        icon: 'fa-solid fa-rocket',
         content: [
           {
             type: 'text',
@@ -831,12 +831,12 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '환경 조건',
-                icon: '🏠',
+                icon: 'fa-solid fa-house',
                 items: ['조용한 공간', '30분 이상 시간', '집중 가능 상태', '안정적 인터넷'],
               },
               {
                 title: '준비 자료',
-                icon: '📋',
+                icon: 'fa-solid fa-clipboard-list',
                 items: ['프로젝트 배경 자료', '평가 기준 설명서', '대안별 상세 정보', '메모장(필요시)'],
               },
             ],
@@ -846,7 +846,7 @@ export const GUIDE_DATA = {
       {
         id: 'understanding-ahp',
         title: 'AHP 이해하기',
-        icon: '💡',
+        icon: 'fa-solid fa-lightbulb',
         content: [
           {
             type: 'text',
@@ -871,7 +871,7 @@ export const GUIDE_DATA = {
       {
         id: 'pairwise-comparison',
         title: '쌍대비교 방법',
-        icon: '⚖️',
+        icon: 'fa-solid fa-scale-balanced',
         content: [
           {
             type: 'text',
@@ -905,7 +905,7 @@ export const GUIDE_DATA = {
       {
         id: 'consistency-check',
         title: '일관성 검토',
-        icon: '🎯',
+        icon: 'fa-solid fa-bullseye',
         content: [
           {
             type: 'text',
@@ -916,9 +916,9 @@ export const GUIDE_DATA = {
             type: 'card-grid',
             columns: 3,
             cards: [
-              { title: 'CR < 0.1', icon: '✅', highlight: 'success', items: ['일관성 우수', '그대로 진행'] },
-              { title: 'CR < 0.2', icon: '⚠️', highlight: 'warning', items: ['일관성 양호', '검토 권장'] },
-              { title: 'CR ≥ 0.2', icon: '❌', highlight: 'danger', items: ['일관성 부족', '재평가 필요'] },
+              { title: 'CR < 0.1', icon: 'fa-solid fa-circle-check', highlight: 'success', items: ['일관성 우수', '그대로 진행'] },
+              { title: 'CR < 0.2', icon: 'fa-solid fa-triangle-exclamation', highlight: 'warning', items: ['일관성 양호', '검토 권장'] },
+              { title: 'CR ≥ 0.2', icon: 'fa-solid fa-circle-xmark', highlight: 'danger', items: ['일관성 부족', '재평가 필요'] },
             ],
           },
           {
@@ -935,7 +935,7 @@ export const GUIDE_DATA = {
       {
         id: 'evaluation-tips',
         title: '평가 요령',
-        icon: '💫',
+        icon: 'fa-solid fa-star',
         content: [
           {
             type: 'text',
@@ -948,7 +948,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '평가 전 준비',
-                icon: '🎯',
+                icon: 'fa-solid fa-bullseye',
                 items: [
                   '충분한 휴식 후 평가',
                   '편견 없는 객관적 자세',
@@ -958,7 +958,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '평가 중 주의사항',
-                icon: '💡',
+                icon: 'fa-solid fa-lightbulb',
                 items: [
                   '집중력 유지: 각 질문을 신중하게',
                   '직관보다 논리: 합리적 근거 기반',
@@ -974,7 +974,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '좋은 평가',
-                icon: '✅',
+                icon: 'fa-solid fa-circle-check',
                 highlight: 'success',
                 items: [
                   '논리적 일관성 유지',
@@ -985,7 +985,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '피할 점',
-                icon: '❌',
+                icon: 'fa-solid fa-circle-xmark',
                 highlight: 'danger',
                 items: [
                   '성급한 판단',
@@ -1001,7 +1001,7 @@ export const GUIDE_DATA = {
       {
         id: 'common-issues',
         title: '문제 해결',
-        icon: '🔧',
+        icon: 'fa-solid fa-wrench',
         content: [
           {
             type: 'text',
@@ -1023,7 +1023,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '접속 문제',
-                icon: '🌐',
+                icon: 'fa-solid fa-globe',
                 items: [
                   '브라우저 새로고침',
                   '다른 브라우저 시도',
@@ -1033,7 +1033,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '저장 문제',
-                icon: '💾',
+                icon: 'fa-solid fa-floppy-disk',
                 items: [
                   '자주 중간 저장',
                   '브라우저 쿠키 허용',
@@ -1048,7 +1048,7 @@ export const GUIDE_DATA = {
       {
         id: 'completion',
         title: '평가 완료',
-        icon: '🏁',
+        icon: 'fa-solid fa-flag-checkered',
         content: [
           {
             type: 'text',
@@ -1070,7 +1070,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '개인 결과',
-                icon: '👤',
+                icon: 'fa-solid fa-user',
                 items: [
                   '기준별 가중치 확인',
                   '대안별 우선순위 확인',
@@ -1080,7 +1080,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '집단 결과',
-                icon: '👥',
+                icon: 'fa-solid fa-users',
                 items: [
                   '전체 참여자 평균 결과',
                   '의견 일치도 확인',
@@ -1109,7 +1109,7 @@ export const GUIDE_DATA = {
       {
         id: 'overview',
         title: 'AI 연구 지원 개요',
-        icon: '🤖',
+        icon: 'fa-solid fa-robot',
         content: [
           {
             type: 'text',
@@ -1120,9 +1120,9 @@ export const GUIDE_DATA = {
             type: 'card-grid',
             columns: 3,
             cards: [
-              { title: '과학적 엄밀성', icon: '🔬', items: ['AI는 연구의 객관성과 재현성을 높이는 도구로 활용'] },
-              { title: '연구 윤리 준수', icon: '⚖️', items: ['AI 사용 투명성 확보 및 학술적 정직성 유지'] },
-              { title: '효율성 극대화', icon: '📈', items: ['반복 작업 자동화로 창의적 연구에 집중'] },
+              { title: '과학적 엄밀성', icon: 'fa-solid fa-flask', items: ['AI는 연구의 객관성과 재현성을 높이는 도구로 활용'] },
+              { title: '연구 윤리 준수', icon: 'fa-solid fa-scale-balanced', items: ['AI 사용 투명성 확보 및 학술적 정직성 유지'] },
+              { title: '효율성 극대화', icon: 'fa-solid fa-chart-line', items: ['반복 작업 자동화로 창의적 연구에 집중'] },
             ],
           },
           {
@@ -1131,7 +1131,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '스마트 논문 작성 시스템',
-                icon: '📝',
+                icon: 'fa-solid fa-pen-to-square',
                 items: [
                   '연구 문제 정의 및 가설 설정 지원',
                   '체계적 문헌고찰 및 메타분석',
@@ -1141,7 +1141,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '고급 데이터 분석 플랫폼',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: [
                   '다차원 가중치 분석 및 시각화',
                   '민감도 분석 및 로버스트니스 검증',
@@ -1156,7 +1156,7 @@ export const GUIDE_DATA = {
       {
         id: 'paper-assistant',
         title: 'AI 논문 작성',
-        icon: '📝',
+        icon: 'fa-solid fa-pen-to-square',
         content: [
           {
             type: 'text',
@@ -1169,7 +1169,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '서론 작성 지원',
-                icon: '📖',
+                icon: 'fa-solid fa-book-open',
                 items: [
                   '연구 배경 및 동기 서술',
                   '연구 문제의 중요성 부각',
@@ -1179,7 +1179,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '문헌 고찰 지원',
-                icon: '📚',
+                icon: 'fa-solid fa-book',
                 items: [
                   '관련 연구 분류 및 정리',
                   '연구 동향 분석',
@@ -1189,7 +1189,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '연구 방법 서술',
-                icon: '🔬',
+                icon: 'fa-solid fa-flask',
                 items: [
                   'AHP 방법론 설명 템플릿',
                   '계층구조 설명 가이드',
@@ -1199,7 +1199,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '결과 및 논의 작성',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: [
                   '분석 결과 서술 가이드',
                   '표와 그래프 설명 지원',
@@ -1218,7 +1218,7 @@ export const GUIDE_DATA = {
       {
         id: 'results-interpretation',
         title: '결과 해석 지원',
-        icon: '📊',
+        icon: 'fa-solid fa-chart-column',
         content: [
           {
             type: 'text',
@@ -1231,7 +1231,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '가중치 분석 해석',
-                icon: '📈',
+                icon: 'fa-solid fa-chart-line',
                 items: [
                   '기준별 가중치 비교 분석',
                   '상위/하위 기준 관계 해석',
@@ -1241,7 +1241,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '민감도 분석 해석',
-                icon: '🔄',
+                icon: 'fa-solid fa-arrows-rotate',
                 items: [
                   '가중치 변화에 따른 순위 변동',
                   '임계값(Critical Value) 식별',
@@ -1260,7 +1260,7 @@ export const GUIDE_DATA = {
       {
         id: 'quality-validation',
         title: '품질 검증',
-        icon: '🔍',
+        icon: 'fa-solid fa-magnifying-glass',
         content: [
           {
             type: 'text',
@@ -1273,7 +1273,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '방법론 검증',
-                icon: '🔬',
+                icon: 'fa-solid fa-flask',
                 items: [
                   '계층구조의 논리적 타당성 검토',
                   '표본 크기 적절성 평가',
@@ -1283,7 +1283,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '결과 검증',
-                icon: '✅',
+                icon: 'fa-solid fa-circle-check',
                 items: [
                   '일관성 비율 분포 분석',
                   '이상치(Outlier) 탐지',
@@ -1307,7 +1307,7 @@ export const GUIDE_DATA = {
       {
         id: 'materials-generation',
         title: '학술자료 생성',
-        icon: '📚',
+        icon: 'fa-solid fa-book',
         content: [
           {
             type: 'text',
@@ -1320,7 +1320,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '설문지 생성',
-                icon: '📋',
+                icon: 'fa-solid fa-clipboard-list',
                 items: [
                   'AHP 쌍대비교 설문지 초안',
                   '설문 안내문 작성',
@@ -1330,7 +1330,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '발표/보고 자료',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: [
                   '연구 발표용 슬라이드 구조',
                   '결과 요약 인포그래픽',
@@ -1345,7 +1345,7 @@ export const GUIDE_DATA = {
       {
         id: 'best-practices',
         title: '효과적 사용법',
-        icon: '💡',
+        icon: 'fa-solid fa-lightbulb',
         content: [
           {
             type: 'text',
@@ -1358,7 +1358,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '효과적 활용 원칙',
-                icon: '✅',
+                icon: 'fa-solid fa-circle-check',
                 highlight: 'success',
                 items: [
                   'AI는 보조 도구로 활용',
@@ -1370,7 +1370,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '주의할 점',
-                icon: '⚠️',
+                icon: 'fa-solid fa-triangle-exclamation',
                 highlight: 'warning',
                 items: [
                   'AI 생성물의 무비판적 사용 금지',
@@ -1401,7 +1401,7 @@ export const GUIDE_DATA = {
       {
         id: 'overview',
         title: '개요',
-        icon: '🌐',
+        icon: 'fa-solid fa-globe',
         content: [
           {
             type: 'text',
@@ -1414,7 +1414,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '개발 배경',
-                icon: '🎯',
+                icon: 'fa-solid fa-bullseye',
                 items: [
                   '기존 AHP의 정확한 수치 요구사항 한계',
                   '실세계의 불확실성과 모호성 반영',
@@ -1424,7 +1424,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '핵심 특징',
-                icon: '🔧',
+                icon: 'fa-solid fa-wrench',
                 items: [
                   '퍼지 수를 이용한 쌍대비교',
                   '불확실성의 체계적 처리',
@@ -1443,7 +1443,7 @@ export const GUIDE_DATA = {
       {
         id: 'fuzzy-theory',
         title: '퍼지 이론',
-        icon: '🔮',
+        icon: 'fa-solid fa-wand-magic-sparkles',
         content: [
           {
             type: 'text',
@@ -1456,7 +1456,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '기존 논리 (이분법)',
-                icon: '🔲',
+                icon: 'fa-solid fa-square',
                 items: [
                   '키 180cm → "키가 크다"(1) 또는 "키가 작다"(0)',
                   '명확한 경계 구분',
@@ -1465,7 +1465,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '퍼지 논리 (연속적)',
-                icon: '🌈',
+                icon: 'fa-solid fa-sliders',
                 items: [
                   '키 175cm → "키가 크다" 소속도 0.7',
                   '부분적 소속 허용',
@@ -1488,7 +1488,7 @@ export const GUIDE_DATA = {
       {
         id: 'fuzzy-numbers',
         title: '삼각퍼지수',
-        icon: '🔢',
+        icon: 'fa-solid fa-hashtag',
         content: [
           {
             type: 'text',
@@ -1514,7 +1514,7 @@ export const GUIDE_DATA = {
       {
         id: 'fuzzy-scales',
         title: '퍼지 척도',
-        icon: '📏',
+        icon: 'fa-solid fa-ruler',
         content: [
           {
             type: 'text',
@@ -1542,7 +1542,7 @@ export const GUIDE_DATA = {
       {
         id: 'defuzzification',
         title: '비퍼지화',
-        icon: '📊',
+        icon: 'fa-solid fa-chart-column',
         content: [
           {
             type: 'text',
@@ -1576,7 +1576,7 @@ export const GUIDE_DATA = {
       {
         id: 'comparison',
         title: 'AHP 비교',
-        icon: '⚖️',
+        icon: 'fa-solid fa-scale-balanced',
         content: [
           {
             type: 'text',
@@ -1602,7 +1602,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: 'AHP 선택 시',
-                icon: '📊',
+                icon: 'fa-solid fa-chart-column',
                 items: [
                   '판단이 명확한 경우',
                   '평가자가 AHP에 익숙한 경우',
@@ -1612,7 +1612,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: 'Fuzzy AHP 선택 시',
-                icon: '🌐',
+                icon: 'fa-solid fa-globe',
                 items: [
                   '판단에 불확실성이 큰 경우',
                   '전문가 의견이 다양한 경우',
@@ -1627,7 +1627,7 @@ export const GUIDE_DATA = {
       {
         id: 'applications',
         title: '적용 사례',
-        icon: '💼',
+        icon: 'fa-solid fa-briefcase',
         content: [
           {
             type: 'text',
@@ -1640,7 +1640,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '산업 분야',
-                icon: '🏭',
+                icon: 'fa-solid fa-industry',
                 items: [
                   '공급망 관리: 공급업체 평가 및 선정',
                   '제조업: 품질 요인 우선순위 결정',
@@ -1650,7 +1650,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '학술 연구',
-                icon: '🎓',
+                icon: 'fa-solid fa-graduation-cap',
                 items: [
                   '환경 분야: 지속가능성 평가',
                   '의료 분야: 치료법 비교 평가',
@@ -1669,7 +1669,7 @@ export const GUIDE_DATA = {
       {
         id: 'advantages',
         title: '장단점',
-        icon: '📈',
+        icon: 'fa-solid fa-chart-line',
         content: [
           {
             type: 'text',
@@ -1682,7 +1682,7 @@ export const GUIDE_DATA = {
             cards: [
               {
                 title: '장점',
-                icon: '✅',
+                icon: 'fa-solid fa-circle-check',
                 highlight: 'success',
                 items: [
                   '불확실성의 체계적 처리',
@@ -1694,7 +1694,7 @@ export const GUIDE_DATA = {
               },
               {
                 title: '단점',
-                icon: '⚠️',
+                icon: 'fa-solid fa-triangle-exclamation',
                 highlight: 'warning',
                 items: [
                   '계산 과정이 복잡함',
