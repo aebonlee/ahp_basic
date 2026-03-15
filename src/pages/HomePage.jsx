@@ -105,7 +105,7 @@ const EVAL_BENEFITS = [
       </svg>
     ),
     title: '현금 출금',
-    desc: '적립 포인트를 출금 요청할 수 있습니다. (1P = 1원)',
+    desc: '적립 포인트를 출금 요청할 수 있습니다.\n(1P = 1원)',
     color: '#10b981',
     bg: '#ecfdf5',
   },

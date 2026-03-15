@@ -725,6 +725,7 @@
   font-size: 0.88rem;
   color: var(--color-text-light);
   line-height: var(--line-height-relaxed);
+  white-space: pre-line;
 }
 
 /* Evaluator marketplace preview */
