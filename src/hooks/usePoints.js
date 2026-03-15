@@ -52,6 +52,7 @@ export function useMarketplace() {
     setLoading(true);
     const { data, error } = await supabase.rpc('get_marketplace_projects');
     if (error) {
+      console.error('[Marketplace RPC]', error);
       setProjects([]);
     } else {
       setProjects(data || []);

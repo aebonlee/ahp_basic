@@ -129,8 +129,11 @@ export default function HomePage() {
 
   useEffect(() => {
     supabase.rpc('get_marketplace_projects').then(
-      ({ data }) => { if (data) setMarketProjects(data.slice(0, 3)); },
-      () => {}
+      ({ data, error }) => {
+        if (error) console.error('[Marketplace RPC]', error);
+        if (data) setMarketProjects(data.slice(0, 3));
+      },
+      (err) => console.error('[Marketplace RPC network]', err)
     );
   }, []);
 

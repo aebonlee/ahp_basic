@@ -163,13 +163,13 @@ export default function EvaluatorInfoPage() {
             <div className={styles.projectsGrid}>
               {projects.map((p) => (
                 <div key={p.id} className={styles.projectCard}>
-                  <h4 className={styles.projectTitle}>{p.title}</h4>
+                  <h4 className={styles.projectTitle}>{p.name}</h4>
                   {p.recruit_description && (
                     <p className={styles.projectDesc}>{p.recruit_description}</p>
                   )}
                   <div className={styles.projectMeta}>
-                    <span>{p.point_reward ? `${formatPoints(p.point_reward)}P` : '포인트 미정'}</span>
-                    <span>{p.current_evaluators ?? 0}명 참여 중</span>
+                    <span>{p.reward_points ? `${formatPoints(p.reward_points)}P` : '포인트 미정'}</span>
+                    <span>{p.evaluator_count ?? 0}명 참여 중</span>
                   </div>
                 </div>
               ))}

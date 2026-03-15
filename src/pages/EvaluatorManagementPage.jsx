@@ -42,6 +42,10 @@ export default function EvaluatorManagementPage() {
   const [comparisonCounts, setComparisonCounts] = useState({});
   const [smsModalOpen, setSmsModalOpen] = useState(false);
   const [planRequiredOpen, setPlanRequiredOpen] = useState(false);
+  const [rewardPoints, setRewardPoints] = useState(0);
+  const [recruitOpen, setRecruitOpen] = useState(false);
+  const [recruitDesc, setRecruitDesc] = useState('');
+  const [saving, setSaving] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [sourceFilter, setSourceFilter] = useState('all');
@@ -51,6 +55,36 @@ export default function EvaluatorManagementPage() {
   const maxEvaluators = isSuperAdmin ? Infinity : (projectPlan?.max_evaluators ?? 1);
 
   const isDirectInput = currentProject?.eval_method === EVAL_METHOD.DIRECT_INPUT;
+
+  // 모집 설정 로컬 state 초기화
+  useEffect(() => {
+    if (currentProject) {
+      setRewardPoints(currentProject.reward_points ?? 0);
+      setRecruitOpen(currentProject.recruit_evaluators ?? false);
+      setRecruitDesc(currentProject.recruit_description ?? '');
+    }
+  }, [currentProject?.id]);
+
+  const isRecruitDirty =
+    rewardPoints !== (currentProject?.reward_points ?? 0) ||
+    recruitOpen !== (currentProject?.recruit_evaluators ?? false) ||
+    recruitDesc !== (currentProject?.recruit_description ?? '');
+
+  const handleSaveRecruit = async () => {
+    setSaving(true);
+    try {
+      await updateProject(id, {
+        reward_points: rewardPoints,
+        recruit_evaluators: recruitOpen,
+        recruit_description: recruitDesc.trim() || null,
+      });
+      toast.success('모집 설정이 저장되었습니다.');
+    } catch (err) {
+      toast.error('저장 실패: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // 전체 필요 수 계산 (직접입력: 항목 수, 쌍대비교: 쌍 수)
   const totalRequired = useMemo(() => {
@@ -190,11 +224,12 @@ export default function EvaluatorManagementPage() {
               type="number"
               min="0"
               className={styles.rewardInput}
-              value={currentProject?.reward_points ?? 0}
-              onChange={async (e) => {
-                const val = parseInt(e.target.value, 10) || 0;
+              value={rewardPoints}
+              onChange={(e) => setRewardPoints(parseInt(e.target.value, 10) || 0)}
+              onBlur={async () => {
+                if (rewardPoints === (currentProject?.reward_points ?? 0)) return;
                 try {
-                  await updateProject(id, { reward_points: val });
+                  await updateProject(id, { reward_points: rewardPoints });
                 } catch (err) {
                   toast.error('보상 포인트 저장 실패: ' + err.message);
                 }
@@ -207,11 +242,13 @@ export default function EvaluatorManagementPage() {
             <label className={styles.recruitToggle}>
               <input
                 type="checkbox"
-                checked={currentProject?.recruit_evaluators ?? false}
+                checked={recruitOpen}
                 onChange={async (e) => {
+                  const checked = e.target.checked;
+                  setRecruitOpen(checked);
                   try {
-                    await updateProject(id, { recruit_evaluators: e.target.checked });
-                    toast.success(e.target.checked ? '마켓플레이스 공개됨' : '마켓플레이스 비공개');
+                    await updateProject(id, { recruit_evaluators: checked });
+                    toast.success(checked ? '마켓플레이스 공개됨' : '마켓플레이스 비공개');
                   } catch (err) {
                     toast.error('설정 변경 실패: ' + err.message);
                   }
@@ -223,7 +260,7 @@ export default function EvaluatorManagementPage() {
           </div>
         </div>
 
-        {currentProject?.recruit_evaluators && (
+        {recruitOpen && (
           <div className={styles.recruitDescWrap}>
             <label className={styles.rewardLabel} htmlFor="recruitDesc">모집 공고</label>
             <textarea
@@ -231,9 +268,10 @@ export default function EvaluatorManagementPage() {
               className={styles.recruitDesc}
               rows={3}
               placeholder="모집 공고 내용을 입력하세요 (평가 내용, 소요 시간 등)"
-              defaultValue={currentProject?.recruit_description ?? ''}
-              onBlur={async (e) => {
-                const val = e.target.value.trim();
+              value={recruitDesc}
+              onChange={(e) => setRecruitDesc(e.target.value)}
+              onBlur={async () => {
+                const val = recruitDesc.trim();
                 if (val === (currentProject?.recruit_description ?? '')) return;
                 try {
                   await updateProject(id, { recruit_description: val || null });
@@ -246,6 +284,16 @@ export default function EvaluatorManagementPage() {
             <span className={styles.rewardHint}>마켓플레이스와 메인페이지에 노출됩니다</span>
           </div>
         )}
+
+        <div className={styles.saveRow}>
+          <button
+            className={styles.saveBtn}
+            disabled={!isRecruitDirty || saving}
+            onClick={handleSaveRecruit}
+          >
+            {saving ? '저장 중...' : '저장'}
+          </button>
+        </div>
       </div>
 
       <div className={common.cardSpaced}>

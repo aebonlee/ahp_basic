@@ -40,7 +40,6 @@ BEGIN
   LEFT JOIN user_profiles u ON u.id = p.owner_id
   WHERE p.recruit_evaluators = TRUE
     AND p.status = 1  -- EVALUATING
-    AND p.reward_points > 0
   ORDER BY p.created_at DESC;
 END;
 $$;
