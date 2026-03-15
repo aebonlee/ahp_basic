@@ -40,7 +40,7 @@ CREATE POLICY "community_posts_delete" ON community_posts
     auth.uid() = author_id
     OR EXISTS (
       SELECT 1 FROM user_profiles
-      WHERE user_id = auth.uid() AND role = 'superadmin'
+      WHERE id = auth.uid() AND role = 'superadmin'
     )
   );
 
@@ -100,7 +100,7 @@ BEGIN
   IF p_category = 'notice' THEN
     IF NOT EXISTS (
       SELECT 1 FROM user_profiles
-      WHERE user_id = auth.uid() AND role = 'superadmin'
+      WHERE id = auth.uid() AND role = 'superadmin'
     ) THEN
       RAISE EXCEPTION 'Only superadmin can post notices';
     END IF;
@@ -108,7 +108,7 @@ BEGIN
 
   -- 작성자 이름
   SELECT display_name INTO v_name
-  FROM user_profiles WHERE user_id = auth.uid();
+  FROM user_profiles WHERE id = auth.uid();
 
   INSERT INTO community_posts (category, title, content, author_id, author_name)
   VALUES (p_category, p_title, p_content, auth.uid(), COALESCE(v_name, '익명'))
@@ -134,7 +134,7 @@ BEGIN
       author_id = auth.uid()
       OR EXISTS (
         SELECT 1 FROM user_profiles
-        WHERE user_id = auth.uid() AND role = 'superadmin'
+        WHERE id = auth.uid() AND role = 'superadmin'
       )
     );
 
