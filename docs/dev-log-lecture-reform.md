@@ -22,7 +22,14 @@
 - `lecture_applications` 테이블에 `lecture_type`, `preferred_date` 컬럼 추가
 - 기존 `preferred_dates` text[] 컬럼은 호환성을 위해 유지
 
+### 5. 관리자 페이지 — 강의 신청 탭 추가
+- SuperAdminPage에 "강의 신청" 탭 신규 추가
+- 전체/무료강의/1:1 맞춤 필터 + 페이지네이션
+- 신청자 이름, 이메일, 전화번호, 강의유형, 희망일, 문의사항, 신청일 테이블 표시
+- 유형별 통계 카드 (전체/무료/1:1 건수)
+
 ## 변경 파일
 - `src/pages/LectureApplyPage.jsx` — 전면 개편
 - `src/pages/LectureApplyPage.module.css` — 카드 스타일 변경
+- `src/pages/SuperAdminPage.jsx` — 강의 신청 탭 추가
 - `supabase/migrations/038_lecture_type_column.sql` — DB 마이그레이션

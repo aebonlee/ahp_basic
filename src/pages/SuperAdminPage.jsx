@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import ConfirmDialog from '../components/common/ConfirmDialog';
@@ -10,6 +10,7 @@ import { WITHDRAWAL_STATUS_LABELS } from '../lib/constants';
 import { formatPoints } from '../utils/formatters';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../lib/constants';
+import { supabase } from '../lib/supabaseClient';
 import styles from './SuperAdminPage.module.css';
 
 function formatDate(dateStr) {
@@ -549,6 +550,112 @@ function WithdrawalsTab({ toast }) {
   );
 }
 
+const LECTURE_TYPE_LABELS = { free: '무료강의', consulting: '1:1 맞춤강의' };
+
+function LecturesTab() {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [typeFilter, setTypeFilter] = useState('all');
+
+  useEffect(() => {
+    supabase
+      .from('lecture_applications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setApplications(data || []);
+        setLoading(false);
+      }, () => setLoading(false));
+  }, []);
+
+  if (loading) return <div className={styles.loading}>강의 신청 목록 로딩 중...</div>;
+  if (!applications.length) return <div className={styles.empty}>강의 신청 내역이 없습니다.</div>;
+
+  const filtered = applications.filter(a => {
+    if (typeFilter === 'all') return true;
+    return a.lecture_type === typeFilter;
+  });
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const safePage = Math.min(currentPage, totalPages || 1);
+  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const freeCount = applications.filter(a => a.lecture_type === 'free').length;
+  const consultingCount = applications.filter(a => a.lecture_type === 'consulting').length;
+
+  const handleFilterChange = (value) => {
+    setTypeFilter(value);
+    setCurrentPage(1);
+  };
+
+  return (
+    <>
+      <div className={styles.stats}>
+        <div className={styles.stat}>
+          <strong>{applications.length}</strong>전체 신청
+        </div>
+        <div className={styles.stat}>
+          <strong>{freeCount}</strong>무료강의
+        </div>
+        <div className={styles.stat}>
+          <strong>{consultingCount}</strong>1:1 맞춤
+        </div>
+      </div>
+      <div className={styles.filterBar}>
+        {[{ value: 'all', label: '전체' }, { value: 'free', label: '무료강의' }, { value: 'consulting', label: '1:1 맞춤' }].map(f => (
+          <button
+            key={f.value}
+            className={`${styles.filterBtn} ${typeFilter === f.value ? styles.filterBtnActive : ''}`}
+            onClick={() => handleFilterChange(f.value)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>이메일</th>
+              <th>전화번호</th>
+              <th>강의 유형</th>
+              <th>희망일</th>
+              <th>문의사항</th>
+              <th>신청일</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paged.map(a => (
+              <tr key={a.id}>
+                <td>{a.name}</td>
+                <td>{a.email}</td>
+                <td>{a.phone}</td>
+                <td>
+                  <span
+                    className={styles.statusBadge}
+                    style={{
+                      background: a.lecture_type === 'consulting' ? '#ede9fe' : '#ecfdf5',
+                      color: a.lecture_type === 'consulting' ? '#5b21b6' : '#065f46',
+                    }}
+                  >
+                    {LECTURE_TYPE_LABELS[a.lecture_type] || a.lecture_type || '-'}
+                  </span>
+                </td>
+                <td>{a.preferred_date || (a.preferred_dates?.join(', ')) || '-'}</td>
+                <td>{a.message || '-'}</td>
+                <td>{formatDate(a.created_at)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setCurrentPage} />
+    </>
+  );
+}
+
 export default function SuperAdminPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const toast = useToast();
@@ -561,6 +668,7 @@ export default function SuperAdminPage() {
     { key: 'withdrawals', label: '출금 관리' },
     { key: 'sms', label: 'SMS 관리' },
     { key: 'visitors', label: '방문자 통계' },
+    { key: 'lectures', label: '강의 신청' },
   ];
 
   return (
@@ -587,6 +695,7 @@ export default function SuperAdminPage() {
         {activeTab === 'withdrawals' && <WithdrawalsTab toast={toast} />}
         {activeTab === 'sms' && <SmsTab />}
         {activeTab === 'visitors' && <VisitorsTab />}
+        {activeTab === 'lectures' && <LecturesTab />}
       </div>
       <Footer />
       <ConfirmDialog {...confirmDialogProps} />
