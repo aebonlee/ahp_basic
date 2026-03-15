@@ -14,6 +14,7 @@ export default function PublicFooter() {
             </h3>
             <p className={styles.brandTagline}>
               AHP(Analytic Hierarchy Process) 기반의 의사결정 분석 플랫폼으로,
+              <br />
               체계적인 다기준 의사결정을 지원합니다.
             </p>
             <div className={styles.companyInfo}>
