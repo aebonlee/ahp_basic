@@ -1,7 +1,7 @@
 # 평가자 모집 설정 — 저장 버튼 CRUD & 마켓플레이스 버그 수정
 
 **날짜:** 2026-03-15
-**파일:** `src/pages/EvaluatorManagementPage.jsx`, `src/pages/EvaluatorManagementPage.module.css`, `src/pages/EvaluatorInfoPage.jsx`, `src/pages/HomePage.jsx`, `src/hooks/usePoints.js`, `src/pages/CommunityPage.jsx`, `src/pages/CommunityPage.module.css`, `supabase/migrations/032_recruit_description.sql`
+**파일:** `src/pages/EvaluatorManagementPage.jsx`, `src/pages/EvaluatorManagementPage.module.css`, `src/pages/EvaluatorInfoPage.jsx`, `src/pages/HomePage.jsx`, `src/hooks/usePoints.js`, `src/pages/CommunityPage.jsx`, `src/pages/CommunityPage.module.css`, `src/pages/InviteLandingPage.jsx`, `src/lib/constants.js`, `src/components/common/Button.module.css`, `supabase/migrations/032_recruit_description.sql`, `supabase/migrations/036_marketplace_register.sql`, `supabase/migrations/037_duplicate_prevention.sql`
 
 ---
 
@@ -212,6 +212,55 @@ RETURNS TABLE(id UUID, name TEXT, is_existing BOOLEAN, completed BOOLEAN)
 | QR → 마켓플레이스 | 동일 전화번호 감지 | false | "이어서 진행" 확인 후 평가 계속 |
 | 마켓플레이스 → QR | 동일 전화번호 감지 | true | "이미 완료" 표시 |
 | 신규 접속 | 없음 | - | 정상 등록 후 평가 시작 |
+
+---
+
+## 8. 평가 재개 버튼 추가 (3버튼 체계)
+
+### 배경
+
+평가 마감(COMPLETED) 후 추가 평가자가 필요하거나, 재평가가 필요한 경우 평가를 재개할 방법이 없었음.
+
+### 변경
+
+#### EvaluatorManagementPage.jsx
+
+- `resuming` state 추가
+- `handleResumeEvaluation` 핸들러 추가: `COMPLETED(4) → EVALUATING(1)` 상태 전환
+- 확인 다이얼로그로 재개 전 안내 표시
+- 상단 상태 바에 상태별 3버튼 조건부 노출
+
+#### Button.module.css
+
+- `warning` variant 추가 (주황색, `var(--color-warning, #f59e0b)`)
+
+### 3버튼 체계
+
+| 프로젝트 상태 | 버튼 | 색상 | 전환 |
+|---|---|---|---|
+| 생성중/대기중 | 평가 시작 | 초록 (success) | → 평가중 |
+| 평가중 | 평가 마감 | 빨강 (danger) | → 평가종료 |
+| 평가종료 | 평가 재개 | 주황 (warning) | → 평가중 |
+
+---
+
+## 9. Vite 번들링 TDZ 오류 수정
+
+### 문제
+
+프로덕션 빌드에서 `ReferenceError: Cannot access 'h' before initialization` 발생.
+
+### 원인 1: constants.js computed property
+
+`PROJECT_STATUS_LABELS`, `PROJECT_STATUS_COLORS` 등이 `[PROJECT_STATUS.CREATING]` 형태의 computed property를 사용. Vite minification 시 변수명이 `h` 등으로 단축되면서 TDZ 위반 발생.
+
+**수정:** computed property를 리터럴 키로 변경 (`[PROJECT_STATUS.CREATING]` → `2`)
+
+### 원인 2: EvaluatorManagementPage.jsx 변수 선언 순서
+
+`completedCount` useMemo가 `totalRequired`를 참조하는데, `totalRequired`가 코드에서 아래에 선언되어 있었음. 개발 모드에서는 동작하나, 프로덕션 minification 시 TDZ 에러 발생.
+
+**수정:** `completedCount` 선언을 `totalRequired` 선언 뒤로 이동
 
 ---
 
