@@ -120,7 +120,28 @@ DROP FUNCTION IF EXISTS public.get_marketplace_projects();
 
 ---
 
+## 5. 마켓플레이스 참여 흐름 개선 (비밀번호/전화인증 우회)
+
+### 문제
+
+마켓플레이스에서 프로젝트 카드를 클릭하여 초대 페이지로 이동해도, 전화번호 인증이나 비밀번호를 모르면 참여 불가.
+
+### 해결
+
+#### 새 RPC (migration 036)
+
+- `get_project_for_invite` 확장: `recruit_evaluators`, `recruit_description` 반환 추가
+- `marketplace_register_evaluator(p_project_id, p_name, p_phone)` 신규: 마켓플레이스 프로젝트 비로그인 자가 등록 (비밀번호 불필요, `recruit_evaluators = TRUE` 확인)
+
+#### InviteLandingPage 수정
+
+- **로그인 사용자** + 마켓플레이스 프로젝트 → `join_marketplace_project` RPC 자동 참여
+- **비로그인 사용자** + 마켓플레이스 프로젝트 → 이름+전화번호 등록 폼 바로 표시 (`marketplace_register` 상태)
+- 기존 전화인증/비밀번호 흐름은 비마켓플레이스 프로젝트에 그대로 유지
+
+---
+
 ## 검증
 
 - `npx vite build` 성공 확인
-- Supabase SQL Editor에서 `SELECT * FROM get_marketplace_projects()` 정상 반환 확인
+- Supabase SQL Editor에서 migration 036 SQL 실행 필요

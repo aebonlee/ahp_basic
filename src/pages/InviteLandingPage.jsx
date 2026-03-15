@@ -84,6 +84,18 @@ export default function InviteLandingPage() {
         sessionStorage.setItem(`evaluator_${token}`, evalData.id);
         setEvaluator(evalData);
         setStatus('ready');
+      } else if (data.recruit_evaluators) {
+        // 마켓플레이스 프로젝트: 자동 참여
+        try {
+          const { data: evalId, error: joinErr } = await supabase.rpc('join_marketplace_project', { p_project_id: token });
+          if (joinErr) throw joinErr;
+          sessionStorage.setItem(`evaluator_${token}`, evalId);
+          setEvaluator({ id: evalId, name: user.email });
+          setStatus('ready');
+        } catch (err) {
+          // 이미 참여 중 등의 에러 → not_assigned로 폴백
+          setStatus('not_assigned');
+        }
       } else if (data.public_access_enabled) {
         setStatus('need_access_code');
       } else {
@@ -101,7 +113,10 @@ export default function InviteLandingPage() {
 
       setProject(data[0]);
 
-      if (data[0].public_access_enabled) {
+      if (data[0].recruit_evaluators) {
+        // 마켓플레이스 → 바로 등록 폼
+        setStatus('marketplace_register');
+      } else if (data[0].public_access_enabled) {
         setStatus('need_access_code');
       } else {
         setStatus('need_verify');
@@ -208,6 +223,52 @@ export default function InviteLandingPage() {
       const row = data[0];
       if (row.is_existing) {
         // 기존 평가자: 이름 일치 여부 확인
+        if (row.name === regName.trim()) {
+          setPendingEvaluator(row);
+          setStatus('confirm_existing');
+        } else {
+          setRegError('이 전화번호로 이미 등록된 평가자가 있습니다. 등록된 이름을 정확히 입력해주세요.');
+        }
+      } else {
+        completeVerification({ id: row.id, name: row.name });
+      }
+    }
+    setRegistering(false);
+  };
+
+  const handleMarketplaceRegister = async () => {
+    if (!regName.trim()) {
+      setRegError('이름을 입력해주세요.');
+      return;
+    }
+    if (isRepeatedName(regName)) {
+      setRegError('올바른 이름을 입력해주세요.');
+      return;
+    }
+    const cleanPhone = regPhone.replace(/\D/g, '');
+    if (cleanPhone.length < 10) {
+      setRegError('올바른 전화번호를 입력해주세요.');
+      return;
+    }
+    setRegistering(true);
+    setRegError('');
+
+    const { data, error } = await supabase
+      .rpc('marketplace_register_evaluator', {
+        p_project_id: token,
+        p_name: regName.trim(),
+        p_phone: cleanPhone,
+      });
+
+    if (error) {
+      setRegError(error.message || '등록 중 오류가 발생했습니다.');
+      setRegistering(false);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      const row = data[0];
+      if (row.is_existing) {
         if (row.name === regName.trim()) {
           setPendingEvaluator(row);
           setStatus('confirm_existing');
@@ -385,6 +446,36 @@ export default function InviteLandingPage() {
               >
                 돌아가기
               </button>
+            </div>
+          </>
+        )}
+
+        {status === 'marketplace_register' && (
+          <>
+            <h2 className={styles.projectName}>{project?.name}</h2>
+            {project?.recruit_description && (
+              <p className={styles.desc}>{project.recruit_description}</p>
+            )}
+            <p className={styles.desc}>평가에 참여하려면 정보를 입력해주세요.</p>
+            <div className={styles.verifyForm}>
+              <input
+                type="text"
+                value={regName}
+                onChange={(e) => { setRegName(e.target.value); setRegError(''); }}
+                placeholder="이름"
+                className={styles.regInput}
+                autoFocus
+              />
+              <input
+                type="tel"
+                value={regPhone}
+                onChange={handlePhoneInput}
+                placeholder="전화번호 (010-0000-0000)"
+                className={styles.regInput}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleMarketplaceRegister(); }}
+              />
+              {regError && <p className={styles.errorDesc}>{regError}</p>}
+              <Button onClick={handleMarketplaceRegister} loading={registering}>참여하기</Button>
             </div>
           </>
         )}
