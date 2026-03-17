@@ -2,6 +2,8 @@
 .body {
   display: flex;
   gap: var(--spacing-md);
+  max-height: calc(90vh - 200px);
+  overflow: hidden;
 }
 
 .panelLeft {
@@ -11,6 +13,7 @@
   border: 1px solid #bbf7d0;
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
+  overflow-y: auto;
 }
 
 .panelRight {
@@ -20,6 +23,9 @@
   border: 1px solid #c7d2fe;
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .section {
@@ -112,8 +118,6 @@
   border-radius: var(--radius-md);
   padding: var(--spacing-xs) 0;
   background: #fff;
-  max-height: 320px;
-  overflow-y: auto;
 }
 
 .recipientRow {
@@ -264,7 +268,8 @@
   font-size: 0.88rem;
   font-family: inherit;
   resize: vertical;
-  min-height: 120px;
+  min-height: 100px;
+  flex: 1;
   box-sizing: border-box;
   background: #fefefe;
   line-height: 1.6;
