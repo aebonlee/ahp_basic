@@ -121,41 +121,53 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    // 글로벌 안전장치: 7초 후에도 loading 상태이면 강제 해제
+    const safetyTimer = setTimeout(() => {
+      dispatch({ type: 'SET_SESSION', payload: null });
+      dispatch({ type: 'SET_PROFILE', payload: null });
+    }, 7000);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(safetyTimer);
       dispatch({ type: 'SET_SESSION', payload: session });
       if (session?.user) loadProfile(session.user.id);
+      else dispatch({ type: 'SET_PROFILE', payload: null });
+    }).catch(() => {
+      clearTimeout(safetyTimer);
+      dispatch({ type: 'SET_SESSION', payload: null });
+      dispatch({ type: 'SET_PROFILE', payload: null });
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         dispatch({ type: 'SET_SESSION', payload: session });
         if (session?.user) {
           loadProfile(session.user.id);
           if (event === 'SIGNED_IN') {
+            // fire-and-forget (await 제거하여 hang 방지)
             const hostname = window.location.hostname;
             supabase.from('user_profiles')
               .update({ last_sign_in_at: new Date().toISOString() })
               .eq('id', session.user.id)
               .then(() => {});
 
-            // visited_sites 도메인 트래킹
-            try {
-              const { data: profile } = await supabase
-                .from('user_profiles')
-                .select('visited_sites')
-                .eq('id', session.user.id)
-                .single();
-              if (profile) {
-                const sites = (profile as any).visited_sites || [];
-                if (!sites.includes(hostname)) {
-                  await supabase.from('user_profiles')
-                    .update({ visited_sites: [...sites, hostname] })
-                    .eq('id', session.user.id);
+            supabase
+              .from('user_profiles')
+              .select('visited_sites')
+              .eq('id', session.user.id)
+              .single()
+              .then(({ data: profile }) => {
+                if (profile) {
+                  const sites = (profile as any).visited_sites || [];
+                  if (!sites.includes(hostname)) {
+                    supabase.from('user_profiles')
+                      .update({ visited_sites: [...sites, hostname] })
+                      .eq('id', session.user.id)
+                      .then(() => {});
+                  }
                 }
-              }
-            } catch {
-              // user_profiles 조회 실패 시 무시
-            }
+              })
+              .catch(() => {});
           }
         } else {
           dispatch({ type: 'SET_PROFILE', payload: null });
@@ -163,7 +175,10 @@ export function AuthProvider({ children }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(safetyTimer);
+      subscription.unsubscribe();
+    };
   }, [loadProfile]);
 
   const setMode = useCallback((mode) => {
