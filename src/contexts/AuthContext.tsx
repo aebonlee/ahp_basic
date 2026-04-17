@@ -63,11 +63,15 @@ export function AuthProvider({ children }) {
     dispatch({ type: 'SET_ACCOUNT_BLOCK', payload: null });
   }, []);
 
-  // 프로필 로드
+  // 프로필 로드 (5초 타임아웃 보호)
   const loadProfile = useCallback(async (userId) => {
     dispatch({ type: 'SET_PROFILE_LOADING' });
     try {
-      const profile = await getProfile(userId);
+      const profilePromise = getProfile(userId);
+      const profile = await Promise.race([
+        profilePromise,
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+      ]);
       dispatch({ type: 'SET_PROFILE', payload: profile });
 
       // signup_domain / visited_sites / check_user_status 자동 처리
@@ -85,10 +89,15 @@ export function AuthProvider({ children }) {
 
         // 계정 상태 체크
         try {
-          const { data: statusData } = await supabase.rpc('check_user_status', {
+          const statusPromise = supabase.rpc('check_user_status', {
             target_user_id: userId,
             current_domain: currentDomain,
           });
+          const statusResult = await Promise.race([
+            statusPromise,
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
+          ]);
+          const statusData = (statusResult as any)?.data;
           if (statusData && statusData.status && statusData.status !== 'active') {
             dispatch({
               type: 'SET_ACCOUNT_BLOCK',
