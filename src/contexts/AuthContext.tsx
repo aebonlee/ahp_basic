@@ -12,6 +12,7 @@ import {
   updateProfile as authUpdateProfile,
 } from '../utils/auth';
 import { clearAllApiKeys } from '../lib/aiService';
+import { useIdleTimeout } from '../hooks/useIdleTimeout';
 
 export const AuthContext = createContext<any>(null);
 
@@ -267,6 +268,16 @@ export function AuthProvider({ children }) {
     ['admin', 'superadmin'].includes(state.profile?.role) || isAdminByEmail
   );
   const isEvaluator = isLoggedIn && state.profile?.role === 'evaluator';
+
+  // 10분 무동작 세션 타임아웃
+  useIdleTimeout({
+    enabled: isLoggedIn,
+    onTimeout: () => {
+      clearAllApiKeys();
+      authSignOut().catch(() => {});
+      dispatch({ type: 'SIGN_OUT' });
+    },
+  });
 
   const value = useMemo(() => ({
     ...state,
