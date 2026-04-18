@@ -1,4 +1,4 @@
-import { createContext, useReducer, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useState, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { USER_MODE } from '../lib/constants';
 import {
@@ -13,6 +13,7 @@ import {
 } from '../utils/auth';
 import { clearAllApiKeys } from '../lib/aiService';
 import { useIdleTimeout } from '../hooks/useIdleTimeout';
+import ProfileCompleteModal from '../components/ProfileCompleteModal';
 
 export const AuthContext = createContext<any>(null);
 
@@ -120,6 +121,24 @@ export function AuthProvider({ children }) {
       dispatch({ type: 'SET_PROFILE', payload: null });
     }
   }, []);
+
+  
+  // ─── 프로필 완성 체크용 user_profiles 로드 ───
+  const [_userProfile, _setUserProfile] = useState<any>(null);
+  const _loadUserProfile = useCallback(async (uid: string) => {
+    try {
+      const { data } = await supabase!.from('user_profiles').select('name,phone').eq('id', uid).maybeSingle();
+      _setUserProfile(data);
+    } catch { _setUserProfile(null); }
+  }, []);
+
+  useEffect(() => {
+    if (state.user?.id) {
+      _loadUserProfile(state.user.id);
+    } else {
+      _setUserProfile(null);
+    }
+  }, [state.user?.id, _loadUserProfile]);
 
   useEffect(() => {
     // 글로벌 안전장치: 7초 후에도 loading 상태이면 강제 해제
@@ -279,6 +298,9 @@ export function AuthProvider({ children }) {
     },
   });
 
+  // 프로필 완성 여부 체크
+  const needsProfileCompletion = !!state.user && !!_userProfile && (!_userProfile.name || !_userProfile.phone);
+
   const value = useMemo(() => ({
     ...state,
     isLoggedIn,
@@ -296,9 +318,13 @@ export function AuthProvider({ children }) {
     updateProfile,
   }), [state, isLoggedIn, isAdmin, isEvaluator, clearAccountBlock, setMode, signIn, loginWithGoogle, loginWithKakao, signUp, signOut, resetPassword, refreshProfile, updateProfile]);
 
+
   return (
     <AuthContext.Provider value={value}>
       {children}
+      {needsProfileCompletion && state.user && (
+        <ProfileCompleteModal user={state.user} onComplete={refreshProfile} />
+      )}
     </AuthContext.Provider>
   );
 }
