@@ -299,7 +299,7 @@ export function AuthProvider({ children }) {
   });
 
   // 프로필 완성 여부 체크
-  const needsProfileCompletion = !!state.user && !!_userProfile && (!_userProfile.name || !_userProfile.phone);
+  const needsProfileCompletion = !!state.user && !!_userProfile && !_userProfile.name;
 
   const value = useMemo(() => ({
     ...state,
