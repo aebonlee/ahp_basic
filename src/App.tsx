@@ -112,21 +112,21 @@ export default function App() {
               {/* Super Admin */}
               <Route path="/superadmin" element={<SuperAdminGuard><ErrorBoundary><SuperAdminPage /></ErrorBoundary></SuperAdminGuard>} />
 
-              {/* Admin */}
-              <Route path="/admin" element={<AdminGuard><ErrorBoundary><AdminDashboard /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id" element={<AdminGuard><ErrorBoundary><ModelBuilderPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/brain" element={<AdminGuard><ErrorBoundary><BrainstormingPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/confirm" element={<AdminGuard><ErrorBoundary><ModelConfirmPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/survey" element={<AdminGuard><ErrorBoundary><SurveyBuilderPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/eval" element={<AdminGuard><ErrorBoundary><EvaluatorManagementPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/result" element={<AdminGuard><ErrorBoundary><AdminResultPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/survey-result" element={<AdminGuard><ErrorBoundary><SurveyResultPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/sensitivity" element={<AdminGuard><ErrorBoundary><SensitivityPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/resource" element={<AdminGuard><ErrorBoundary><ResourceAllocationPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/workshop" element={<AdminGuard><ErrorBoundary><WorkshopPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/statistics" element={<AdminGuard><ErrorBoundary><StatisticalAnalysisPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/ai-analysis" element={<AdminGuard><ErrorBoundary><AiAnalysisPage /></ErrorBoundary></AdminGuard>} />
-              <Route path="/admin/project/:id/sms-history" element={<AdminGuard><ErrorBoundary><SmsHistoryPage /></ErrorBoundary></AdminGuard>} />
+              {/* Admin (로그인 사용자 전체 — RLS로 본인 프로젝트만 조회) */}
+              <Route path="/admin" element={<ProtectedRoute><ErrorBoundary><AdminDashboard /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id" element={<ProtectedRoute><ErrorBoundary><ModelBuilderPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/brain" element={<ProtectedRoute><ErrorBoundary><BrainstormingPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/confirm" element={<ProtectedRoute><ErrorBoundary><ModelConfirmPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/survey" element={<ProtectedRoute><ErrorBoundary><SurveyBuilderPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/eval" element={<ProtectedRoute><ErrorBoundary><EvaluatorManagementPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/result" element={<ProtectedRoute><ErrorBoundary><AdminResultPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/survey-result" element={<ProtectedRoute><ErrorBoundary><SurveyResultPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/sensitivity" element={<ProtectedRoute><ErrorBoundary><SensitivityPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/resource" element={<ProtectedRoute><ErrorBoundary><ResourceAllocationPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/workshop" element={<ProtectedRoute><ErrorBoundary><WorkshopPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/statistics" element={<ProtectedRoute><ErrorBoundary><StatisticalAnalysisPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/ai-analysis" element={<ProtectedRoute><ErrorBoundary><AiAnalysisPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/admin/project/:id/sms-history" element={<ProtectedRoute><ErrorBoundary><SmsHistoryPage /></ErrorBoundary></ProtectedRoute>} />
 
               {/* Evaluator */}
               <Route path="/eval" element={<ProtectedRoute><ErrorBoundary><EvaluatorMainPage /></ErrorBoundary></ProtectedRoute>} />
