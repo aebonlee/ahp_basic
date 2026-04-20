@@ -277,7 +277,7 @@ export function AuthProvider({ children }) {
   }, [state.user]);
 
   const isLoggedIn = !!state.user;
-  const ADMIN_EMAILS = ['aebonlee@gmail.com'];
+  const ADMIN_EMAILS = ['aebon@kakao.com', 'radical8566@gmail.com', 'aebon@kyonggi.ac.kr'];
   const adminEmails = [
     state.user?.email,
     state.user?.user_metadata?.email,
