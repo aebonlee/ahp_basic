@@ -5,6 +5,7 @@ import { updateProfile } from '../utils/auth';
 interface Props {
   user: User;
   onComplete: () => Promise<void>;
+  onDismiss?: () => void;
 }
 
 /** 전화번호 자동 포맷: 01012345678 → 010-1234-5678 */
@@ -15,7 +16,7 @@ function formatPhone(value: string): string {
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
-const ProfileCompleteModal = ({ user, onComplete }: Props) => {
+const ProfileCompleteModal = ({ user, onComplete, onDismiss }: Props) => {
   const meta = user.user_metadata || {};
   const [name, setName] = useState(meta.full_name || meta.name || '');
   const [phone, setPhone] = useState('');
@@ -56,16 +57,19 @@ const ProfileCompleteModal = ({ user, onComplete }: Props) => {
   };
 
   const handleSkip = async () => {
-    // 이름이 있으면 저장하고 스킵
+    // 이름이 있으면 저장하고 닫기
     const trimmedName = name.trim();
     if (trimmedName) {
       try {
         await updateProfile(user.id, { name: trimmedName, display_name: trimmedName });
+        await onComplete();
+        return;
       } catch {
         // 저장 실패해도 모달 닫기
       }
     }
-    await onComplete();
+    // 이름 없이 스킵 → 이 세션에서 모달 다시 표시 안 함
+    onDismiss?.();
   };
 
   return (

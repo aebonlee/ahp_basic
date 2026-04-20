@@ -125,6 +125,9 @@ export function AuthProvider({ children }) {
   
   // ─── 프로필 완성 체크용 user_profiles 로드 ───
   const [_userProfile, _setUserProfile] = useState<any>(null);
+  const [_profileDismissed, _setProfileDismissed] = useState(
+    () => typeof window !== 'undefined' && sessionStorage.getItem('ahp_profile_modal_dismissed') === '1'
+  );
   const _loadUserProfile = useCallback(async (uid: string) => {
     try {
       const { data } = await supabase!.from('user_profiles').select('name,phone').eq('id', uid).maybeSingle();
@@ -299,7 +302,12 @@ export function AuthProvider({ children }) {
   });
 
   // 프로필 완성 여부 체크
-  const needsProfileCompletion = !!state.user && !!_userProfile && !_userProfile.name;
+  const needsProfileCompletion = !!state.user && !!_userProfile && !_userProfile.name && !_profileDismissed;
+
+  const dismissProfileModal = useCallback(() => {
+    sessionStorage.setItem('ahp_profile_modal_dismissed', '1');
+    _setProfileDismissed(true);
+  }, []);
 
   const value = useMemo(() => ({
     ...state,
@@ -323,7 +331,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={value}>
       {children}
       {needsProfileCompletion && state.user && (
-        <ProfileCompleteModal user={state.user} onComplete={refreshProfile} />
+        <ProfileCompleteModal user={state.user} onComplete={refreshProfile} onDismiss={dismissProfileModal} />
       )}
     </AuthContext.Provider>
   );
