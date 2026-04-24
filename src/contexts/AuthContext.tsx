@@ -334,8 +334,8 @@ export function AuthProvider({ children }) {
       {needsProfileCompletion && state.user && (
         <ProfileCompleteModal user={state.user} onComplete={refreshProfile} onDismiss={dismissProfileModal} />
       )}
-    {isLoggedIn && user && !needsProfileCompletion && (
-      <PaymentNudgePopup user={user} siteSlug="ahp-basic" />
+    {isLoggedIn && state.user && !needsProfileCompletion && (
+      <PaymentNudgePopup user={state.user} siteSlug="ahp-basic" />
     )}
     </AuthContext.Provider>
   );
