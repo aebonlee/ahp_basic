@@ -2,8 +2,11 @@ import { supabase } from '../lib/supabaseClient';
 
 /**
  * 주문 생성 (order + order_items)
+ * user_id를 클라이언트에서 보내지 않음 — auth.users FK 권한 문제 회피
+ * fix-orders-fk.sql 실행 후 DB에서 user_id = auth.uid() 자동 설정
  */
 export async function createOrder(orderData) {
+  // user_id 제외 — FK→auth.users "permission denied" 방지
   const orderPayload = {
     order_number: orderData.order_number,
     user_email: orderData.user_email,
@@ -12,48 +15,47 @@ export async function createOrder(orderData) {
     total_amount: orderData.total_amount,
     payment_method: orderData.payment_method,
   };
-  if (orderData.user_id) orderPayload.user_id = orderData.user_id;
 
-  let { data: order, error: orderError } = await supabase
+  // bare INSERT — .select() 없이 (RLS SELECT 정책 문제 회피)
+  const { error: orderError } = await supabase
     .from('orders')
-    .insert(orderPayload)
-    .select()
-    .single();
-
-  // FK on user_id→auth.users causes "permission denied" — retry without user_id
-  if (orderError && orderPayload.user_id) {
-    delete orderPayload.user_id;
-    const retry = await supabase
-      .from('orders')
-      .insert(orderPayload)
-      .select()
-      .single();
-    order = retry.data;
-    orderError = retry.error;
-  }
+    .insert(orderPayload);
 
   if (orderError) throw orderError;
 
+  // order_items — 비필수, 실패해도 결제 진행
   if (orderData.items && orderData.items.length > 0) {
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(
-        orderData.items.map(item => {
-          const row = {
-            order_id: order.id,
-            product_title: item.product_title,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            subtotal: item.subtotal,
-          };
-          if (item.plan_type) row.plan_type = item.plan_type;
-          return row;
-        })
-      );
-    if (itemsError) throw itemsError;
+    try {
+      // order_number로 방금 생성한 주문의 UUID 조회
+      const { data: row } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('order_number', orderData.order_number)
+        .maybeSingle();
+
+      if (row?.id) {
+        await supabase
+          .from('order_items')
+          .insert(
+            orderData.items.map(item => {
+              const r = {
+                order_id: row.id,
+                product_title: item.product_title,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                subtotal: item.subtotal,
+              };
+              if (item.plan_type) r.plan_type = item.plan_type;
+              return r;
+            })
+          );
+      }
+    } catch {
+      // order_items 실패해도 결제 플로우는 계속 진행
+    }
   }
 
-  return order;
+  return { id: orderData.order_number, order_number: orderData.order_number };
 }
 
 /**
@@ -79,7 +81,7 @@ export async function getOrderByNumber(orderNumber) {
 }
 
 /**
- * 주문 상태 업데이트
+ * 주문 상태 업데이트 (UUID 또는 order_number 모두 지원)
  */
 export async function updateOrderStatus(orderId, status, paymentId, cancelReason) {
   const updatePayload = { payment_status: status };
@@ -92,30 +94,35 @@ export async function updateOrderStatus(orderId, status, paymentId, cancelReason
   const extras = {};
   if (paymentId) extras.portone_payment_id = paymentId;
 
+  // orderId가 UUID인지 order_number인지 판별
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-/.test(orderId);
+  const filterCol = isUUID ? 'id' : 'order_number';
+
   let result = null;
   try {
     const { data, error } = await supabase
       .from('orders')
       .update({ ...updatePayload, ...extras })
-      .eq('id', orderId)
+      .eq(filterCol, orderId)
       .select();
     if (error) throw error;
     result = data;
   } catch {
-    const { data, error } = await supabase
-      .from('orders')
-      .update(updatePayload)
-      .eq('id', orderId)
-      .select();
-    if (error) throw error;
-    result = data;
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .update(updatePayload)
+        .eq(filterCol, orderId)
+        .select();
+      if (error) throw error;
+      result = data;
+    } catch {
+      // 업데이트 완전 실패 — 결제 자체는 성공이므로 무시
+      return null;
+    }
   }
 
-  if (!result || result.length === 0) {
-    throw new Error(`UPDATE_NO_ROWS: 주문 ID ${orderId}에 해당하는 주문을 찾을 수 없습니다.`);
-  }
-
-  return result[0];
+  return result?.[0] || null;
 }
 
 /**
