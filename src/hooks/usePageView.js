@@ -15,43 +15,28 @@ function getVisitorId() {
 export function usePageView() {
   const { pathname } = useLocation();
   const prevPath = useRef(null);
+  const pendingRef = useRef(false);
 
   useEffect(() => {
-    if (pathname === prevPath.current) return;
+    if (pathname === prevPath.current || pendingRef.current) return;
     prevPath.current = pathname;
+    pendingRef.current = true;
 
     const visitorId = getVisitorId();
-    const userId = supabase.auth.getUser?.()
-      ?.then?.(({ data }) => data?.user?.id)
-      ?? null;
 
-    // Fire-and-forget using thenable pattern (no .catch on PostgrestFilterBuilder)
-    if (userId && typeof userId.then === 'function') {
-      userId.then((uid) => {
-        supabase
-          .rpc('record_page_view', {
-            p_path: pathname,
-            p_visitor_id: visitorId,
-            p_user_id: uid || null,
-          })
-          .then(null, () => {});
-      }, () => {
-        supabase
-          .rpc('record_page_view', {
-            p_path: pathname,
-            p_visitor_id: visitorId,
-            p_user_id: null,
-          })
-          .then(null, () => {});
-      });
-    } else {
+    const record = (uid) => {
       supabase
         .rpc('record_page_view', {
           p_path: pathname,
           p_visitor_id: visitorId,
-          p_user_id: null,
+          p_user_id: uid || null,
         })
-        .then(null, () => {});
-    }
+        .then(null, () => {})
+        .finally(() => { pendingRef.current = false; });
+    };
+
+    supabase.auth.getUser()
+      .then(({ data }) => record(data?.user?.id))
+      .catch(() => record(null));
   }, [pathname]);
 }

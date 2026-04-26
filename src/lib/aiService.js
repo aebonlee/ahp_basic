@@ -1,20 +1,28 @@
 // AI Service Layer — API key management + streaming chat for OpenAI / Anthropic / Custom
 
-const STORAGE_KEYS = {
-  openai: 'ahp_openai_api_key',
-  anthropic: 'ahp_anthropic_api_key',
-  custom_url: 'ahp_custom_api_url',
-  custom_key: 'ahp_custom_api_key',
+// ─── In-memory key store (XSS 대비 sessionStorage 제거) ─────
+const _keys = {
+  openai: '',
+  anthropic: '',
+  custom_url: '',
+  custom_key: '',
 };
 
-// ─── localStorage → sessionStorage 마이그레이션 ──────────
-(function migrateToSessionStorage() {
-  Object.values(STORAGE_KEYS).forEach(key => {
-    const old = localStorage.getItem(key);
-    if (old !== null) {
-      if (!sessionStorage.getItem(key)) {
-        sessionStorage.setItem(key, old);
-      }
+// 기존 sessionStorage/localStorage 잔존 키 정리 (1회성 마이그레이션)
+(function cleanupStorage() {
+  const OLD_KEYS = [
+    'ahp_openai_api_key', 'ahp_anthropic_api_key',
+    'ahp_custom_api_url', 'ahp_custom_api_key',
+  ];
+  OLD_KEYS.forEach(key => {
+    const val = sessionStorage.getItem(key) || localStorage.getItem(key);
+    if (val !== null) {
+      // 메모리로 복원
+      if (key.includes('openai')) _keys.openai = val;
+      else if (key.includes('anthropic')) _keys.anthropic = val;
+      else if (key.includes('custom_api_url')) _keys.custom_url = val;
+      else if (key.includes('custom_api_key')) _keys.custom_key = val;
+      sessionStorage.removeItem(key);
       localStorage.removeItem(key);
     }
   });
@@ -24,41 +32,39 @@ const STORAGE_KEYS = {
 
 export function getApiKey(provider) {
   if (provider === 'custom') {
-    return {
-      url: sessionStorage.getItem(STORAGE_KEYS.custom_url) || '',
-      key: sessionStorage.getItem(STORAGE_KEYS.custom_key) || '',
-    };
+    return { url: _keys.custom_url, key: _keys.custom_key };
   }
-  return sessionStorage.getItem(STORAGE_KEYS[provider]) || '';
+  return _keys[provider] || '';
 }
 
 export function setApiKey(provider, value) {
   if (provider === 'custom') {
-    sessionStorage.setItem(STORAGE_KEYS.custom_url, value.url || '');
-    sessionStorage.setItem(STORAGE_KEYS.custom_key, value.key || '');
+    _keys.custom_url = value.url || '';
+    _keys.custom_key = value.key || '';
   } else {
-    sessionStorage.setItem(STORAGE_KEYS[provider], value);
+    _keys[provider] = value;
   }
 }
 
 export function removeApiKey(provider) {
   if (provider === 'custom') {
-    sessionStorage.removeItem(STORAGE_KEYS.custom_url);
-    sessionStorage.removeItem(STORAGE_KEYS.custom_key);
+    _keys.custom_url = '';
+    _keys.custom_key = '';
   } else {
-    sessionStorage.removeItem(STORAGE_KEYS[provider]);
+    _keys[provider] = '';
   }
 }
 
 export function hasApiKey(provider) {
-  if (provider === 'custom') {
-    return !!sessionStorage.getItem(STORAGE_KEYS.custom_url);
-  }
-  return !!sessionStorage.getItem(STORAGE_KEYS[provider]);
+  if (provider === 'custom') return !!_keys.custom_url;
+  return !!_keys[provider];
 }
 
 export function clearAllApiKeys() {
-  Object.values(STORAGE_KEYS).forEach(key => sessionStorage.removeItem(key));
+  _keys.openai = '';
+  _keys.anthropic = '';
+  _keys.custom_url = '';
+  _keys.custom_key = '';
 }
 
 // ─── Streaming Chat ───────────────────────────────────────

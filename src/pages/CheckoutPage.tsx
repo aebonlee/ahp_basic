@@ -126,10 +126,12 @@ export default function CheckoutPage() {
       try {
         await verifyPayment(paymentResult.paymentId, orderId);
       } catch {
+        // Edge Function 검증 실패 시 1회 재시도
         try {
+          await verifyPayment(paymentResult.paymentId, orderId);
+        } catch {
+          // 재시도도 실패 시 주문 상태만 업데이트 (결제 자체는 PortOne에서 성공)
           await updateOrderStatus(orderId, 'paid', paymentResult.paymentId);
-        } catch (updateErr) {
-          if (import.meta.env.DEV) console.warn('주문 상태 업데이트 실패 (결제는 성공):', updateErr);
         }
       }
 

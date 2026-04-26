@@ -7,6 +7,7 @@
  */
 import { useState, useEffect } from 'react';
 import type { User, SupabaseClient } from '@supabase/supabase-js';
+import { SUPERADMIN_EMAILS } from '../lib/constants';
 
 /** 사이트별 supabase export 패턴 차이를 자동 감지 */
 async function resolveSupabase(): Promise<SupabaseClient | null> {
@@ -24,12 +25,6 @@ async function resolveSupabase(): Promise<SupabaseClient | null> {
   }
   return null;
 }
-
-const SUPERADMIN_EMAILS = [
-  'aebon@kakao.com',
-  'aebon@kyonggi.ac.kr',
-  'radical8566@gmail.com',
-];
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 

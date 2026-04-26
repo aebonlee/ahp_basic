@@ -10,6 +10,9 @@ export function useCriteria(projectId) {
   const criteriaRef = useRef(criteria);
   useEffect(() => { criteriaRef.current = criteria; }, [criteria]);
 
+  // Move 작업 중복 실행 방지
+  const movingRef = useRef(false);
+
   const fetchCriteria = useCallback(async () => {
     if (!projectId) { setLoading(false); return; }
     setLoading(true);
@@ -103,8 +106,11 @@ export function useCriteria(projectId) {
   const getTree = useCallback(() => tree, [tree]);
 
   const moveCriterion = useCallback(async (criterionId, newParentId, newIndex) => {
+    if (movingRef.current) return;
+    movingRef.current = true;
+
     const current = criteriaRef.current.find(c => c.id === criterionId);
-    if (!current) return;
+    if (!current) { movingRef.current = false; return; }
 
     const effectiveNewParentId = newParentId || null;
     const oldParentId = current.parent_id || null;
@@ -160,6 +166,8 @@ export function useCriteria(projectId) {
       // 실패 시 이전 상태 복원
       setCriteria(prevCriteria);
       throw new Error('기준 순서 변경 실패');
+    } finally {
+      movingRef.current = false;
     }
   }, []);
 

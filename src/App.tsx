@@ -112,7 +112,7 @@ export default function App() {
               {/* Super Admin */}
               <Route path="/superadmin" element={<SuperAdminGuard><ErrorBoundary><SuperAdminPage /></ErrorBoundary></SuperAdminGuard>} />
 
-              {/* Admin (로그인 사용자 전체 — RLS로 본인 프로젝트만 조회) */}
+              {/* Researcher workspace (인증 필수 — Supabase RLS로 본인 프로젝트만 접근) */}
               <Route path="/admin" element={<ProtectedRoute><ErrorBoundary><AdminDashboard /></ErrorBoundary></ProtectedRoute>} />
               <Route path="/admin/project/:id" element={<ProtectedRoute><ErrorBoundary><ModelBuilderPage /></ErrorBoundary></ProtectedRoute>} />
               <Route path="/admin/project/:id/brain" element={<ProtectedRoute><ErrorBoundary><BrainstormingPage /></ErrorBoundary></ProtectedRoute>} />

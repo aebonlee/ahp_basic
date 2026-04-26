@@ -43,7 +43,7 @@ export default memo(function PairwiseRow({ pair, parentId, projectId, evaluatorI
     try {
       await saveComparison(projectId, evaluatorId, parentId, pair.left.id, pair.right.id, newValue);
     } catch (err: any) {
-      console.error('비교 저장 실패:', err);
+      // 비교 저장 실패 — UI에서는 값이 반영되지 않으므로 사용자가 재시도
     }
   }, [projectId, evaluatorId, parentId, pair, saveComparison]);
 

@@ -10,6 +10,9 @@ export function useAlternatives(projectId) {
   const alternativesRef = useRef(alternatives);
   useEffect(() => { alternativesRef.current = alternatives; }, [alternatives]);
 
+  // Move 작업 중복 실행 방지
+  const movingRef = useRef(false);
+
   const fetchAlternatives = useCallback(async () => {
     if (!projectId) { setLoading(false); return; }
     setLoading(true);
@@ -84,8 +87,11 @@ export function useAlternatives(projectId) {
   }, []);
 
   const moveAlternative = useCallback(async (altId, newIndex) => {
+    if (movingRef.current) return;
+    movingRef.current = true;
+
     const current = alternativesRef.current.find(a => a.id === altId);
-    if (!current) return;
+    if (!current) { movingRef.current = false; return; }
 
     const siblings = alternativesRef.current
       .filter(a => !a.parent_id && a.id !== altId)
@@ -117,6 +123,8 @@ export function useAlternatives(projectId) {
       // 실패 시 이전 상태 복원
       setAlternatives(prevAlternatives);
       throw new Error('대안 순서 변경 실패');
+    } finally {
+      movingRef.current = false;
     }
   }, []);
 

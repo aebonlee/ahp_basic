@@ -66,7 +66,7 @@ export function useBrainstormingImport(projectId) {
       setResult(res);
       return res;
     } catch (err) {
-      setResult({ error: err.message });
+      setError(err.message || '브레인스토밍 가져오기 실패');
       throw err;
     } finally {
       setImporting(false);

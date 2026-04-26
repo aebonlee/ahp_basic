@@ -1,6 +1,6 @@
 import { createContext, useState, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { USER_MODE } from '../lib/constants';
+import { USER_MODE, SUPERADMIN_EMAILS } from '../lib/constants';
 import {
   signInWithEmail,
   signInWithGoogle,
@@ -281,12 +281,11 @@ export function AuthProvider({ children }) {
   }, [state.user]);
 
   const isLoggedIn = !!state.user;
-  const ADMIN_EMAILS = ['aebon@kakao.com', 'radical8566@gmail.com', 'aebon@kyonggi.ac.kr'];
   const adminEmails = [
     state.user?.email,
     state.user?.user_metadata?.email,
   ].filter((e): e is string => Boolean(e)).map(e => e.toLowerCase());
-  const isAdminByEmail = adminEmails.some(e => ADMIN_EMAILS.includes(e));
+  const isAdminByEmail = adminEmails.some(e => SUPERADMIN_EMAILS.includes(e));
   const isAdmin = isLoggedIn && (
     ['admin', 'superadmin'].includes(state.profile?.role) || isAdminByEmail
   );

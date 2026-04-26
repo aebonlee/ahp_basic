@@ -119,3 +119,10 @@ export const WITHDRAWAL_STATUS_LABELS = {
   approved: '승인',
   rejected: '거절',
 };
+
+// Global superadmin emails (단일 출처)
+export const SUPERADMIN_EMAILS = [
+  'aebon@kakao.com',
+  'aebon@kyonggi.ac.kr',
+  'radical8566@gmail.com',
+];

@@ -105,17 +105,29 @@ export function useSurveyQuestions(projectId) {
   }, []);
 
   const reorderQuestions = useCallback(async (reorderedIds) => {
+    const prevQuestions = questionsRef.current;
     const updates = reorderedIds.map((id, idx) => ({ id, sort_order: idx }));
-    await Promise.all(
-      updates.map(u =>
-        supabase.from('survey_questions').update({ sort_order: u.sort_order }).eq('id', u.id)
-      )
-    );
+
+    // 낙관적 로컬 업데이트
     setQuestions(prev => {
       const map = {};
       for (const q of prev) map[q.id] = q;
       return reorderedIds.map((id, idx) => ({ ...map[id], sort_order: idx }));
     });
+
+    try {
+      const results = await Promise.all(
+        updates.map(u =>
+          supabase.from('survey_questions').update({ sort_order: u.sort_order }).eq('id', u.id)
+        )
+      );
+      const failed = results.find(r => r.error);
+      if (failed) throw failed.error;
+    } catch {
+      // 실패 시 이전 상태 복원
+      setQuestions(prevQuestions);
+      throw new Error('질문 순서 변경 실패');
+    }
   }, []);
 
   return { questions, loading, error, fetchQuestions, addQuestion, addQuestionsBatch, updateQuestion, deleteQuestion, deleteQuestionsByCategory, reorderQuestions };
@@ -156,8 +168,14 @@ export function useSurveyResponses(projectId) {
   }, [responses]);
 
   const submitResponses = useCallback(async (evaluatorId, answers) => {
+    if (!evaluatorId) throw new Error('평가자 ID가 필요합니다.');
+    if (!answers || typeof answers !== 'object') throw new Error('응답 데이터가 올바르지 않습니다.');
+
     // answers: { questionId: answerValue }
-    const rows = Object.entries(answers).map(([questionId, answer]) => ({
+    const entries = Object.entries(answers).filter(([, v]) => v !== undefined && v !== null);
+    if (entries.length === 0) throw new Error('제출할 응답이 없습니다.');
+
+    const rows = entries.map(([questionId, answer]) => ({
       project_id: projectId,
       evaluator_id: evaluatorId,
       question_id: questionId,

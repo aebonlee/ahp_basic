@@ -40,8 +40,7 @@ export default function CommunityPage() {
     if (activeTab !== 'recruit-evaluator') return;
     setMarketLoading(true);
     supabase.rpc('get_marketplace_projects').then(
-      ({ data, error }) => {
-        if (error) console.error('[Marketplace RPC]', error);
+      ({ data }) => {
         setMarketProjects(data || []);
         setMarketLoading(false);
       },
