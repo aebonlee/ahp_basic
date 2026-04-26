@@ -14,11 +14,23 @@ export async function createOrder(orderData) {
   };
   if (orderData.user_id) orderPayload.user_id = orderData.user_id;
 
-  const { data: order, error: orderError } = await supabase
+  let { data: order, error: orderError } = await supabase
     .from('orders')
     .insert(orderPayload)
     .select()
     .single();
+
+  // FK on user_id→auth.users causes "permission denied" — retry without user_id
+  if (orderError && orderPayload.user_id) {
+    delete orderPayload.user_id;
+    const retry = await supabase
+      .from('orders')
+      .insert(orderPayload)
+      .select()
+      .single();
+    order = retry.data;
+    orderError = retry.error;
+  }
 
   if (orderError) throw orderError;
 
