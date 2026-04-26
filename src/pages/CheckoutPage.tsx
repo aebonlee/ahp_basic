@@ -80,40 +80,48 @@ export default function CheckoutPage() {
       const orderNumber = generateOrderNumber();
 
       // 1. Supabase에 주문 생성
-      const orderData = {
-        order_number: orderNumber,
-        user_email: form.email,
-        user_name: form.name,
-        user_phone: form.phone,
-        total_amount: cartTotal,
-        payment_method: paymentMethod,
-        user_id: user?.id || null,
-        items: cartItems.map(item => ({
-          product_title: item.title,
-          quantity: item.quantity,
-          unit_price: item.price,
-          subtotal: item.price * item.quantity,
-          plan_type: item.planType || null,
-        })),
-      };
-
-      const order = await createOrder(orderData);
+      let order;
+      try {
+        const orderData = {
+          order_number: orderNumber,
+          user_email: form.email,
+          user_name: form.name,
+          user_phone: form.phone,
+          total_amount: cartTotal,
+          payment_method: paymentMethod,
+          user_id: user?.id || null,
+          items: cartItems.map(item => ({
+            product_title: item.title,
+            quantity: item.quantity,
+            unit_price: item.price,
+            subtotal: item.price * item.quantity,
+            plan_type: item.planType || null,
+          })),
+        };
+        order = await createOrder(orderData);
+      } catch (e: any) {
+        throw new Error('[주문 생성] ' + (e?.message || e));
+      }
       const orderId = order?.id || orderNumber;
 
       // 2. PortOne 결제 요청
-      const orderName = `AHP Basic 이용권 ${cartCount}건`;
-
-      const paymentResult = await requestPayment({
-        orderId,
-        orderName,
-        totalAmount: cartTotal,
-        payMethod: paymentMethod === 'card' ? 'CARD' : 'TRANSFER',
-        customer: {
-          fullName: form.name,
-          email: form.email,
-          phoneNumber: form.phone,
-        },
-      });
+      let paymentResult;
+      try {
+        const orderName = `AHP Basic 이용권 ${cartCount}건`;
+        paymentResult = await requestPayment({
+          orderId,
+          orderName,
+          totalAmount: cartTotal,
+          payMethod: paymentMethod === 'card' ? 'CARD' : 'TRANSFER',
+          customer: {
+            fullName: form.name,
+            email: form.email,
+            phoneNumber: form.phone,
+          },
+        });
+      } catch (e: any) {
+        throw new Error('[결제 요청] ' + (e?.message || e));
+      }
 
       // 결제 실패/취소
       if (paymentResult.code) {
@@ -126,32 +134,28 @@ export default function CheckoutPage() {
       try {
         await verifyPayment(paymentResult.paymentId, orderId);
       } catch {
-        // Edge Function 검증 실패 시 1회 재시도
         try {
-          await verifyPayment(paymentResult.paymentId, orderId);
-        } catch {
-          // 재시도도 실패 시 주문 상태만 업데이트 (결제 자체는 PortOne에서 성공)
-          try {
-            await updateOrderStatus(orderId, 'paid', paymentResult.paymentId);
-          } catch { /* 상태 업데이트 실패해도 결제 진행 */ }
-        }
+          await updateOrderStatus(orderId, 'paid', paymentResult.paymentId);
+        } catch { /* 상태 업데이트 실패해도 결제 진행 */ }
       }
 
       // 4. 결제 성공 → 프로젝트 이용권 생성
-      if (user?.id) {
-        for (const item of cartItems) {
-          if (item.planType && item.planType !== PLAN_TYPES.FREE) {
-            for (let q = 0; q < item.quantity; q++) {
-              await supabase.rpc('activate_project_plan', {
-                p_user_id: user.id,
-                p_plan_type: item.planType,
-                p_order_id: orderId,
-              }).then(null, () => {});
+      try {
+        if (user?.id) {
+          for (const item of cartItems) {
+            if (item.planType && item.planType !== PLAN_TYPES.FREE) {
+              for (let q = 0; q < item.quantity; q++) {
+                await supabase.rpc('activate_project_plan', {
+                  p_user_id: user.id,
+                  p_plan_type: item.planType,
+                  p_order_id: orderId,
+                }).then(null, () => {});
+              }
             }
           }
+          await refreshPlans();
         }
-        await refreshPlans();
-      }
+      } catch { /* 이용권 생성 실패해도 결제 확인 페이지로 이동 */ }
 
       // 5. 장바구니 비우고 확인 페이지로 이동
       paymentDone.current = true;
@@ -173,8 +177,7 @@ export default function CheckoutPage() {
       clearCart();
       navigate(`/order-confirmation?orderNumber=${orderNumber}`, { state: confirmState });
     } catch (err: any) {
-      if (import.meta.env.DEV) console.error('Checkout error:', err);
-      setError('오류가 발생했습니다. 다시 시도해주세요.');
+      setError(err?.message || '오류가 발생했습니다. 다시 시도해주세요.');
       setProcessing(false);
     }
   };
