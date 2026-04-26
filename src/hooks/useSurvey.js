@@ -46,7 +46,30 @@ export function useSurveyQuestions(projectId) {
       .select()
       .single();
     if (error) throw error;
+    questionsRef.current = [...questionsRef.current, data];
     setQuestions(prev => [...prev, data]);
+    return data;
+  }, [projectId]);
+
+  const addQuestionsBatch = useCallback(async (questionsList) => {
+    const maxOrder = questionsRef.current.reduce((max, q) => Math.max(max, q.sort_order || 0), 0);
+    const rows = questionsList.map((q, i) => ({
+      project_id: projectId,
+      question_text: q.question_text || '새 질문',
+      question_type: q.question_type || 'short_text',
+      options: q.options || [],
+      required: q.required !== undefined ? q.required : true,
+      sort_order: maxOrder + 1 + i,
+      ...(q.category ? { category: q.category } : {}),
+    }));
+    const { data, error } = await supabase
+      .from('survey_questions')
+      .insert(rows)
+      .select()
+      .order('sort_order');
+    if (error) throw error;
+    questionsRef.current = [...questionsRef.current, ...(data || [])];
+    setQuestions(prev => [...prev, ...(data || [])]);
     return data;
   }, [projectId]);
 
@@ -95,7 +118,7 @@ export function useSurveyQuestions(projectId) {
     });
   }, []);
 
-  return { questions, loading, error, fetchQuestions, addQuestion, updateQuestion, deleteQuestion, deleteQuestionsByCategory, reorderQuestions };
+  return { questions, loading, error, fetchQuestions, addQuestion, addQuestionsBatch, updateQuestion, deleteQuestion, deleteQuestionsByCategory, reorderQuestions };
 }
 
 /**

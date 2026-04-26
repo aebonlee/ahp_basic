@@ -85,7 +85,7 @@ const CUSTOM_TEMPLATE = [
 export default function SurveyBuilderPage() {
   const { id } = useParams();
   const { currentProject } = useProject(id);
-  const { questions, loading: qLoading, addQuestion, updateQuestion, deleteQuestion, deleteQuestionsByCategory, reorderQuestions } = useSurveyQuestions(id);
+  const { questions, loading: qLoading, addQuestion, addQuestionsBatch, updateQuestion, deleteQuestion, deleteQuestionsByCategory, reorderQuestions } = useSurveyQuestions(id);
   const { config, loading: cLoading, saveConfig } = useSurveyConfig(id);
   const toast = useToast();
 
@@ -173,12 +173,11 @@ export default function SurveyBuilderPage() {
   const handleLoadTemplate = useCallback(async (template, category) => {
     setTemplateLoading(true);
     try {
-      for (const tmpl of template) {
-        await addQuestion({ ...tmpl, category });
-      }
+      const items = template.map(tmpl => ({ ...tmpl, category }));
+      await addQuestionsBatch(items);
     } catch (e: any) { toast.error('저장 실패: ' + e.message); }
     setTemplateLoading(false);
-  }, [addQuestion]);
+  }, [addQuestionsBatch]);
 
   const handleLoadIntroTemplate = useCallback(async () => {
     setSavingField('research_description');
@@ -226,7 +225,7 @@ export default function SurveyBuilderPage() {
           <StepQuestions
             title="인구통계학적 설문" desc="평가자의 배경 정보를 수집하는 기본 질문입니다. 기본 템플릿을 로드하거나 직접 추가할 수 있습니다."
             category="demographic" questions={demographicQs} allQuestions={questions}
-            templateData={DEMOGRAPHIC_TEMPLATE} templateLabel="인구통계 기본 템플릿 로드 (11개)"
+            templateData={DEMOGRAPHIC_TEMPLATE} templateLabel="인구통계 기본 템플릿 로드 (12개)"
             templateLoading={templateLoading} activeId={activeId} setActiveId={setActiveId}
             onUpdate={handleQuestionUpdate} onDelete={handleDeleteWithConfirm} onDuplicate={handleDuplicate}
             onMove={handleMove} onAdd={handleAddQuestion} onLoadTemplate={handleLoadTemplate}
